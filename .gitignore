@@ -1,0 +1,13 @@
+# Binaries
+bin/
+*.exe
+*.test
+*.out
+
+# Local configuration and secrets
+.env
+
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
