@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>E-Commerce Platform — Dokumen Rekayasa (FRD, FSD, System Design, Test, Stress Test)</title>
+<style>
+:root{--pri:#0B7A94;--pri-soft:#D9F2F8;--ink:#12181D;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9;--ok:#1E7B34;--ok-soft:#E3F4E6;--warn:#8A5A00;--warn-soft:#FFF4D6;--err:#B3261E;--info:#1D4ED8;--info-soft:#E0E9FF}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;font-size:15px}
+header{background:linear-gradient(135deg,#04404F,#0B7A94);color:#fff;padding:44px 32px 36px}
+header .wrap{max-width:1180px;margin:0 auto}
+header h1{margin:0 0 6px;font-size:30px;line-height:1.2}
+header p{margin:0;opacity:.85}
+header .tags{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px}
+header .tags span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:3px 10px;border-radius:999px;font-size:12.5px}
+.layout{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px 1fr;gap:28px;padding:28px 20px 80px}
+nav{position:sticky;top:16px;align-self:start;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px}
+nav a{display:flex;gap:10px;padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
+nav a:hover,nav a.active{background:var(--pri-soft);color:#04404F}
+nav a span{color:var(--pri);font-weight:700;min-width:16px}
+section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:22px}
+h2{margin:0 0 14px;font-size:23px;display:flex;align-items:center;gap:12px}
+h2 .num{background:var(--pri);color:#fff;border-radius:8px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+h3{margin:28px 0 10px;font-size:17px;color:#04404F}
+h4{margin:0 0 6px}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.86em;background:#EEF2F4;padding:1px 5px;border-radius:4px}
+pre{background:#0F1B21;color:#D7E3E8;padding:14px 16px;border-radius:10px;overflow:auto;font-size:12.5px;margin:0}
+pre code{background:none;padding:0;color:inherit}
+.tw{overflow-x:auto;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;background:#F2F6F8;color:#34424B;font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td:first-child code{white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #EEF2F4;vertical-align:top}
+table.small{font-size:13px}
+table.num td{white-space:nowrap}
+figure{margin:14px 0 20px}
+figure .diagram,figure .chart{width:100%;height:auto;background:#FBFCFD;border:1px solid var(--line);border-radius:12px;padding:6px}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.kpi{border:1px solid var(--line);border-radius:12px;padding:14px;background:#FBFCFD}
+.kv{font-size:26px;font-weight:700;color:var(--pri)}.kv.ok{color:var(--ok)}.kv.warn{color:var(--warn)}
+.kl{font-size:12.5px;color:var(--muted)}
+.b{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.b-ok{background:var(--ok-soft);color:var(--ok)}.b-warn{background:var(--warn-soft);color:var(--warn)}.b-info{background:var(--info-soft);color:var(--info)}
+.callout{background:var(--pri-soft);border-left:4px solid var(--pri);padding:12px 14px;border-radius:8px;margin:14px 0;font-size:14px}
+.callout.warn{background:var(--warn-soft);border-color:#E7C66A}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card ul{margin:0;padding-left:18px}
+.m{font-family:monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;color:#fff}
+.m-get{background:#1E7B34}.m-post{background:#0B7A94}.m-put{background:#8A5A00}.m-patch{background:#6B4FA0}.m-delete{background:#B3261E}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.sw{display:flex;flex-direction:column;gap:2px;width:120px;font-size:12px}
+.sw span{height:42px;border-radius:8px;border:1px solid var(--line)}
+.muted{color:var(--muted);font-size:13px}
+details{margin:10px 0}summary{cursor:pointer;color:var(--pri);font-weight:600}
+ul.cols{columns:2;font-size:12.5px}
+a{color:var(--pri)}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 0 40px}
+@media (max-width:900px){.layout{grid-template-columns:1fr}nav{position:static;display:flex;flex-wrap:wrap}.grid2{grid-template-columns:1fr}ul.cols{columns:1}section{padding:20px 16px}}
+@media print{nav{display:none}.layout{display:block}section{break-inside:avoid-page;border:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<header><div class="wrap">
+<h1>E-Commerce Platform — Dokumen Rekayasa Perangkat Lunak</h1>
+<p>FRD · FSD · System Design · Sequence &amp; Flow · Unit Test · Integration Test · Stress Test</p>
+<div class="tags"><span>go-ecommerce-api v1.0.0</span><span>ecommerce_app v1.0.0</span><span>Go · Fiber · PostgreSQL · Redis</span><span>Flutter · Riverpod 3 · Clean Architecture</span></div>
+</div></header>
+<div class="layout"><nav><a href="#ringkasan"><span>1</span>Ringkasan dokumen</a><a href="#frd"><span>2</span>FRD — Functional Requirements Document</a><a href="#design"><span>3</span>System design</a><a href="#fsd"><span>4</span>FSD — Functional Specification Document</a><a href="#diagram"><span>5</span>Sequence diagram & flow</a><a href="#testing"><span>6</span>Pengujian: UT & UIT</a><a href="#stress"><span>7</span>Stress test & hasil</a><a href="#risiko"><span>8</span>Risiko, batasan & rencana</a></nav><main><section id="ringkasan"><h2><span class="num">1</span>Ringkasan dokumen</h2>
+<p>Dokumen ini menjelaskan <b>E-Commerce Platform</b>: backend <code>go-ecommerce-api</code> (Go, Fiber, PostgreSQL, Redis) dan aplikasi mobile <code>ecommerce_app</code> (Flutter, Riverpod, Clean Architecture). Isinya mengikuti urutan pembuatan aplikasi yang semestinya: kebutuhan bisnis (FRD), spesifikasi fungsional (FSD), desain sistem, diagram, rencana dan hasil pengujian (UT, UIT), serta stress test.</p>
+<div class="kpis">
+  <div class="kpi"><div class="kv">34</div><div class="kl">endpoint REST</div></div>
+  <div class="kpi"><div class="kv">8</div><div class="kl">tabel database</div></div>
+  <div class="kpi"><div class="kv ok">53/53</div><div class="kl">unit test Go lulus</div></div>
+  <div class="kpi"><div class="kv ok">70/70</div><div class="kl">integration test lulus</div></div>
+  <div class="kpi"><div class="kv ok">3/3</div><div class="kl">uji konkurensi lulus</div></div>
+  <div class="kpi"><div class="kv warn">91</div><div class="kl">test Flutter ditulis, belum dijalankan</div></div>
+</div>
+<div class="tw"><table class=""><thead><tr><th>Atribut</th><th>Nilai</th></tr></thead><tbody><tr><td>Versi</td><td>v1.0.0 (tag di kedua repo)</td></tr><tr><td>Tanggal pengujian</td><td>2026-11-18</td></tr><tr><td>Pemilik</td><td>Auldy Ansya Rullah (github.com/aulansah)</td></tr><tr><td>Status backend</td><td><span class="b b-ok">Terverifikasi</span> unit, integration, race detector, stress test</td></tr><tr><td>Status aplikasi Flutter</td><td><span class="b b-warn">Belum dicompile</span> kode dan test lengkap, belum dijalankan karena SDK Flutter tidak tersedia di lingkungan pembuatan</td></tr></tbody></table></div>
+<div class="callout">Semua angka pengujian di dokumen ini berasal dari eksekusi nyata. Hasil test Flutter <b>tidak</b> dicantumkan sebagai lulus karena belum pernah dijalankan; statusnya ditulis apa adanya.</div>
+</section><section id="frd"><h2><span class="num">2</span>FRD — Functional Requirements Document</h2>
+<h3>2.1 Latar belakang dan tujuan bisnis</h3>
+<p>Toko online kecil–menengah butuh sistem yang <b>tidak pernah menjual barang melebihi stok</b>, <b>tidak menagih dua kali</b> walau koneksi pelanggan buruk, dan tetap cepat saat promo. Aplikasi ini dibuat sebagai portfolio yang menunjukkan cara menyelesaikan masalah-masalah tersebut secara benar, bukan sekadar CRUD.</p>
+<ul>
+<li><b>BO-1</b> Pelanggan bisa belanja dari HP: lihat katalog, keranjang, checkout, bayar, lacak pesanan.</li>
+<li><b>BO-2</b> Stok dan uang selalu konsisten, termasuk saat ribuan pembeli berebut barang yang sama.</li>
+<li><b>BO-3</b> Admin bisa mengelola katalog dan memproses pesanan tanpa akses database.</li>
+</ul>
+<h3>2.2 Aktor</h3>
+<div class="tw"><table class=""><thead><tr><th>Aktor</th><th>Deskripsi</th><th>Akses</th></tr></thead><tbody><tr><td>Guest</td><td>Pengunjung yang belum login</td><td>Katalog (baca), register, login</td></tr><tr><td>Customer</td><td>User terdaftar dengan role <code>customer</code></td><td>Semua fitur belanja untuk datanya sendiri</td></tr><tr><td>Admin</td><td>User dengan role <code>admin</code> (di-seed saat startup)</td><td>Semua fitur customer + kelola produk, kategori, semua pesanan</td></tr><tr><td>Payment gateway (simulasi)</td><td>Endpoint simulate-success / simulate-failure</td><td>Mengubah status pembayaran</td></tr></tbody></table></div>
+<h3>2.3 Lingkup</h3>
+<div class="grid2"><div class="card"><h4>Dalam lingkup</h4><ul><li>Auth JWT + refresh token rotation</li><li>Katalog, pencarian, kategori</li><li>Keranjang, checkout, riwayat, pembatalan</li><li>Pembayaran simulasi dengan idempotency</li><li>Panel admin di aplikasi</li></ul></div>
+<div class="card"><h4>Di luar lingkup v1</h4><ul><li>Payment gateway sungguhan (Midtrans, Xendit)</li><li>Ongkir dan alamat pengiriman</li><li>Foto produk / upload file</li><li>Notifikasi push, email</li><li>Voucher dan diskon</li></ul></div></div>
+<h3>2.4 Kebutuhan fungsional</h3>
+<div class="tw"><table class="small"><thead><tr><th>ID</th><th>Modul</th><th>Kebutuhan</th><th>Kriteria penerimaan</th><th>Prioritas</th></tr></thead><tbody><tr><td><code>FR-AUTH-01</code></td><td>Auth</td><td>Guest dapat mendaftar dengan nama, email, dan password kuat.</td><td>Email unik (409 jika terpakai); password min. 8 karakter dengan huruf besar, kecil, dan angka; akun dibuat dengan role customer.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-AUTH-02</code></td><td>Auth</td><td>User dapat login dan menerima access token + refresh token.</td><td>Kredensial salah → 401 tanpa membocorkan apakah email terdaftar; access token berlaku 15 menit.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-AUTH-03</code></td><td>Auth</td><td>Sesi diperpanjang otomatis tanpa login ulang.</td><td>Refresh token dirotasi setiap dipakai; token lama yang dipakai lagi mencabut semua sesi (reuse detection).</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-AUTH-04</code></td><td>Auth</td><td>User dapat logout.</td><td>Refresh token dicabut; app menghapus token dari secure storage.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-USER-01</code></td><td>User</td><td>User dapat melihat dan mengubah profil serta password.</td><td>Ganti password mencabut semua refresh token.</td><td><span class="b b-info">Should</span></td></tr><tr><td><code>FR-CAT-01</code></td><td>Katalog</td><td>Siapa pun dapat melihat daftar produk berhalaman.</td><td>page/limit dibatasi aman; respons berisi meta total_items/total_pages.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-CAT-02</code></td><td>Katalog</td><td>User dapat mencari produk dan memfilter per kategori.</td><td>Pencarian di app ditunda 400 ms (debounce); hasil lama tidak menimpa hasil baru.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-CAT-03</code></td><td>Katalog</td><td>User dapat melihat detail produk.</td><td>Harga dalam rupiah (integer), stok, dan status 'Stok habis'.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-CART-01</code></td><td>Keranjang</td><td>Customer dapat menambah produk ke keranjang.</td><td>Jumlah ditambahkan ke yang sudah ada; ditolak 409 jika melebihi stok.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-CART-02</code></td><td>Keranjang</td><td>Customer dapat mengubah jumlah, menghapus, dan mengosongkan keranjang.</td><td>Perubahan langsung terlihat (optimistic) dan dikembalikan jika server menolak.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-CART-03</code></td><td>Keranjang</td><td>Keranjang menandai produk yang stoknya kurang atau sudah dihapus.</td><td>Checkout dinonaktifkan selama ada item tidak tersedia.</td><td><span class="b b-info">Should</span></td></tr><tr><td><code>FR-ORD-01</code></td><td>Pesanan</td><td>Customer dapat checkout keranjang menjadi pesanan.</td><td>Satu transaksi: stok dikurangi, harga di-snapshot, keranjang dikosongkan; tidak pernah overselling.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-ORD-02</code></td><td>Pesanan</td><td>Customer dapat melihat riwayat dan detail pesanan.</td><td>Urut terbaru; hanya pesanan miliknya (admin melihat semua).</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-ORD-03</code></td><td>Pesanan</td><td>Customer dapat membatalkan pesanan yang belum dibayar.</td><td>Hanya status PENDING; stok dikembalikan dalam transaksi yang sama.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-PAY-01</code></td><td>Pembayaran</td><td>Customer dapat membayar pesanan PENDING.</td><td>Wajib Idempotency-Key; request ulang dengan key sama mengembalikan pembayaran yang sama.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-PAY-02</code></td><td>Pembayaran</td><td>Pembayaran kedaluwarsa setelah batas waktu.</td><td>Default 30 menit; pembayaran kedaluwarsa tidak bisa dikonfirmasi; percobaan baru dibuat.</td><td><span class="b b-info">Should</span></td></tr><tr><td><code>FR-PAY-03</code></td><td>Pembayaran</td><td>Gateway disimulasikan (berhasil/ditolak).</td><td>Berhasil → pesanan PAID; ditolak → pesanan tetap PENDING.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-ADM-01</code></td><td>Admin</td><td>Admin mengelola produk dan stok.</td><td>Create/update/delete (soft delete), ubah stok; cache katalog diinvalidasi.</td><td><span class="b b-ok">Must</span></td></tr><tr><td><code>FR-ADM-02</code></td><td>Admin</td><td>Admin mengelola kategori.</td><td>Nama unik; kategori yang masih dipakai produk tidak bisa dihapus (409).</td><td><span class="b b-info">Should</span></td></tr><tr><td><code>FR-ADM-03</code></td><td>Admin</td><td>Admin memproses pesanan.</td><td>Transisi PAID→PROCESSING→SHIPPED→COMPLETED; transisi lain ditolak 409.</td><td><span class="b b-ok">Must</span></td></tr></tbody></table></div>
+<h3>2.5 Kebutuhan non-fungsional</h3>
+<div class="tw"><table class=""><thead><tr><th>ID</th><th>Kategori</th><th>Target</th><th>Hasil terukur</th></tr></thead><tbody><tr><td>NFR-01</td><td>Kinerja baca</td><td>p95 katalog &lt; 50 ms pada 50 koneksi bersamaan</td><td><span class="b b-ok">Tercapai</span> p95 list 16,8 ms, detail 5,3 ms</td></tr><tr><td>NFR-02</td><td>Throughput</td><td>≥ 1.000 req/detik untuk katalog di mesin 2 vCPU</td><td><span class="b b-ok">Tercapai</span> 6.304 rps (list), 23.006 rps (detail)</td></tr><tr><td>NFR-03</td><td>Konsistensi stok</td><td>0 overselling dalam rebutan stok</td><td><span class="b b-ok">Tercapai</span> 300 pembeli, stok 50 → tepat 50 pesanan, stok akhir 0</td></tr><tr><td>NFR-04</td><td>Idempotency</td><td>1 pembayaran untuk 1 Idempotency-Key</td><td><span class="b b-ok">Tercapai</span> 100 request paralel → 1 pembayaran di DB</td></tr><tr><td>NFR-05</td><td>Ketersediaan</td><td>API tetap melayani saat Redis mati</td><td><span class="b b-ok">Tercapai</span> 0% error tanpa Redis (fail-open), lebih lambat</td></tr><tr><td>NFR-06</td><td>Keamanan</td><td>Password bcrypt, token refresh di-hash SHA-256, role dicek di server</td><td><span class="b b-ok">Diterapkan</span></td></tr><tr><td>NFR-07</td><td>Keandalan error</td><td>Tidak ada 5xx di semua skenario beban</td><td><span class="b b-ok">Tercapai</span> error rate 0,00% di semua skenario</td></tr><tr><td>NFR-08</td><td>Maintainability</td><td>Arsitektur berlapis, test otomatis, CI</td><td><span class="b b-ok">Diterapkan</span> coverage integration 74.8%</td></tr></tbody></table></div>
+</section><section id="design"><h2><span class="num">3</span>System design</h2>
+<h3>3.1 Arsitektur</h3>
+<figure><svg viewBox="0 0 1060 470" class="diagram" role="img" aria-label="Arsitektur sistem" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="230" y1="85.0" x2="330" y2="85.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="262.6" y="75.0" width="34.8" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="280.0" y="88.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">REST</text>
+<line x1="125.0" y1="170" x2="125.0" y2="130" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="460.0" y1="130" x2="460.0" y2="170" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="590" y1="230.0" x2="690" y2="85.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="607.1" y="147.5" width="65.80000000000001" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="640.0" y="160.5" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">GORM + tx</text>
+<line x1="590" y1="230.0" x2="690" y2="215.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="619.5" y="212.5" width="41.0" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="640.0" y="225.5" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cache</text>
+<line x1="590" y1="85.0" x2="690" y2="330.0" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<rect x="20" y="40" width="210" height="90" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="125.0" y="75.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Flutter app</text>
+<text x="125.0" y="91.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Riverpod · go_router · Dio</text>
+<text x="125.0" y="105.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">flutter_secure_storage</text>
+<rect x="20" y="170" width="210" height="70" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="125.0" y="202.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Panel admin</text>
+<text x="125.0" y="218.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">di dalam app yang sama</text>
+<rect x="330" y="40" width="260" height="90" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="460.0" y="75.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Go API (Fiber v2)</text>
+<text x="460.0" y="91.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">middleware: request id, CORS,</text>
+<text x="460.0" y="105.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">rate limit, JWT, error handler</text>
+<rect x="330" y="170" width="260" height="120" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="460.0" y="213.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Modul domain</text>
+<text x="460.0" y="229.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">auth · user · category · product</text>
+<text x="460.0" y="243.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cart · order · payment</text>
+<text x="460.0" y="257.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">handler → service → repository</text>
+<rect x="690" y="40" width="200" height="90" rx="10" fill="#EEE8F8" stroke="#6B4FA0" stroke-width="1.4"/>
+<text x="790.0" y="75.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PostgreSQL 16</text>
+<text x="790.0" y="91.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">data utama, transaksi,</text>
+<text x="790.0" y="105.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">constraint &amp; partial index</text>
+<rect x="690" y="170" width="200" height="90" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="790.0" y="205.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Redis 7</text>
+<text x="790.0" y="221.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cache-aside katalog,</text>
+<text x="790.0" y="235.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">rate limiter (fail-open)</text>
+<rect x="690" y="300" width="200" height="60" rx="10" fill="#FFFFFF" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="790.0" y="327.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Swagger UI</text>
+<text x="790.0" y="343.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">/docs (OpenAPI 3)</text>
+<rect x="330" y="340" width="260" height="70" rx="10" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.4"/>
+<text x="460.0" y="365.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">GitHub Actions</text>
+<text x="460.0" y="381.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">gofmt · vet · test · integration</text>
+<text x="460.0" y="395.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">flutter analyze · test</text>
+</svg><figcaption>Gambar 3.1 — Komponen utama dan komunikasinya</figcaption></figure>
+<h3>3.2 Lapisan backend</h3>
+<figure><svg viewBox="0 0 1060 300" class="diagram" role="img" aria-label="Lapisan backend" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="250" y1="75.0" x2="300" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="520" y1="75.0" x2="570" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="790" y1="75.0" x2="840" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="410.0" y1="110" x2="410.0" y2="170" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="140.0" y1="110" x2="140.0" y2="170" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="520" y1="75.0" x2="570" y2="210.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="30" y="40" width="220" height="70" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="140.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Handler</text>
+<text x="140.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">parse &amp; validasi request,</text>
+<text x="140.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">mapping ke response</text>
+<rect x="300" y="40" width="220" height="70" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="410.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Service</text>
+<text x="410.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">aturan bisnis, transaksi,</text>
+<text x="410.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cache, idempotency</text>
+<rect x="570" y="40" width="220" height="70" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="680.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Repository</text>
+<text x="680.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">query GORM, lock,</text>
+<text x="680.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">conditional update</text>
+<rect x="840" y="40" width="190" height="70" rx="10" fill="#EEE8F8" stroke="#6B4FA0" stroke-width="1.4"/>
+<text x="935.0" y="79.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PostgreSQL</text>
+<rect x="300" y="170" width="220" height="80" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="410.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">TxManager</text>
+<text x="410.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">transaksi dibawa lewat</text>
+<text x="410.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">context.Context</text>
+<rect x="30" y="170" width="220" height="80" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="140.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">AppError + ErrorHandler</text>
+<text x="140.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">sentinel error → status HTTP</text>
+<text x="140.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">format error seragam</text>
+<rect x="570" y="170" width="220" height="80" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="680.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Cache</text>
+<text x="680.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">key versi (INCR) untuk list,</text>
+<text x="680.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">TTL per jenis data</text>
+</svg><figcaption>Gambar 3.2 — Handler → service → repository, masing-masing lewat interface di sisi konsumen dan DI manual di <code>internal/app/app.go</code></figcaption></figure>
+<h3>3.3 Lapisan aplikasi Flutter</h3>
+<figure><svg viewBox="0 0 1060 300" class="diagram" role="img" aria-label="Clean Architecture Flutter" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="230" y1="75.0" x2="280" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="530" y1="75.0" x2="480" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="730" y1="75.0" x2="780" y2="75.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="895.0" y1="110" x2="895.0" y2="170" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="380.0" y1="170" x2="380.0" y2="110" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<line x1="130.0" y1="170" x2="130.0" y2="110" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="30" y="40" width="200" height="70" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="130.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Presentation</text>
+<text x="130.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Page/Widget + Notifier</text>
+<text x="130.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">(AsyncNotifier, AsyncValue)</text>
+<rect x="280" y="40" width="200" height="70" rx="10" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.4"/>
+<text x="380.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Domain</text>
+<text x="380.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Entity, UseCase,</text>
+<text x="380.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">interface Repository</text>
+<rect x="530" y="40" width="200" height="70" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="630.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Data</text>
+<text x="630.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">RepositoryImpl, Model,</text>
+<text x="630.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">RemoteDataSource</text>
+<rect x="780" y="40" width="230" height="70" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="895.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Dio + AuthInterceptor</text>
+<text x="895.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Bearer token, refresh</text>
+<text x="895.0" y="95.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">otomatis (QueuedInterceptor)</text>
+<rect x="280" y="170" width="200" height="80" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="380.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Riverpod Provider</text>
+<text x="380.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">dependency injection,</text>
+<text x="380.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">override di test</text>
+<rect x="780" y="170" width="230" height="80" rx="10" fill="#EEE8F8" stroke="#6B4FA0" stroke-width="1.4"/>
+<text x="895.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Secure storage</text>
+<text x="895.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">token, Idempotency-Key</text>
+<text x="895.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">per pesanan</text>
+<rect x="30" y="170" width="200" height="80" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="130.0" y="200.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">go_router</text>
+<text x="130.0" y="216.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">redirect: splash, login,</text>
+<text x="130.0" y="230.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">guard admin</text>
+</svg><figcaption>Gambar 3.3 — Feature-first Clean Architecture: Data mengimplementasikan interface Repository milik Domain; Domain tidak bergantung pada Flutter maupun Dio</figcaption></figure>
+<h3>3.4 Deployment</h3>
+<figure><svg viewBox="0 0 1060 250" class="diagram" role="img" aria-label="Deployment lokal" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="200" y1="120.0" x2="290" y2="70.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="510" y1="70.0" x2="600" y2="70.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="510" y1="70.0" x2="600" y2="180.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="400.0" y1="150" x2="400.0" y2="110" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="382.6" y="120.0" width="34.8" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="400.0" y="133.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">HTTP</text>
+<line x1="800" y1="70.0" x2="860" y2="70.0" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<rect x="20" y="80" width="180" height="80" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="110.0" y="117.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Laptop developer</text>
+<text x="110.0" y="133.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">docker compose up</text>
+<rect x="290" y="30" width="220" height="80" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="400.0" y="60.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">container: api</text>
+<text x="400.0" y="76.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">multi-stage build,</text>
+<text x="400.0" y="90.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">binary distroless/alpine</text>
+<rect x="600" y="30" width="200" height="80" rx="10" fill="#EEE8F8" stroke="#6B4FA0" stroke-width="1.4"/>
+<text x="700.0" y="60.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">container: postgres</text>
+<text x="700.0" y="76.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">volume pgdata</text>
+<text x="700.0" y="90.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">+ ecommerce_test</text>
+<rect x="600" y="140" width="200" height="80" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="700.0" y="184.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">container: redis</text>
+<rect x="290" y="150" width="220" height="80" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="400.0" y="180.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Emulator / HP</text>
+<text x="400.0" y="196.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">API_BASE_URL</text>
+<text x="400.0" y="210.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">10.0.2.2:8080 (Android)</text>
+<rect x="860" y="30" width="180" height="80" rx="10" fill="#FFFFFF" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="950.0" y="60.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Migrasi SQL</text>
+<text x="950.0" y="76.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">golang-migrate (embed)</text>
+<text x="950.0" y="90.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">saat startup</text>
+</svg><figcaption>Gambar 3.4 — Lingkungan lokal dengan Docker Compose</figcaption></figure>
+<h3>3.5 Keputusan arsitektur (ADR)</h3>
+<div class="tw"><table class=""><thead><tr><th>ID</th><th>Keputusan</th><th>Alasan</th></tr></thead><tbody><tr><td><code>ADR-01</code></td><td>Modular monolith, bukan microservices</td><td>Satu tim, satu database, butuh transaksi lintas modul (order + stok + cart). Batas modul tetap jelas lewat package dan interface.</td></tr><tr><td><code>ADR-02</code></td><td>Conditional UPDATE untuk stok</td><td><code>UPDATE products SET stock = stock - ? WHERE id = ? AND stock &gt;= ?</code>: atomik tanpa lock tabel; plus CHECK stock &gt;= 0 sebagai pertahanan terakhir.</td></tr><tr><td><code>ADR-03</code></td><td>Lock ordering saat checkout</td><td>Produk dikunci berurutan menurut product_id supaya dua checkout yang berbagi produk tidak deadlock.</td></tr><tr><td><code>ADR-04</code></td><td>Harga snapshot di order_items</td><td>Denormalisasi disengaja: perubahan harga atau penghapusan produk tidak mengubah pesanan lama.</td></tr><tr><td><code>ADR-05</code></td><td>Idempotency-Key + partial unique index</td><td>Unique index pada idempotency_key dan <code>(order_id) WHERE status='PENDING'</code> menjamin satu pembayaran aktif per pesanan, bahkan saat race.</td></tr><tr><td><code>ADR-06</code></td><td>Refresh token rotation + SHA-256</td><td>Token tidak disimpan mentah; reuse token lama mencabut semua sesi user.</td></tr><tr><td><code>ADR-07</code></td><td>Cache-aside, fail-open</td><td>Redis mempercepat baca; kalau mati, API tetap jalan dari database (terbukti di stress test).</td></tr><tr><td><code>ADR-08</code></td><td>Riverpod 3 tanpa codegen</td><td>Sesuai requirement lowongan; DI dan state dalam satu sistem, mudah di-override di test.</td></tr><tr><td><code>ADR-09</code></td><td>Uang sebagai integer rupiah</td><td>BIGINT di DB dan int di Dart; tidak ada float untuk uang.</td></tr></tbody></table></div>
+<h3>3.6 Keamanan</h3>
+<div class="tw"><table class=""><thead><tr><th>Ancaman</th><th>Mitigasi</th></tr></thead><tbody><tr><td>Pencurian password dari DB</td><td>bcrypt cost 12</td></tr><tr><td>Token refresh bocor</td><td>Disimpan sebagai hash SHA-256, rotasi tiap pemakaian, reuse detection mencabut semua sesi</td></tr><tr><td>Akses data user lain (IDOR)</td><td>Kepemilikan dicek di service; pesanan orang lain dibalas 404, bukan 403</td></tr><tr><td>User biasa memanggil endpoint admin</td><td>Middleware RequireRole(admin) di server; UI admin hanya kenyamanan</td></tr><tr><td>Brute force / spam</td><td>Rate limiter per IP (100/menit default) di Redis</td></tr><tr><td>Token di HP</td><td>flutter_secure_storage (Keystore/Keychain), bukan SharedPreferences</td></tr><tr><td>Input berbahaya</td><td>Validator per field, sort whitelist, query terparameter (GORM)</td></tr><tr><td>Konfigurasi salah di produksi</td><td>Startup gagal jika JWT_SECRET pendek atau CORS '*' di production</td></tr></tbody></table></div>
+</section><section id="fsd"><h2><span class="num">4</span>FSD — Functional Specification Document</h2>
+<h3>4.1 Model data</h3>
+<figure><svg viewBox="0 0 1110 640" class="diagram" role="img" aria-label="ERD" xmlns="http://www.w3.org/2000/svg">
+<path d="M250,84.0 C275.0,84.0 275.0,93.0 300,93.0" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="300" cy="93.0" r="3.5" fill="#5B6670"/>
+<rect x="261.0" y="79.5" width="28" height="16" rx="4" fill="#fff"/>
+<text x="275.0" y="91.5" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M810,532.0 C835.0,532.0 835.0,505.0 860,505.0" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="860" cy="505.0" r="3.5" fill="#5B6670"/>
+<rect x="821.0" y="509.5" width="28" height="16" rx="4" fill="#fff"/>
+<text x="835.0" y="521.5" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M415.0,240 L415.0,166" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="415.0" cy="166" r="3.5" fill="#5B6670"/>
+<rect x="401.0" y="194.0" width="28" height="16" rx="4" fill="#fff"/>
+<text x="415.0" y="206.0" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1:1</text>
+<path d="M415.0,450 L415.0,314" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="415.0" cy="314" r="3.5" fill="#5B6670"/>
+<rect x="401.0" y="373.0" width="28" height="16" rx="4" fill="#fff"/>
+<text x="415.0" y="385.0" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M530,505.0 C555.0,505.0 555.0,532.0 580,532.0" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="580" cy="532.0" r="3.5" fill="#5B6670"/>
+<rect x="541.0" y="509.5" width="28" height="16" rx="4" fill="#fff"/>
+<text x="555.0" y="521.5" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M580,84.0 C555.0,84.0 555.0,93.0 530,93.0" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="530" cy="93.0" r="3.5" fill="#5B6670"/>
+<rect x="541.0" y="79.5" width="28" height="16" rx="4" fill="#fff"/>
+<text x="555.0" y="91.5" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M695.0,240 L695.0,148" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="695.0" cy="148" r="3.5" fill="#5B6670"/>
+<rect x="681.0" y="185.0" width="28" height="16" rx="4" fill="#fff"/>
+<text x="695.0" y="197.0" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<path d="M695.0,404 L695.0,450" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="695.0" cy="450" r="3.5" fill="#5B6670"/>
+<rect x="666.0" y="418.0" width="58" height="16" rx="4" fill="#fff"/>
+<text x="695.0" y="430.0" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1 null</text>
+<path d="M860,102.0 C835.0,102.0 835.0,84.0 810,84.0" fill="none" stroke="#5B6670" stroke-width="1.4"/>
+<circle cx="810" cy="84.0" r="3.5" fill="#5B6670"/>
+<rect x="821.0" y="84.0" width="28" height="16" rx="4" fill="#fff"/>
+<text x="835.0" y="96.0" font-size="10" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">N:1</text>
+<rect x="20" y="20" width="230" height="128" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M20,46 h230" stroke="#6B4FA0"/>
+<rect x="20" y="20" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="135.0" y="38" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">refresh_tokens</text>
+<text x="30" y="64" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="240" y="64" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="30" y="82" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK user_id</text>
+<text x="240" y="82" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="30" y="100" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">token_hash</text>
+<text x="240" y="100" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">char(64) uq</text>
+<text x="30" y="118" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">expires_at</text>
+<text x="240" y="118" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+<text x="30" y="136" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">revoked_at</text>
+<text x="240" y="136" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+<rect x="300" y="20" width="230" height="146" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M300,46 h230" stroke="#6B4FA0"/>
+<rect x="300" y="20" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="415.0" y="38" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">users</text>
+<text x="310" y="64" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="520" y="64" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="310" y="82" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">name</text>
+<text x="520" y="82" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar(100)</text>
+<text x="310" y="100" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">email</text>
+<text x="520" y="100" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar(255) uq</text>
+<text x="310" y="118" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">password_hash</text>
+<text x="520" y="118" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar</text>
+<text x="310" y="136" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">role</text>
+<text x="520" y="136" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">admin|customer</text>
+<text x="310" y="154" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">deleted_at</text>
+<text x="520" y="154" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+<rect x="580" y="20" width="230" height="128" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M580,46 h230" stroke="#6B4FA0"/>
+<rect x="580" y="20" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="695.0" y="38" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">orders</text>
+<text x="590" y="64" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="800" y="64" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="82" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK user_id</text>
+<text x="800" y="82" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="100" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">order_number</text>
+<text x="800" y="100" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar uq</text>
+<text x="590" y="118" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">status</text>
+<text x="800" y="118" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6 status</text>
+<text x="590" y="136" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">total_amount</text>
+<text x="800" y="136" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">bigint</text>
+<rect x="860" y="20" width="230" height="164" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M860,46 h230" stroke="#6B4FA0"/>
+<rect x="860" y="20" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="975.0" y="38" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">payments</text>
+<text x="870" y="64" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="1080" y="64" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="870" y="82" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK order_id</text>
+<text x="1080" y="82" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="870" y="100" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">reference</text>
+<text x="1080" y="100" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar uq</text>
+<text x="870" y="118" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">idempotency_key</text>
+<text x="1080" y="118" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar uq</text>
+<text x="870" y="136" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">amount</text>
+<text x="1080" y="136" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">bigint</text>
+<text x="870" y="154" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">status</text>
+<text x="1080" y="154" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">4 status</text>
+<text x="870" y="172" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">expires_at</text>
+<text x="1080" y="172" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+<rect x="300" y="240" width="230" height="74" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M300,266 h230" stroke="#6B4FA0"/>
+<rect x="300" y="240" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="415.0" y="258" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">carts</text>
+<text x="310" y="284" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="520" y="284" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="310" y="302" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK user_id</text>
+<text x="520" y="302" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid uq</text>
+<rect x="580" y="240" width="230" height="164" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M580,266 h230" stroke="#6B4FA0"/>
+<rect x="580" y="240" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="695.0" y="258" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">order_items</text>
+<text x="590" y="284" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="800" y="284" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="302" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK order_id</text>
+<text x="800" y="302" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="320" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK product_id</text>
+<text x="800" y="320" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid null</text>
+<text x="590" y="338" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">product_name</text>
+<text x="800" y="338" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">snapshot</text>
+<text x="590" y="356" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">unit_price</text>
+<text x="800" y="356" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">snapshot</text>
+<text x="590" y="374" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">quantity</text>
+<text x="800" y="374" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">int</text>
+<text x="590" y="392" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">subtotal</text>
+<text x="800" y="392" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">bigint</text>
+<rect x="300" y="450" width="230" height="110" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M300,476 h230" stroke="#6B4FA0"/>
+<rect x="300" y="450" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="415.0" y="468" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cart_items</text>
+<text x="310" y="494" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="520" y="494" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="310" y="512" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK cart_id</text>
+<text x="520" y="512" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="310" y="530" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK product_id</text>
+<text x="520" y="530" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="310" y="548" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">quantity</text>
+<text x="520" y="548" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">int &gt;0</text>
+<rect x="580" y="450" width="230" height="164" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M580,476 h230" stroke="#6B4FA0"/>
+<rect x="580" y="450" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="695.0" y="468" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">products</text>
+<text x="590" y="494" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="800" y="494" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="512" font-size="11" fill="#6B4FA0" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FK category_id</text>
+<text x="800" y="512" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="590" y="530" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">name</text>
+<text x="800" y="530" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar(200)</text>
+<text x="590" y="548" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">slug</text>
+<text x="800" y="548" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar uq</text>
+<text x="590" y="566" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">price</text>
+<text x="800" y="566" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">bigint ≥0</text>
+<text x="590" y="584" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">stock</text>
+<text x="800" y="584" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">int ≥0</text>
+<text x="590" y="602" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">deleted_at</text>
+<text x="800" y="602" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+<rect x="860" y="450" width="230" height="110" rx="8" fill="#fff" stroke="#6B4FA0" stroke-width="1.4"/>
+<path d="M860,476 h230" stroke="#6B4FA0"/>
+<rect x="860" y="450" width="230" height="26" rx="8" fill="#EEE8F8"/>
+<text x="975.0" y="468" font-size="12.5" fill="#6B4FA0" text-anchor="middle" font-weight="700" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">categories</text>
+<text x="870" y="494" font-size="11" fill="#0B7A94" text-anchor="start" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PK id</text>
+<text x="1080" y="494" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">uuid</text>
+<text x="870" y="512" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">name</text>
+<text x="1080" y="512" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar(100)</text>
+<text x="870" y="530" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">slug</text>
+<text x="1080" y="530" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">varchar uq</text>
+<text x="870" y="548" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">deleted_at</text>
+<text x="1080" y="548" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timestamptz</text>
+</svg><figcaption>Gambar 4.1 — ERD (8 tabel + refresh_tokens). Soft delete untuk users, categories, products.</figcaption></figure>
+<h3>4.2 Siklus status</h3>
+<figure><svg viewBox="0 0 1010 250" class="diagram" role="img" aria-label="Status pesanan" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="s-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<path d="M155.0,70 L231.0,70" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="152.0" y="51.0" width="82" height="16" rx="4" fill="#fff"/>
+<text x="193.0" y="63.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">bayar sukses</text>
+<path d="M365.0,70 L441.0,70" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="383.0" y="51.0" width="40" height="16" rx="4" fill="#fff"/>
+<text x="403.0" y="63.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">admin</text>
+<path d="M575.0,70 L651.0,70" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="593.0" y="51.0" width="40" height="16" rx="4" fill="#fff"/>
+<text x="613.0" y="63.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">admin</text>
+<path d="M785.0,70 L851.0,70" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="798.0" y="51.0" width="40" height="16" rx="4" fill="#fff"/>
+<text x="818.0" y="63.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">admin</text>
+<path d="M90,90.0 L90,176.0" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="25.0" y="114.0" width="130" height="16" rx="4" fill="#fff"/>
+<text x="90.0" y="126.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">batal (stok kembali)</text>
+<rect x="25.0" y="50.0" width="130" height="40" rx="20" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.5"/>
+<text x="90" y="74" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PENDING</text>
+<rect x="235.0" y="50.0" width="130" height="40" rx="20" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.5"/>
+<text x="300" y="74" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PAID</text>
+<rect x="445.0" y="50.0" width="130" height="40" rx="20" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.5"/>
+<text x="510" y="74" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PROCESSING</text>
+<rect x="655.0" y="50.0" width="130" height="40" rx="20" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.5"/>
+<text x="720" y="74" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">SHIPPED</text>
+<rect x="855.0" y="50.0" width="130" height="40" rx="20" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.5"/>
+<text x="920" y="74" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">COMPLETED</text>
+<rect x="25.0" y="180.0" width="130" height="40" rx="20" fill="#FCE8E6" stroke="#B3261E" stroke-width="1.5"/>
+<text x="90" y="204" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">CANCELLED</text>
+</svg><figcaption>Gambar 4.2 — State machine pesanan</figcaption></figure>
+<figure><svg viewBox="0 0 1000 240" class="diagram" role="img" aria-label="Status pembayaran" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="s-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<path d="M265.0,120 L631.0,40" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="395.0" y="61.0" width="106" height="16" rx="4" fill="#fff"/>
+<text x="448.0" y="73.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">simulate-success</text>
+<path d="M265.0,120 L631.0,120" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="395.0" y="101.0" width="106" height="16" rx="4" fill="#fff"/>
+<text x="448.0" y="113.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">simulate-failure</text>
+<path d="M265.0,120 L631.0,200" fill="none" stroke="#5B6670" stroke-width="1.5" marker-end="url(#s-arrow)"/>
+<rect x="395.0" y="141.0" width="106" height="16" rx="4" fill="#fff"/>
+<text x="448.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">lewat expires_at</text>
+<rect x="135.0" y="100.0" width="130" height="40" rx="20" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.5"/>
+<text x="200" y="124" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PENDING</text>
+<rect x="635.0" y="20.0" width="130" height="40" rx="20" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.5"/>
+<text x="700" y="44" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">SUCCESS</text>
+<rect x="635.0" y="100.0" width="130" height="40" rx="20" fill="#FCE8E6" stroke="#B3261E" stroke-width="1.5"/>
+<text x="700" y="124" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">FAILED</text>
+<rect x="635.0" y="180.0" width="130" height="40" rx="20" fill="#fff" stroke="#C9D2D8" stroke-width="1.5"/>
+<text x="700" y="204" font-size="12" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">EXPIRED</text>
+</svg><figcaption>Gambar 4.3 — State machine pembayaran. FAILED/EXPIRED final; pesanan tetap PENDING dan bisa dibayar dengan percobaan baru.</figcaption></figure>
+<h3>4.3 Aturan bisnis</h3>
+<div class="tw"><table class=""><thead><tr><th>ID</th><th>Aturan</th><th>Implementasi</th><th>Dibuktikan oleh</th></tr></thead><tbody><tr><td><code>BR-01</code></td><td>Stok tidak boleh negatif</td><td>Conditional UPDATE + CHECK constraint</td><td><small>TestConcurrentCheckoutNeverOversells, stress S-C1</small></td></tr><tr><td><code>BR-02</code></td><td>Satu keranjang hanya bisa jadi satu pesanan</td><td>SELECT … FOR UPDATE pada carts</td><td><small>TestConcurrentCheckoutOfSameCartCreatesOneOrder, stress S-C3</small></td></tr><tr><td><code>BR-03</code></td><td>Harga pesanan = harga saat checkout</td><td>Snapshot product_name, unit_price, subtotal</td><td><small>TestOrderCheckout</small></td></tr><tr><td><code>BR-04</code></td><td>Hanya PENDING yang bisa dibatalkan / dibayar</td><td>Compare-and-swap status</td><td><small>TestOrderCancelAndStatusFlow, TestPaymentFlow</small></td></tr><tr><td><code>BR-05</code></td><td>Satu pembayaran aktif per pesanan</td><td>Partial unique index uq_payments_pending_order</td><td><small>TestPaymentFlow, stress S-C2</small></td></tr><tr><td><code>BR-06</code></td><td>Key yang sama → pembayaran yang sama</td><td>Unique idempotency_key + replay</td><td><small>TestPaymentFlow, stress S-C2</small></td></tr><tr><td><code>BR-07</code></td><td>Key dipakai untuk pesanan lain → 409</td><td>Pengecekan order_id saat replay</td><td><small>TestPaymentFlow</small></td></tr><tr><td><code>BR-08</code></td><td>Keranjang tidak menyimpan harga</td><td>Total dihitung dari harga terkini setiap dibaca</td><td><small>TestCartRules</small></td></tr><tr><td><code>BR-09</code></td><td>Kategori yang masih dipakai tidak bisa dihapus</td><td>Cek produk aktif sebelum delete</td><td><small>TestCategoryAndProductCatalog</small></td></tr><tr><td><code>BR-10</code></td><td>Transisi status admin mengikuti tabel</td><td>CanTransition()</td><td><small>TestCanTransition</small></td></tr></tbody></table></div>
+<h3>4.4 Spesifikasi API</h3>
+<p>Base URL <code>/api/v1</code>. Semua respons memakai amplop yang sama; daftar lengkap ada di Swagger UI (<code>/docs</code>).</p>
+<div class="grid2"><pre><code>// sukses
+{
+  "success": true,
+  "message": "Products retrieved",
+  "data": [ ... ],
+  "meta": { "page": 1, "limit": 20,
+            "total_items": 120, "total_pages": 6 }
+}</code></pre><pre><code>// error
+{
+  "success": false,
+  "message": "Validation failed",
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "details": [{ "field": "email",
+                  "message": "must be a valid email" }]
+  }
+}</code></pre></div>
+<div class="tw"><table class="small"><thead><tr><th>Method</th><th>Path</th><th>Modul</th><th>Akses</th><th>Fungsi</th><th>Status</th></tr></thead><tbody><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/auth/register</code></td><td>Auth</td><td>publik</td><td>Register a customer account</td><td>201 409 422</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/auth/login</code></td><td>Auth</td><td>publik</td><td>Log in and receive an access/refresh token pair</td><td>200 401</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/auth/refresh</code></td><td>Auth</td><td>publik</td><td>Rotate the refresh token and get a new token pair</td><td>200 401</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/auth/logout</code></td><td>Auth</td><td>🔒</td><td>Revoke a refresh token</td><td>200 401</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/users/me</code></td><td>Users</td><td>🔒</td><td>Get own profile</td><td>200 401</td></tr><tr><td><span class="m m-put">PUT</span></td><td><code>/api/v1/users/me</code></td><td>Users</td><td>🔒</td><td>Update own profile</td><td>200 422</td></tr><tr><td><span class="m m-put">PUT</span></td><td><code>/api/v1/users/me/password</code></td><td>Users</td><td>🔒</td><td>Change password (revokes all refresh tokens)</td><td>200 400 422</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/users</code></td><td>Users</td><td>🔒 admin</td><td>List users (admin)</td><td>200 403</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/users/{id}</code></td><td>Users</td><td>🔒 admin</td><td>Get a user by ID (admin)</td><td>200 403 404</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/categories</code></td><td>Categories</td><td>publik</td><td>List categories</td><td>200</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/categories</code></td><td>Categories</td><td>🔒 admin</td><td>Create a category (admin)</td><td>201 403 409</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/categories/{id}</code></td><td>Categories</td><td>publik</td><td>Get a category</td><td>200 404</td></tr><tr><td><span class="m m-put">PUT</span></td><td><code>/api/v1/categories/{id}</code></td><td>Categories</td><td>🔒 admin</td><td>Update a category (admin)</td><td>200 409</td></tr><tr><td><span class="m m-delete">DELETE</span></td><td><code>/api/v1/categories/{id}</code></td><td>Categories</td><td>🔒 admin</td><td>Delete a category (admin); rejected while it still has products</td><td>204 409</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/products</code></td><td>Products</td><td>publik</td><td>List, search, filter and sort products</td><td>200</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/products</code></td><td>Products</td><td>🔒 admin</td><td>Create a product (admin)</td><td>201 403 422</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/products/{id}</code></td><td>Products</td><td>publik</td><td>Get a product (cached in Redis)</td><td>200 404</td></tr><tr><td><span class="m m-put">PUT</span></td><td><code>/api/v1/products/{id}</code></td><td>Products</td><td>🔒 admin</td><td>Update a product (admin)</td><td>200 404</td></tr><tr><td><span class="m m-delete">DELETE</span></td><td><code>/api/v1/products/{id}</code></td><td>Products</td><td>🔒 admin</td><td>Soft-delete a product (admin)</td><td>204 404</td></tr><tr><td><span class="m m-patch">PATCH</span></td><td><code>/api/v1/products/{id}/stock</code></td><td>Products</td><td>🔒 admin</td><td>Set product stock (admin)</td><td>200</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/cart</code></td><td>Cart</td><td>🔒</td><td>Get the shopping cart with computed totals</td><td>200</td></tr><tr><td><span class="m m-delete">DELETE</span></td><td><code>/api/v1/cart</code></td><td>Cart</td><td>🔒</td><td>Clear the cart</td><td>204</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/cart/items</code></td><td>Cart</td><td>🔒</td><td>Add a product to the cart</td><td>200 404 409</td></tr><tr><td><span class="m m-put">PUT</span></td><td><code>/api/v1/cart/items/{id}</code></td><td>Cart</td><td>🔒</td><td>Change the quantity of a cart item</td><td>200 409</td></tr><tr><td><span class="m m-delete">DELETE</span></td><td><code>/api/v1/cart/items/{id}</code></td><td>Cart</td><td>🔒</td><td>Remove a cart item</td><td>200</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/orders</code></td><td>Orders</td><td>🔒</td><td>Create an order from the cart (transactional, no request body)</td><td>201 400 409</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/orders</code></td><td>Orders</td><td>🔒 admin</td><td>Order history (own orders; all orders for admins)</td><td>200</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/orders/{id}</code></td><td>Orders</td><td>🔒</td><td>Get an order</td><td>200 404</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/orders/{id}/cancel</code></td><td>Orders</td><td>🔒</td><td>Cancel a PENDING order and restore stock</td><td>200 409</td></tr><tr><td><span class="m m-patch">PATCH</span></td><td><code>/api/v1/orders/{id}/status</code></td><td>Orders</td><td>🔒 admin</td><td>Move an order along the fulfilment flow (admin)</td><td>200 403 409</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/payments</code></td><td>Payments</td><td>🔒</td><td>Create a payment for a PENDING order (idempotent)</td><td>200 201 409</td></tr><tr><td><span class="m m-get">GET</span></td><td><code>/api/v1/payments/{id}</code></td><td>Payments</td><td>🔒</td><td>Get a payment</td><td>200 404</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/payments/{id}/simulate-success</code></td><td>Payments</td><td>🔒</td><td>Simulate a successful payment (order becomes PAID)</td><td>200 409</td></tr><tr><td><span class="m m-post">POST</span></td><td><code>/api/v1/payments/{id}/simulate-failure</code></td><td>Payments</td><td>🔒</td><td>Simulate a failed payment (order stays PENDING)</td><td>200 409</td></tr></tbody></table></div>
+<h3>4.5 Kode error</h3>
+<div class="tw"><table class=""><thead><tr><th>HTTP</th><th>Kapan</th><th>Perilaku app</th></tr></thead><tbody><tr><td>400</td><td>Body tidak valid, keranjang kosong saat checkout</td><td>Pesan dari backend</td></tr><tr><td>401</td><td>Token tidak ada / kedaluwarsa</td><td>Interceptor refresh otomatis lalu ulangi request; gagal → logout</td></tr><tr><td>403</td><td>Role tidak cukup</td><td>Pesan; layar admin memang disembunyikan</td></tr><tr><td>404</td><td>Data tidak ada atau bukan milik user</td><td>StateView + coba lagi</td></tr><tr><td>409</td><td>Stok kurang, status tidak valid, key dipakai ulang, nama duplikat</td><td>Pesan + muat ulang data yang relevan</td></tr><tr><td>422</td><td>Validasi per field</td><td>Error ditampilkan di bawah form</td></tr><tr><td>429</td><td>Rate limit</td><td>Pesan</td></tr><tr><td>5xx</td><td>Kesalahan server</td><td>Pesan umum; tidak terjadi di semua uji</td></tr></tbody></table></div>
+<h3>4.6 Spesifikasi layar (Flutter)</h3>
+<div class="tw"><table class=""><thead><tr><th>Route</th><th>Layar</th><th>Perilaku utama</th><th>Aktor</th></tr></thead><tbody><tr><td><code>/splash</code></td><td>Splash</td><td>Memeriksa sesi tersimpan</td><td>Semua</td></tr><tr><td><code>/login, /register</code></td><td>Login & daftar</td><td>Form dengan validasi, error dari backend per field</td><td>Guest</td></tr><tr><td><code>/home</code></td><td>Katalog</td><td>Cari (debounce), chip kategori, grid 2 kolom, infinite scroll, pull-to-refresh</td><td>Customer</td></tr><tr><td><code>/products/:id</code></td><td>Detail produk</td><td>Stepper 1…stok, tambah ke keranjang</td><td>Customer</td></tr><tr><td><code>/cart</code></td><td>Keranjang</td><td>Ubah jumlah optimistic, hapus/geser, banner stok kurang, total</td><td>Customer</td></tr><tr><td><code>/checkout</code></td><td>Checkout</td><td>Ringkasan, guard tap ganda, penanganan 409 stok</td><td>Customer</td></tr><tr><td><code>/orders, /orders/:id</code></td><td>Pesanan</td><td>Riwayat berhalaman, timeline status, batalkan</td><td>Customer</td></tr><tr><td><code>/orders/:id/pay</code></td><td>Pembayaran</td><td>Countdown, referensi, simulasi berhasil/ditolak, coba lagi</td><td>Customer</td></tr><tr><td><code>/admin, /admin/products/:id</code></td><td>Admin</td><td>Tab produk/kategori/pesanan, form produk, ubah status</td><td>Admin</td></tr></tbody></table></div>
+<h3>4.7 Design system</h3>
+<p>Token di Figma (<a href="https://www.figma.com/design/B9ckLWw2BNWUWNO3h5zdqa">E-Commerce App — UI Design</a>) dipetakan 1:1 ke <code>AppColors</code>, <code>AppSizes</code>, <code>AppTextStyles</code>.</p>
+<div class="swatches"><div class="sw"><span style="background:#0B7A94"></span><code>primary</code><small>#0B7A94</small></div><div class="sw"><span style="background:#D9F2F8"></span><code>primaryContainer</code><small>#D9F2F8</small></div><div class="sw"><span style="background:#F6F8F9"></span><code>background</code><small>#F6F8F9</small></div><div class="sw"><span style="background:#EEF2F4"></span><code>surfaceVariant</code><small>#EEF2F4</small></div><div class="sw"><span style="background:#DDE3E7"></span><code>border</code><small>#DDE3E7</small></div><div class="sw"><span style="background:#12181D"></span><code>text</code><small>#12181D</small></div><div class="sw"><span style="background:#5B6670"></span><code>textMuted</code><small>#5B6670</small></div><div class="sw"><span style="background:#B3261E"></span><code>error</code><small>#B3261E</small></div><div class="sw"><span style="background:#1E7B34"></span><code>success</code><small>#1E7B34</small></div></div>
+</section><section id="diagram"><h2><span class="num">5</span>Sequence diagram & flow</h2>
+<h3>5.1 User journey</h3><figure><svg viewBox="0 0 1080 300" class="diagram" role="img" aria-label="User journey" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="130" y1="140.0" x2="160" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="280" y1="140.0" x2="310" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="430" y1="140.0" x2="460" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="580" y1="140.0" x2="610" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="730" y1="140.0" x2="760" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="880" y1="140.0" x2="910" y2="140.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="980.0" y1="170" x2="980.0" y2="220" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="956.4" y="185.0" width="47.2" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="980.0" y="198.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">sukses</text>
+<line x1="820.0" y1="170" x2="820.0" y2="220" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<line x1="760" y1="250.0" x2="730" y2="140.0" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<line x1="980.0" y1="110" x2="980.0" y2="70" stroke="#5B6670" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#b-arrow)"/>
+<rect x="10" y="110" width="120" height="60" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="70.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Buka app</text>
+<text x="70.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">splash cek sesi</text>
+<rect x="160" y="110" width="120" height="60" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="220.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Login</text>
+<text x="220.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">atau daftar</text>
+<rect x="310" y="110" width="120" height="60" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="370.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Katalog</text>
+<text x="370.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">cari &amp; filter</text>
+<rect x="460" y="110" width="120" height="60" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="520.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Detail</text>
+<text x="520.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">pilih jumlah</text>
+<rect x="610" y="110" width="120" height="60" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="670.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Keranjang</text>
+<text x="670.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">atur item</text>
+<rect x="760" y="110" width="120" height="60" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="820.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Checkout</text>
+<text x="820.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">buat pesanan</text>
+<rect x="910" y="110" width="140" height="60" rx="10" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.4"/>
+<text x="980.0" y="137.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Bayar</text>
+<text x="980.0" y="153.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Idempotency-Key</text>
+<rect x="910" y="220" width="140" height="60" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="980.0" y="247.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Lacak pesanan</text>
+<text x="980.0" y="263.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timeline status</text>
+<rect x="760" y="220" width="120" height="60" rx="10" fill="#FCE8E6" stroke="#B3261E" stroke-width="1.4"/>
+<text x="820.0" y="247.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Stok berubah</text>
+<text x="820.0" y="263.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">409 → kembali</text>
+<rect x="910" y="10" width="140" height="60" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="980.0" y="37.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Ditolak/expired</text>
+<text x="980.0" y="53.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">coba lagi</text>
+</svg><figcaption>Gambar 5.1 — Perjalanan customer dari membuka app sampai melacak pesanan</figcaption></figure>
+<h3>5.2 Login dan refresh token otomatis</h3><figure><svg viewBox="0 0 880 670" class="diagram" role="img" aria-label="Login dan refresh token" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a-req" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#0B7A94"/></marker><marker id="a-ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#B3261E"/></marker><marker id="a-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#6B4FA0"/></marker></defs>
+<rect x="28.0" y="16" width="194" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="125.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Flutter UI</text>
+<line x1="125.0" y1="48" x2="125.0" y2="654" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="238.0" y="16" width="194" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="335.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">AuthInterceptor</text>
+<line x1="335.0" y1="48" x2="335.0" y2="654" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="448.0" y="16" width="194" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="545.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Go API</text>
+<line x1="545.0" y1="48" x2="545.0" y2="654" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="658.0" y="16" width="194" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="755.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PostgreSQL</text>
+<line x1="755.0" y1="48" x2="755.0" y2="654" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<line x1="125.0" y1="80" x2="539.0" y2="80" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="335.0" y="74" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1. POST /auth/login</text>
+<line x1="545.0" y1="120" x2="749.0" y2="120" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="650.0" y="114" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">2. SELECT user by email</text>
+<path d="M545.0,154 h30 v16 h-28" fill="none" stroke="#0B7A94" stroke-width="1.5" marker-end="url(#a-req)"/>
+<text x="581.0" y="166" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3. bcrypt.Compare (cost 12)</text>
+<line x1="545.0" y1="200" x2="749.0" y2="200" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="650.0" y="194" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">4. INSERT refresh_tokens (hash SHA-256)</text>
+<line x1="545.0" y1="240" x2="131.0" y2="240" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="335.0" y="234" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5. 200 {access 15m, refresh 7d}</text>
+<path d="M125.0,274 h30 v16 h-28" fill="none" stroke="#0B7A94" stroke-width="1.5" marker-end="url(#a-req)"/>
+<text x="161.0" y="286" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6. simpan di secure storage</text>
+<line x1="125.0" y1="320" x2="539.0" y2="320" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="335.0" y="314" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7. GET /cart (Bearer, access kedaluwarsa)</text>
+<line x1="545.0" y1="360" x2="341.0" y2="360" stroke="#B3261E" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-err)"/>
+<text x="440.0" y="354" font-size="11" fill="#B3261E" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">8. 401</text>
+<line x1="335.0" y1="400" x2="539.0" y2="400" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="440.0" y="394" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">9. POST /auth/refresh (request lain antre)</text>
+<line x1="545.0" y1="440" x2="749.0" y2="440" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="650.0" y="434" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">10. revoke token lama + insert token baru</text>
+<line x1="545.0" y1="480" x2="341.0" y2="480" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="440.0" y="474" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">11. 200 pasangan token baru</text>
+<line x1="335.0" y1="520" x2="539.0" y2="520" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="440.0" y="514" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">12. ulangi GET /cart</text>
+<line x1="545.0" y1="560" x2="131.0" y2="560" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="335.0" y="554" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">13. 200 cart</text>
+<rect x="65.0" y="586" width="540.0" height="26" rx="6" fill="#FFF4D6" stroke="#E7C66A"/>
+<text x="335.0" y="603" font-size="11" fill="#8A5A00" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Token lama dipakai lagi → semua sesi dicabut</text>
+</svg><figcaption>Gambar 5.2 — Request yang gagal 401 diulang setelah refresh; request lain menunggu di antrean QueuedInterceptor</figcaption></figure>
+<h3>5.3 Checkout transaksional</h3><figure><svg viewBox="0 0 960 590" class="diagram" role="img" aria-label="Checkout transaksional" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a-req" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#0B7A94"/></marker><marker id="a-ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#B3261E"/></marker><marker id="a-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#6B4FA0"/></marker></defs>
+<rect x="28.0" y="16" width="214" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="135.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Flutter</text>
+<line x1="135.0" y1="48" x2="135.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="258.0" y="16" width="214" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="365.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">OrderService</text>
+<line x1="365.0" y1="48" x2="365.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="488.0" y="16" width="214" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="595.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PostgreSQL</text>
+<line x1="595.0" y1="48" x2="595.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="718.0" y="16" width="214" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="825.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Redis</text>
+<line x1="825.0" y1="48" x2="825.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<line x1="135.0" y1="80" x2="359.0" y2="80" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="250.0" y="74" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1. POST /orders (tanpa body)</text>
+<line x1="365.0" y1="120" x2="589.0" y2="120" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="114" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">2. BEGIN</text>
+<line x1="365.0" y1="160" x2="589.0" y2="160" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="154" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3. SELECT cart … FOR UPDATE</text>
+<path d="M365.0,194 h30 v16 h-28" fill="none" stroke="#0B7A94" stroke-width="1.5" marker-end="url(#a-req)"/>
+<text x="401.0" y="206" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">4. kosong? → 400; urutkan item per product_id</text>
+<line x1="365.0" y1="240" x2="589.0" y2="240" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="234" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5. UPDATE products SET stock=stock-q WHERE stock&gt;=q</text>
+<line x1="595.0" y1="280" x2="371.0" y2="280" stroke="#B3261E" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-err)"/>
+<text x="480.0" y="274" font-size="11" fill="#B3261E" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6. 0 baris → stok kurang → ROLLBACK → 409</text>
+<line x1="365.0" y1="320" x2="589.0" y2="320" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="314" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7. INSERT orders + order_items (snapshot harga)</text>
+<line x1="365.0" y1="360" x2="589.0" y2="360" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="354" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">8. DELETE cart_items</text>
+<line x1="365.0" y1="400" x2="589.0" y2="400" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="480.0" y="394" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">9. COMMIT</text>
+<line x1="365.0" y1="440" x2="819.0" y2="440" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="595.0" y="434" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">10. invalidate cache produk &amp; versi list</text>
+<line x1="365.0" y1="480" x2="141.0" y2="480" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="250.0" y="474" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">11. 201 order PENDING</text>
+<path d="M135.0,514 h30 v16 h-28" fill="none" stroke="#0B7A94" stroke-width="1.5" marker-end="url(#a-req)"/>
+<text x="171.0" y="526" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">12. invalidate(cart), invalidate(orders)</text>
+</svg><figcaption>Gambar 5.3 — Semua langkah di dalam satu transaksi; gagal di tengah = tidak ada yang berubah</figcaption></figure>
+<h3>5.4 Pembayaran idempoten</h3><figure><svg viewBox="0 0 920 590" class="diagram" role="img" aria-label="Pembayaran idempoten" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a-req" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#0B7A94"/></marker><marker id="a-ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#B3261E"/></marker><marker id="a-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#6B4FA0"/></marker></defs>
+<rect x="28.0" y="16" width="204" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="130.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Flutter</text>
+<line x1="130.0" y1="48" x2="130.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="248.0" y="16" width="204" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="350.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">KeyStore</text>
+<line x1="350.0" y1="48" x2="350.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="468.0" y="16" width="204" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="570.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PaymentService</text>
+<line x1="570.0" y1="48" x2="570.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="688.0" y="16" width="204" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="790.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">PostgreSQL</text>
+<line x1="790.0" y1="48" x2="790.0" y2="574" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<line x1="130.0" y1="80" x2="344.0" y2="80" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="240.0" y="74" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1. keyFor(orderId)</text>
+<line x1="350.0" y1="120" x2="136.0" y2="120" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="240.0" y="114" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">2. key lama / UUID baru (disimpan dulu)</text>
+<line x1="130.0" y1="160" x2="564.0" y2="160" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="350.0" y="154" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3. POST /payments + Idempotency-Key</text>
+<line x1="570.0" y1="200" x2="784.0" y2="200" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="680.0" y="194" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">4. cari payment by key</text>
+<line x1="570.0" y1="240" x2="784.0" y2="240" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="680.0" y="234" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5. INSERT payment PENDING (unique key)</text>
+<line x1="790.0" y1="280" x2="576.0" y2="280" stroke="#B3261E" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-err)"/>
+<text x="680.0" y="274" font-size="11" fill="#B3261E" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6. duplicate (race) → kembalikan payment yang menang</text>
+<line x1="570.0" y1="320" x2="136.0" y2="320" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="350.0" y="314" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7. 201 baru / 200 replay — id sama</text>
+<rect x="70.0" y="346" width="560.0" height="26" rx="6" fill="#FFF4D6" stroke="#E7C66A"/>
+<text x="350.0" y="363" font-size="11" fill="#8A5A00" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">timeout → retry dengan key SAMA</text>
+<line x1="130.0" y1="400" x2="564.0" y2="400" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="350.0" y="394" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">9. POST /payments/:id/simulate-success</text>
+<line x1="570.0" y1="440" x2="784.0" y2="440" stroke="#6B4FA0" stroke-width="1.6" marker-end="url(#a-db)"/>
+<text x="680.0" y="434" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">10. CAS PENDING→SUCCESS + order PENDING→PAID (1 tx)</text>
+<line x1="570.0" y1="480" x2="136.0" y2="480" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="350.0" y="474" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">11. 200 SUCCESS</text>
+<line x1="130.0" y1="520" x2="344.0" y2="520" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="240.0" y="514" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">12. clear(orderId)</text>
+</svg><figcaption>Gambar 5.4 — Key disimpan sebelum request; retry selalu memakai key yang sama</figcaption></figure>
+<h3>5.5 Keranjang: optimistic update</h3><figure><svg viewBox="0 0 940 470" class="diagram" role="img" aria-label="Optimistic update keranjang" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a-req" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#0B7A94"/></marker><marker id="a-ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker><marker id="a-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#B3261E"/></marker><marker id="a-db" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#6B4FA0"/></marker></defs>
+<rect x="28.0" y="16" width="284" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="170.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">UI</text>
+<line x1="170.0" y1="48" x2="170.0" y2="454" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="328.0" y="16" width="284" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="470.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">CartController</text>
+<line x1="470.0" y1="48" x2="470.0" y2="454" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<rect x="628.0" y="16" width="284" height="32" rx="8" fill="#D9F2F8" stroke="#0B7A94"/>
+<text x="770.0" y="37" font-size="12" fill="#12181D" text-anchor="middle" font-weight="600" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Go API</text>
+<line x1="770.0" y1="48" x2="770.0" y2="454" stroke="#C9D2D8" stroke-dasharray="4 4"/>
+<line x1="170.0" y1="80" x2="464.0" y2="80" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="320.0" y="74" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1. tap + (2)</text>
+<line x1="470.0" y1="120" x2="176.0" y2="120" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="320.0" y="114" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">2. layar langsung 2</text>
+<line x1="470.0" y1="160" x2="764.0" y2="160" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="620.0" y="154" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3. PUT quantity=2</text>
+<line x1="170.0" y1="200" x2="464.0" y2="200" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="320.0" y="194" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">4. tap + (3), tap + (4)</text>
+<line x1="470.0" y1="240" x2="176.0" y2="240" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="320.0" y="234" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5. layar 3 lalu 4</text>
+<line x1="770.0" y1="280" x2="476.0" y2="280" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="620.0" y="274" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6. 200 (2) — masih ada antrean → diabaikan</text>
+<line x1="470.0" y1="320" x2="764.0" y2="320" stroke="#0B7A94" stroke-width="1.6" marker-end="url(#a-req)"/>
+<text x="620.0" y="314" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7. PUT quantity=3, lalu 4 (berurutan)</text>
+<line x1="770.0" y1="360" x2="476.0" y2="360" stroke="#5B6670" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-ret)"/>
+<text x="620.0" y="354" font-size="11" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">8. 200 (4) — antrean kosong → dipasang</text>
+<line x1="770.0" y1="400" x2="476.0" y2="400" stroke="#B3261E" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a-err)"/>
+<text x="620.0" y="394" font-size="11" fill="#B3261E" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">9. 409 → GET /cart, kembalikan ke data server</text>
+</svg><figcaption>Gambar 5.5 — Request diantre berurutan; hanya respons terakhir yang dipasang ke layar</figcaption></figure>
+<h3>5.6 Flow checkout di aplikasi</h3><figure><svg viewBox="0 0 1080 360" class="diagram" role="img" aria-label="Flow checkout di app" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="b-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5B6670"/></marker></defs>
+<line x1="150" y1="178.0" x2="190" y2="178.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="340" y1="178.0" x2="380" y2="178.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="339.5" y="168.0" width="41.0" height="18" rx="4" fill="#FFFFFF" opacity="0.92"/>
+<text x="360.0" y="181.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">tidak</text>
+<line x1="530" y1="178.0" x2="570" y2="68.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="530" y1="178.0" x2="570" y2="178.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="530" y1="178.0" x2="570" y2="288.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="740" y1="68.0" x2="790" y2="68.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="740" y1="178.0" x2="790" y2="178.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<line x1="740" y1="288.0" x2="790" y2="288.0" stroke="#5B6670" stroke-width="1.5" marker-end="url(#b-arrow)"/>
+<rect x="20" y="150" width="130" height="56" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="85.0" y="182.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Tap Checkout</text>
+<rect x="190" y="150" width="150" height="56" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="265.0" y="175.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Sedang loading?</text>
+<text x="265.0" y="191.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">ya → abaikan</text>
+<rect x="380" y="150" width="150" height="56" rx="10" fill="#D9F2F8" stroke="#0B7A94" stroke-width="1.4"/>
+<text x="455.0" y="182.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">POST /orders</text>
+<rect x="570" y="40" width="170" height="56" rx="10" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.4"/>
+<text x="655.0" y="72.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">201 Created</text>
+<rect x="570" y="150" width="170" height="56" rx="10" fill="#FCE8E6" stroke="#B3261E" stroke-width="1.4"/>
+<text x="655.0" y="182.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">409 stok</text>
+<rect x="570" y="260" width="170" height="56" rx="10" fill="#FCE8E6" stroke="#B3261E" stroke-width="1.4"/>
+<text x="655.0" y="292.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">error jaringan</text>
+<rect x="790" y="40" width="260" height="56" rx="10" fill="#E3F4E6" stroke="#1E7B34" stroke-width="1.4"/>
+<text x="920.0" y="65.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Kosongkan badge, buka detail</text>
+<text x="920.0" y="81.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">back → katalog</text>
+<rect x="790" y="150" width="260" height="56" rx="10" fill="#FFF4D6" stroke="#E7C66A" stroke-width="1.4"/>
+<text x="920.0" y="175.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Banner error + muat ulang</text>
+<text x="920.0" y="191.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">item ditandai merah</text>
+<rect x="790" y="260" width="260" height="56" rx="10" fill="#F2F6F8" stroke="#C9D2D8" stroke-width="1.4"/>
+<text x="920.0" y="285.0" font-size="13" fill="#12181D" text-anchor="middle" font-weight="650" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Banner &#x27;tidak terhubung&#x27;</text>
+<text x="920.0" y="301.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">tombol tetap bisa ditekan lagi</text>
+</svg><figcaption>Gambar 5.6 — Penanganan setiap hasil checkout</figcaption></figure>
+</section><section id="testing"><h2><span class="num">6</span>Pengujian: UT & UIT</h2>
+<h3>6.1 Strategi</h3>
+<div class="tw"><table class=""><thead><tr><th>Level</th><th>Alat</th><th>Cakupan</th><th>Cara jalan</th></tr></thead><tbody><tr><td>Unit test (UT) backend</td><td>testing + testify, mock interface</td><td>Service, middleware, token, utils</td><td><code>go test -race ./...</code></td></tr><tr><td>Unit/widget test Flutter</td><td>flutter_test + mocktail + ProviderContainer</td><td>Use case, controller, repository, widget</td><td><code>flutter test</code></td></tr><tr><td>Integration test (UIT)</td><td>Server Fiber sungguhan + PostgreSQL + Redis</td><td>Alur API end-to-end, konkurensi</td><td><code>go test -tags integration -race ./tests/...</code></td></tr><tr><td>Stress & concurrency</td><td>Load tester Go (stdlib)</td><td>Throughput, latensi, race stok & pembayaran</td><td>Bagian 7</td></tr><tr><td>CI</td><td>GitHub Actions</td><td>gofmt, vet, UT, UIT, flutter analyze/test</td><td>setiap push & PR</td></tr></tbody></table></div>
+<h3>6.2 Hasil unit test backend — <span class="b b-ok">53/53 PASS</span></h3>
+<p>Dijalankan dengan race detector (<code>go test -count=1 -race -v ./...</code>). Kolom "kasus" menghitung subtest.</p>
+<div class="tw"><table class="small"><thead><tr><th>Test</th><th>Yang diuji</th><th>Kasus</th><th>Hasil</th></tr></thead><tbody><tr><td><code>TestAuthAndRequireRole</code></td><td>Middleware JWT dan role</td><td>9</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRateLimit</code></td><td>Rate limiter per IP</td><td>2</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRegister</code></td><td>Register: email duplikat, password lemah</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestLogin</code></td><td>Login sukses/gagal</td><td>2</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRefresh_RotatesToken</code></td><td>Rotasi refresh token</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRefresh_RejectsUnknownAndExpiredTokens</code></td><td>Token asing/kedaluwarsa ditolak</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestLogout</code></td><td>Logout mencabut token</td><td>2</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestCanTransition</code></td><td>Tabel transisi status pesanan</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestCreate</code></td><td>Create produk + slug</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestGet_CacheAside</code></td><td>Cache-aside detail produk</td><td>2</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestList_CacheIsVersioned</code></td><td>Versi cache list (INCR)</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestList_NormalizesUnsafeSortInput</code></td><td>Whitelist sort (anti injeksi)</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRedisDown_FallsBackToDatabase</code></td><td>Fail-open saat Redis mati</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestIsStrongPassword</code></td><td>Aturan password kuat</td><td>6</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestSlugify</code></td><td>Pembuatan slug</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestNewPagination</code></td><td>Batas page/limit</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestValidateStruct_ReportsJSONFieldNames</code></td><td>Nama field JSON di error validasi</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestManager_GenerateAndParse</code></td><td>JWT generate & parse</td><td>1</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestManager_Parse_RejectsInvalidTokens</code></td><td>JWT palsu/kedaluwarsa ditolak</td><td>8</td><td><span class="b b-ok">PASS</span></td></tr></tbody></table></div>
+<h3>6.3 Hasil integration test (UIT) — <span class="b b-ok">70/70 PASS</span></h3>
+<p>Server Fiber dijalankan di dalam test terhadap database <code>ecommerce_test</code> (PostgreSQL 16) dan Redis sungguhan, dengan race detector. Coverage gabungan <code>internal/</code> + <code>pkg/</code>: <b>74.8%</b> statement.</p>
+<div class="tw"><table class="small"><thead><tr><th>Suite</th><th>Skenario</th><th>Requirement</th><th>Kasus</th><th>Durasi</th><th>Hasil</th></tr></thead><tbody><tr><td><code>TestAuthFlow</code></td><td>Register → login → refresh → logout di server sungguhan</td><td><small>FR-AUTH-01..04</small></td><td>11</td><td>0.24 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestAuthorization</code></td><td>Customer ditolak di endpoint admin; data user lain 404</td><td><small>NFR-06</small></td><td>12</td><td>0.10 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestCategoryAndProductCatalog</code></td><td>CRUD kategori & produk, pencarian, pagination, cache</td><td><small>FR-CAT, FR-ADM-01/02</small></td><td>6</td><td>0.09 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestCartRules</code></td><td>Tambah, gabung jumlah, batas stok, hapus</td><td><small>FR-CART-01..03</small></td><td>7</td><td>0.16 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestOrderCheckout</code></td><td>Checkout: snapshot harga, stok berkurang, keranjang kosong</td><td><small>FR-ORD-01</small></td><td>6</td><td>0.20 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestConcurrentCheckoutNeverOversells</code></td><td>Banyak pembeli paralel untuk stok terbatas</td><td><small>BR-01</small></td><td>1</td><td>0.94 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestConcurrentCheckoutOfSameCartCreatesOneOrder</code></td><td>Satu keranjang di-checkout paralel</td><td><small>BR-02</small></td><td>1</td><td>0.10 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestOrderCancelAndStatusFlow</code></td><td>Batal mengembalikan stok; transisi status admin</td><td><small>FR-ORD-03, FR-ADM-03</small></td><td>4</td><td>0.18 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestRepository_StockAndTransactions</code></td><td>Rollback transaksi dan update stok bersyarat</td><td><small>BR-01</small></td><td>4</td><td>0.06 s</td><td><span class="b b-ok">PASS</span></td></tr><tr><td><code>TestPaymentFlow</code></td><td>Idempotency, replay, kedaluwarsa, sukses/gagal, pesanan batal</td><td><small>FR-PAY-01..03</small></td><td>10</td><td>0.33 s</td><td><span class="b b-ok">PASS</span></td></tr></tbody></table></div>
+<details><summary>Daftar 60 kasus UIT</summary><ul class="cols"><li><code>register</code></li><li><code>register cannot choose a role</code></li><li><code>duplicate email</code></li><li><code>validation errors use the standard error format</code></li><li><code>malformed JSON</code></li><li><code>login with wrong password</code></li><li><code>profile requires a token</code></li><li><code>update profile</code></li><li><code>refresh rotates the token and detects reuse</code></li><li><code>logout revokes the refresh token</code></li><li><code>change password signs out other sessions</code></li><li><code>GET /users</code></li><li><code>GET /users/8508411d-645d-498b-99f1-7e6e0d19349d</code></li><li><code>POST /categories</code></li><li><code>PUT /categories/1e4f491f-013e-4207-9e1c-e08eb70dc47f</code></li><li><code>DELETE /categories/1e4f491f-013e-4207-9e1c-e08eb70dc47f</code></li><li><code>POST /products</code></li><li><code>PUT /products/2b168d4b-a145-4838-8eb5-9d448f4019fc</code></li><li><code>PATCH /products/2b168d4b-a145-4838-8eb5-9d448f4019fc/stock</code></li><li><code>DELETE /products/2b168d4b-a145-4838-8eb5-9d448f4019fc</code></li><li><code>PATCH /orders/4fc8f41b-bb74-4da0-baae-16a4cefaf4d4/status</code></li><li><code>admin can list users with pagination meta</code></li><li><code>unknown route uses the standard error format</code></li><li><code>category rules</code></li><li><code>product validation</code></li><li><code>list, search, filter, sort, paginate</code></li><li><code>cached detail is invalidated by writes</code></li><li><code>category with products cannot be deleted</code></li><li><code>soft delete hides the product</code></li><li><code>empty cart is created on first read</code></li><li><code>rejects invalid input and unavailable products</code></li><li><code>adding the same product accumulates and totals are recalculated</code></li><li><code>update quantity</code></li><li><code>cart reflects the current price</code></li><li><code>another user cannot touch the item</code></li><li><code>remove item and clear cart</code></li><li><code>empty cart cannot be checked out</code></li><li><code>order uses server-side prices</code></li><li><code>stock is reduced and the cart is emptied</code></li><li><code>order items keep the name and price snapshot</code></li><li><code>order access is restricted to the owner and admins</code></li><li><code>checkout fails as a whole when one item is out of stock</code></li><li><code>cancel restores stock exactly once</code></li><li><code>concurrent cancels restore stock once</code></li><li><code>admin status flow follows the state machine</code></li><li><code>admin can cancel a pending order</code></li><li><code>DecreaseStock returns the updated row</code></li><li><code>DecreaseStock refuses to go below zero</code></li><li><code>a failed transaction rolls back repository writes</code></li><li><code>the database itself rejects negative stock</code></li><li><code>create requires an idempotency key and an own, payable order</code></li><li><code>same idempotency key returns the same payment</code></li><li><code>same idempotency key returns the same payment/a different key cannot open a second active payment</code></li><li><code>same idempotency key returns the same payment/a key cannot be reused for another order</code></li><li><code>concurrent creates with one key produce one payment</code></li><li><code>simulate-success is idempotent and marks the order PAID</code></li><li><code>concurrent simulate-success processes the payment once</code></li><li><code>failed payment keeps the order payable</code></li><li><code>expired payment cannot be paid and frees the order for a new one</code></li><li><code>a cancelled order cannot be paid</code></li></ul></details>
+<h3>6.4 Coverage unit test per package</h3>
+<div class="tw"><table class="small"><thead><tr><th>Package</th><th>Coverage</th></tr></thead><tbody><tr><td><code>internal/middleware</code></td><td>65.5%</td></tr><tr><td><code>internal/modules/auth</code></td><td>46.4%</td></tr><tr><td><code>internal/modules/order</code></td><td>2.5%</td></tr><tr><td><code>internal/modules/product</code></td><td>46.2%</td></tr><tr><td><code>internal/utils</code></td><td>61.9%</td></tr><tr><td><code>pkg/token</code></td><td>82.4%</td></tr></tbody></table></div>
+<p class="muted">Modul cart, category, payment, dan user tidak punya unit test terpisah; perilakunya diuji di UIT (coverage gabungan 74.8%).</p>
+<h3>6.5 Test aplikasi Flutter — <span class="b b-info">91 test ditulis</span> <span class="b b-warn">belum dijalankan</span></h3>
+<p>Test sudah lengkap per fitur, tapi SDK Flutter tidak tersedia di lingkungan pembuatan, jadi <b>belum ada hasil</b>. Hasil pertama akan muncul di GitHub Actions (<code>flutter analyze</code> + <code>flutter test --coverage</code>) setelah repo di-push.</p>
+<div class="tw"><table class="small"><thead><tr><th>File</th><th>Jumlah</th><th>Contoh kasus</th><th>Status</th></tr></thead><tbody><tr><td><code>core/network/api_error_mapper_test.dart</code></td><td>6</td><td><small>422 maps message, code and field errors<br>401 maps to UnauthorizedFailure<br>409 keeps the backend message<br>connection errors map to NetworkFailure<br>… +2</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>core/network/auth_interceptor_test.dart</code></td><td>4</td><td><small>adds the access token to requests<br>three concurrent 401s trigger exactly ONE refresh<br>rejected refresh clears tokens and announces session expiry<br>does not try to refresh when login itself returns 401</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>core/validators_test.dart</code></td><td>2</td><td><small>strongPassword mirrors the backend policy<br>email</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/admin/admin_test.dart</code></td><td>7</td><td><small>create sends the trimmed draft<br>with an id it updates instead<br>invalid input is rejected per field without calling the API<br>follows PAID → PROCESSING → SHIPPED → COMPLETED<br>… +3</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/auth/auth_controller_test.dart</code></td><td>6</td><td><small>starts as AsyncLoading, then restores the saved session<br>no saved session → AsyncData(null)<br>backend unreachable on startup → signed out, not an error screen<br>signedIn() switches to the given user<br>… +2</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/auth/auth_repository_impl_test.dart</code></td><td>6</td><td><small>saves both tokens and returns the user<br>wrong password returns UnauthorizedFailure and saves nothing<br>returns null without calling the API when no session is stored<br>returns the user of a stored session<br>… +2</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/auth/auth_usecases_test.dart</code></td><td>3</td><td><small>trims the email before calling the repository<br>registers, then logs in with the same credentials<br>stops and returns the failure when registration fails</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/auth/login_controller_test.dart</code></td><td>3</td><td><small>idle → loading → data(user)<br>422 becomes AsyncError carrying the field errors<br>a second tap while submitting is ignored</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/cart/cart_controller_test.dart</code></td><td>9</td><td><small>signed out → empty cart without calling the API<br>signed in → loads the cart; the badge shows the number of units<br>add() replaces the cart with the server response<br>add() failure is returned and the cart stays as it was<br>… +5</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/cart/cart_data_test.dart</code></td><td>3</td><td><small>CartModel parses the backend cart<br>an empty cart from the backend has items: []<br>withQuantity / without edit one line and keep totals consistent</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/catalog/catalog_data_test.dart</code></td><td>5</td><td><small>getProducts parses items and pagination meta<br>getProducts sends only the filters that are set<br>getCategories parses the list<br>404 becomes a ServerFailure with the backend message<br>… +1</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/catalog/catalog_filter_test.dart</code></td><td>3</td><td><small>search is debounced: only the last term is applied<br>whitespace-only changes do not trigger a new search<br>selecting a category keeps the search term</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/catalog/catalog_widgets_test.dart</code></td><td>3</td><td><small>ProductCard shows name, formatted price and stock<br>ProductCard shows the sold-out variant<br>CategoryChip reports taps</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/catalog/product_list_controller_test.dart</code></td><td>7</td><td><small>build() loads page 1 for the current filter<br>loadMore() appends pages until the last one, then stops<br>concurrent loadMore() calls (scroll events) request the next page once<br>first page failing → AsyncError (full error screen)<br>… +3</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/orders/order_controllers_test.dart</code></td><td>6</td><td><small>success returns the order and reloads the (now empty) cart<br>a double tap places one order<br>409 stock conflict → AsyncError and the cart is reloaded<br>loads page 1 and appends page 2<br>… +2</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/orders/order_data_test.dart</code></td><td>3</td><td><small>OrderModel parses the backend order, including a deleted product<br>unknown statuses do not crash the app<br>formatDateTime</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/payment/payment_data_test.dart</code></td><td>1</td><td><small>POST /payments sends the Idempotency-Key header and the order id</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>features/payment/payment_usecases_test.dart</code></td><td>10</td><td><small>retrying (timeout, reopen, restart) sends the SAME key → same payment<br>a network error keeps the key for the retry<br>a replayed FAILED payment starts a new attempt with a new key<br>a replayed PENDING payment whose time is up is replaced<br>… +6</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr><tr><td><code>widget_test.dart</code></td><td>4</td><td><small>ErrorBanner shows the message and every field error<br>PrimaryButton is disabled and shows a spinner while loading<br>LoginPage shows the backend error (provider override)<br>LoginPage validates locally before calling the API</small></td><td><span class="b b-warn">Belum dijalankan</span></td></tr></tbody></table></div>
+<h3>6.6 Matriks keterlacakan</h3>
+<div class="tw"><table class="small"><thead><tr><th>Requirement</th><th>UT backend</th><th>UIT</th><th>Test Flutter</th><th>Stress</th></tr></thead><tbody><tr><td>FR-AUTH-01..04</td><td>TestRegister, TestLogin, TestRefresh_*, TestLogout</td><td>TestAuthFlow</td><td>auth_controller_test, auth_interceptor_test</td><td>Login 9 rps</td></tr><tr><td>FR-CAT-01..03</td><td>TestGet_CacheAside, TestList_*</td><td>TestCategoryAndProductCatalog</td><td>product_list_controller_test, catalog_filter_test</td><td>S-L1..L3, ramp</td></tr><tr><td>FR-CART-01..03</td><td>—</td><td>TestCartRules</td><td>cart_controller_test</td><td>S-L6</td></tr><tr><td>FR-ORD-01</td><td>TestCanTransition</td><td>TestOrderCheckout, TestConcurrent*</td><td>order_controllers_test</td><td>S-C1, S-C3</td></tr><tr><td>FR-ORD-03</td><td>TestCanTransition</td><td>TestOrderCancelAndStatusFlow</td><td>order_controllers_test</td><td>—</td></tr><tr><td>FR-PAY-01..03</td><td>—</td><td>TestPaymentFlow</td><td>payment_usecases_test, payment_data_test</td><td>S-C2</td></tr><tr><td>FR-ADM-01..03</td><td>TestCreate</td><td>TestCategoryAndProductCatalog, TestOrderCancelAndStatusFlow</td><td>admin_test</td><td>—</td></tr><tr><td>NFR-05</td><td>TestRedisDown_FallsBackToDatabase</td><td>—</td><td>—</td><td>S-N1, S-N2</td></tr></tbody></table></div>
+</section><section id="stress"><h2><span class="num">7</span>Stress test & hasil</h2>
+<h3>7.1 Lingkungan uji</h3>
+<div class="tw"><table class=""><thead><tr><th>Item</th><th>Nilai</th></tr></thead><tbody><tr><td>Mesin</td><td>2 vCPU Intel Xeon @ 2.30GHz (server dan load generator berbagi CPU yang sama)</td></tr><tr><td>Memori</td><td>7 GB</td></tr><tr><td>Software</td><td>go1.24.7, PostgreSQL 16, Redis 7.0.15</td></tr><tr><td>Konfigurasi API</td><td><code>APP_ENV=production, LOG_LEVEL=warn, DB_MAX_OPEN_CONNS=25, rate limit dimatikan, BCRYPT_COST=12</code></td></tr><tr><td>Data</td><td>100 produk + 1 kategori di-seed via API sebelum uji; 300+ user dibuat untuk uji konkurensi</td></tr><tr><td>Alat</td><td>Load tester Go sendiri (standard library), koneksi keep-alive, closed-loop: setiap worker mengirim request berikutnya setelah respons diterima</td></tr><tr><td>Waktu</td><td>2026-11-18T13:53:41+07:00</td></tr></tbody></table></div>
+<div class="callout warn"><b>Catatan keterbatasan.</b> Server, PostgreSQL, Redis, dan load generator berjalan di mesin 2 vCPU yang sama, sehingga saling berebut CPU. Angka di bawah adalah batas bawah yang konservatif, bukan kapasitas produksi. Rate limiter dimatikan agar yang diukur adalah aplikasinya.</div>
+<h3>7.2 Beban stabil</h3>
+<div class="tw"><table class="small num"><thead><tr><th>ID</th><th>Skenario</th><th>Endpoint</th><th>Konk.</th><th>Durasi</th><th>Request</th><th>RPS</th><th>p50 ms</th><th>p95 ms</th><th>p99 ms</th><th>Error</th></tr></thead><tbody><tr><td><code>S-L1</code></td><td>Katalog: list produk (cache)</td><td><code>GET /products?page=1&amp;limit=20</code></td><td>50</td><td>20 s</td><td>126.120</td><td><b>6.304</b></td><td>7,0</td><td>16,8</td><td>23,0</td><td>0.00%</td></tr><tr><td><code>S-L2</code></td><td>Katalog: detail produk (cache)</td><td><code>GET /products/:id</code></td><td>50</td><td>20 s</td><td>460.542</td><td><b>23.006</b></td><td>1,8</td><td>5,3</td><td>8,0</td><td>0.00%</td></tr><tr><td><code>S-L3</code></td><td>Katalog: pencarian</td><td><code>GET /products?search=Uji 0</code></td><td>50</td><td>15 s</td><td>92.612</td><td><b>6.170</b></td><td>7,2</td><td>16,9</td><td>23,6</td><td>0.00%</td></tr><tr><td><code>S-L4</code></td><td>Health check</td><td><code>GET /health</code></td><td>50</td><td>10 s</td><td>64.127</td><td><b>6.405</b></td><td>3,1</td><td>32,5</td><td>61,3</td><td>0.00%</td></tr><tr><td><code>S-L5</code></td><td>Auth: login (bcrypt cost 12)</td><td><code>POST /auth/login</code></td><td>16</td><td>16 s</td><td>141</td><td><b>9</b></td><td>1.797,5</td><td>2.118,7</td><td>2.286,3</td><td>0.00%</td></tr><tr><td><code>S-L6</code></td><td>Keranjang: GET /cart (JWT + DB)</td><td><code>GET /cart</code></td><td>50</td><td>15 s</td><td>42.099</td><td><b>2.802</b></td><td>12,2</td><td>55,1</td><td>89,0</td><td>0.00%</td></tr></tbody></table></div>
+<figure><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="Latensi per endpoint" xmlns="http://www.w3.org/2000/svg">
+<line x1="56" y1="246.0" x2="744" y2="246.0" stroke="#E6EBEE"/>
+<text x="50" y="250.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">0</text>
+<line x1="56" y1="192.0" x2="744" y2="192.0" stroke="#E6EBEE"/>
+<text x="50" y="196.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">26</text>
+<line x1="56" y1="138.0" x2="744" y2="138.0" stroke="#E6EBEE"/>
+<text x="50" y="142.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">51</text>
+<line x1="56" y1="84.0" x2="744" y2="84.0" stroke="#E6EBEE"/>
+<text x="50" y="88.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">77</text>
+<line x1="56" y1="30.0" x2="744" y2="30.0" stroke="#E6EBEE"/>
+<text x="50" y="34.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">102</text>
+<rect x="69.8" y="231.22056764656008" width="34" height="14.779432353439908" rx="3" fill="#7CC4D4"><title>p50: 7.0 ms</title></rect>
+<text x="86.8" y="227.22056764656008" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7</text>
+<rect x="107.8" y="210.5808718717305" width="34" height="35.4191281282695" rx="3" fill="#0B7A94"><title>p95: 16.8 ms</title></rect>
+<text x="124.8" y="206.5808718717305" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">17</text>
+<rect x="145.8" y="197.3509472096811" width="34" height="48.64905279031891" rx="3" fill="#04404F"><title>p99: 23.0 ms</title></rect>
+<text x="162.8" y="193.3509472096811" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">23</text>
+<text x="124.8" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">list produk</text>
+<text x="124.8" y="275" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">(cache)</text>
+<rect x="207.39999999999998" y="242.23811620428083" width="34" height="3.761883795719171" rx="3" fill="#7CC4D4"><title>p50: 1.8 ms</title></rect>
+<text x="224.39999999999998" y="238.23811620428083" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">2</text>
+<rect x="245.39999999999998" y="234.8684549636211" width="34" height="11.131545036378892" rx="3" fill="#0B7A94"><title>p95: 5.3 ms</title></rect>
+<text x="262.4" y="230.8684549636211" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5</text>
+<rect x="283.4" y="229.19818567332834" width="34" height="16.80181432667165" rx="3" fill="#04404F"><title>p99: 8.0 ms</title></rect>
+<text x="300.4" y="225.19818567332834" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">8</text>
+<text x="262.4" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">detail produk</text>
+<text x="262.4" y="275" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">(cache)</text>
+<rect x="345.0" y="230.89335553189315" width="34" height="15.106644468106838" rx="3" fill="#7CC4D4"><title>p50: 7.2 ms</title></rect>
+<text x="362.0" y="226.89335553189315" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7</text>
+<rect x="383.0" y="210.26421498656896" width="34" height="35.73578501343105" rx="3" fill="#0B7A94"><title>p95: 16.9 ms</title></rect>
+<text x="400.0" y="206.26421498656896" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">17</text>
+<rect x="421.0" y="196.2405370657146" width="34" height="49.759462934285395" rx="3" fill="#04404F"><title>p99: 23.6 ms</title></rect>
+<text x="438.0" y="192.2405370657146" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">24</text>
+<text x="400.0" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">pencarian</text>
+<rect x="482.59999999999997" y="239.45997979846354" width="34" height="6.540020201536471" rx="3" fill="#7CC4D4"><title>p50: 3.1 ms</title></rect>
+<text x="499.59999999999997" y="235.45997979846354" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3</text>
+<rect x="520.5999999999999" y="177.36989775598752" width="34" height="68.63010224401248" rx="3" fill="#0B7A94"><title>p95: 32.5 ms</title></rect>
+<text x="537.5999999999999" y="173.36989775598752" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">33</text>
+<rect x="558.5999999999999" y="116.63088509020079" width="34" height="129.3691149097992" rx="3" fill="#04404F"><title>p99: 61.3 ms</title></rect>
+<text x="575.5999999999999" y="112.63088509020079" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">61</text>
+<text x="537.5999999999999" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Health check</text>
+<rect x="620.1999999999999" y="220.23890686915766" width="34" height="25.761093130842333" rx="3" fill="#7CC4D4"><title>p50: 12.2 ms</title></rect>
+<text x="637.1999999999999" y="216.23890686915766" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">12</text>
+<rect x="658.1999999999999" y="129.72992490638342" width="34" height="116.27007509361658" rx="3" fill="#0B7A94"><title>p95: 55.1 ms</title></rect>
+<text x="675.1999999999999" y="125.72992490638342" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">55</text>
+<rect x="696.1999999999999" y="58.17391304347822" width="34" height="187.82608695652178" rx="3" fill="#04404F"><title>p99: 89.0 ms</title></rect>
+<text x="713.1999999999999" y="54.17391304347822" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">89</text>
+<text x="675.1999999999999" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">GET /cart (JWT +</text>
+<text x="675.1999999999999" y="275" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">DB)</text>
+<text x="14" y="138.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">ms</text>
+<rect x="56" y="8" width="10" height="10" rx="2" fill="#7CC4D4"/>
+<text x="70" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">p50</text>
+<rect x="109.8" y="8" width="10" height="10" rx="2" fill="#0B7A94"/>
+<text x="123.8" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">p95</text>
+<rect x="163.6" y="8" width="10" height="10" rx="2" fill="#04404F"/>
+<text x="177.6" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">p99</text>
+</svg><figcaption>Gambar 7.1 — Latensi p50/p95/p99 (login tidak ditampilkan karena skalanya detik)</figcaption></figure>
+<h3>7.3 Ramp: throughput vs jumlah koneksi</h3>
+<figure><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="Ramp" xmlns="http://www.w3.org/2000/svg">
+<line x1="70" y1="256.0" x2="700" y2="256.0" stroke="#E6EBEE"/>
+<text x="64" y="260.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">0</text>
+<line x1="70" y1="203.0" x2="700" y2="203.0" stroke="#E6EBEE"/>
+<text x="64" y="207.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1.796</text>
+<line x1="70" y1="150.0" x2="700" y2="150.0" stroke="#E6EBEE"/>
+<text x="64" y="154.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">3.592</text>
+<line x1="70" y1="97.0" x2="700" y2="97.0" stroke="#E6EBEE"/>
+<text x="64" y="101.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">5.388</text>
+<line x1="70" y1="44.0" x2="700" y2="44.0" stroke="#E6EBEE"/>
+<text x="64" y="48.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">7.184</text>
+<text x="70.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1</text>
+<text x="175.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">10</text>
+<text x="280.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">25</text>
+<text x="385.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">50</text>
+<text x="490.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">100</text>
+<text x="595.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">200</text>
+<text x="700.0" y="274" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">400</text>
+<text x="385.0" y="294" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">jumlah koneksi bersamaan (concurrency)</text>
+<text x="64" y="24" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">req/detik</text>
+<polyline points="70.0,186.20639791337186 175.0,118.17530931246847 280.0,105.51141181144166 385.0,82.25455604373897 490.0,71.80610381277205 595.0,71.65217391304344 700.0,77.37656683999055" fill="none" stroke="#0B7A94" stroke-width="2.4"/>
+<circle cx="70.0" cy="186.20639791337186" r="3.5" fill="#0B7A94"><title>1: 2,365.1</title></circle>
+<circle cx="175.0" cy="118.17530931246847" r="3.5" fill="#0B7A94"><title>10: 4,670.5</title></circle>
+<circle cx="280.0" cy="105.51141181144166" r="3.5" fill="#0B7A94"><title>25: 5,099.7</title></circle>
+<circle cx="385.0" cy="82.25455604373897" r="3.5" fill="#0B7A94"><title>50: 5,887.8</title></circle>
+<circle cx="490.0" cy="71.80610381277205" r="3.5" fill="#0B7A94"><title>100: 6,241.8</title></circle>
+<circle cx="595.0" cy="71.65217391304344" r="3.5" fill="#0B7A94"><title>200: 6,247.1</title></circle>
+<circle cx="700.0" cy="77.37656683999055" r="3.5" fill="#0B7A94"><title>400: 6,053.1</title></circle>
+<text x="706" y="260.0" font-size="10.5" fill="#C2410C" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">0</text>
+<text x="706" y="207.0" font-size="10.5" fill="#C2410C" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">31</text>
+<text x="706" y="154.0" font-size="10.5" fill="#C2410C" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">62</text>
+<text x="706" y="101.0" font-size="10.5" fill="#C2410C" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">93</text>
+<text x="706" y="48.0" font-size="10.5" fill="#C2410C" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">124</text>
+<text x="752" y="24" font-size="10.5" fill="#C2410C" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">p95 ms</text>
+<polyline points="70.0,255.11232538299288 175.0,248.2379683009011 280.0,237.67805449165851 385.0,225.4486295758141 490.0,201.48824318290613 595.0,154.91434592174147 700.0,71.65217391304344" fill="none" stroke="#C2410C" stroke-width="2.4" stroke-dasharray="6 4"/>
+<circle cx="70.0" cy="255.11232538299288" r="3.5" fill="#C2410C"><title>1: 0.5</title></circle>
+<circle cx="175.0" cy="248.2379683009011" r="3.5" fill="#C2410C"><title>10: 4.5</title></circle>
+<circle cx="280.0" cy="237.67805449165851" r="3.5" fill="#C2410C"><title>25: 10.7</title></circle>
+<circle cx="385.0" cy="225.4486295758141" r="3.5" fill="#C2410C"><title>50: 17.9</title></circle>
+<circle cx="490.0" cy="201.48824318290613" r="3.5" fill="#C2410C"><title>100: 31.9</title></circle>
+<circle cx="595.0" cy="154.91434592174147" r="3.5" fill="#C2410C"><title>200: 59.2</title></circle>
+<circle cx="700.0" cy="71.65217391304344" r="3.5" fill="#C2410C"><title>400: 108.0</title></circle>
+<rect x="70" y="8" width="10" height="10" rx="2" fill="#0B7A94"/>
+<text x="84" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Throughput (req/detik)</text>
+<rect x="249.2" y="8" width="10" height="10" rx="2" fill="#C2410C"/>
+<text x="263.2" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Latensi p95 (ms)</text>
+</svg><figcaption>Gambar 7.2 — Throughput naik sampai jenuh di sekitar 6.247 req/detik (c=200); setelah itu tambahan koneksi hanya menambah antrean (p95 naik), tanpa error</figcaption></figure>
+<div class="tw"><table class="small num"><thead><tr><th>Konkurensi</th><th>RPS</th><th>p50 ms</th><th>p95 ms</th><th>p99 ms</th><th>Error</th></tr></thead><tbody><tr><td>1</td><td>2.365</td><td>0,3</td><td>0,5</td><td>1,1</td><td>0.00%</td></tr><tr><td>10</td><td>4.671</td><td>1,7</td><td>4,5</td><td>6,3</td><td>0.00%</td></tr><tr><td>25</td><td>5.100</td><td>4,1</td><td>10,7</td><td>14,8</td><td>0.00%</td></tr><tr><td>50</td><td>5.888</td><td>7,5</td><td>17,9</td><td>23,8</td><td>0.00%</td></tr><tr><td>100</td><td>6.242</td><td>14,9</td><td>31,9</td><td>43,6</td><td>0.00%</td></tr><tr><td>200</td><td>6.247</td><td>30,1</td><td>59,2</td><td>79,6</td><td>0.00%</td></tr><tr><td>400</td><td>6.053</td><td>63,0</td><td>108,0</td><td>137,1</td><td>0.00%</td></tr></tbody></table></div>
+<h3>7.4 Dampak cache Redis</h3>
+<figure><svg viewBox="0 0 760 300" class="chart" role="img" aria-label="Cache vs tanpa cache" xmlns="http://www.w3.org/2000/svg">
+<line x1="56" y1="246.0" x2="744" y2="246.0" stroke="#E6EBEE"/>
+<text x="50" y="250.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">0</text>
+<line x1="56" y1="192.0" x2="744" y2="192.0" stroke="#E6EBEE"/>
+<text x="50" y="196.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6.614</text>
+<line x1="56" y1="138.0" x2="744" y2="138.0" stroke="#E6EBEE"/>
+<text x="50" y="142.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">13.228</text>
+<line x1="56" y1="84.0" x2="744" y2="84.0" stroke="#E6EBEE"/>
+<text x="50" y="88.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">19.843</text>
+<line x1="56" y1="30.0" x2="744" y2="30.0" stroke="#E6EBEE"/>
+<text x="50" y="34.0" font-size="10.5" fill="#5B6670" text-anchor="end" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">26.457</text>
+<rect x="192.0" y="194.53585897627397" width="34" height="51.464141023726015" rx="3" fill="#0B7A94"><title>Dengan Redis: 6,303.6 req/detik</title></rect>
+<text x="209.0" y="190.53585897627397" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">6.304</text>
+<rect x="230.0" y="234.7690316427325" width="34" height="11.230968357267514" rx="3" fill="#9AA5AD"><title>Redis mati (fail-open): 1,375.6 req/detik</title></rect>
+<text x="247.0" y="230.7690316427325" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1.376</text>
+<text x="228.0" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">List produk</text>
+<rect x="536.0" y="58.17391304347822" width="34" height="187.82608695652178" rx="3" fill="#0B7A94"><title>Dengan Redis: 23,005.8 req/detik</title></rect>
+<text x="553.0" y="54.17391304347822" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">23.006</text>
+<rect x="574.0" y="236.21948590646704" width="34" height="9.780514093532961" rx="3" fill="#9AA5AD"><title>Redis mati (fail-open): 1,198.0 req/detik</title></rect>
+<text x="591.0" y="232.21948590646704" font-size="10" fill="#12181D" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">1.198</text>
+<text x="572.0" y="262" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Detail produk</text>
+<text x="14" y="138.0" font-size="10.5" fill="#5B6670" text-anchor="middle" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">req/detik</text>
+<rect x="56" y="8" width="10" height="10" rx="2" fill="#0B7A94"/>
+<text x="70" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Dengan Redis</text>
+<rect x="169.2" y="8" width="10" height="10" rx="2" fill="#9AA5AD"/>
+<text x="183.2" y="17" font-size="11" fill="#12181D" text-anchor="start" font-weight="400" class="" style="font-family:Inter,Segoe UI,Roboto,Arial,sans-serif">Redis mati (fail-open)</text>
+</svg><figcaption>Gambar 7.3 — Redis dimatikan di tengah uji; API tetap 0% error</figcaption></figure>
+<div class="tw"><table class="small num"><thead><tr><th>Skenario</th><th>RPS</th><th>p95 ms</th></tr></thead><tbody><tr><td>List produk + Redis</td><td>6.304</td><td>16,8</td></tr><tr><td>List produk, Redis mati</td><td>1.376</td><td>78,8</td></tr><tr><td>Detail produk + Redis</td><td>23.006</td><td>5,3</td></tr><tr><td>Detail produk, Redis mati</td><td>1.198</td><td>55,4</td></tr></tbody></table></div>
+<p>Cache membuat list produk <b>4.6×</b> dan detail produk <b>19.2×</b> lebih cepat. Saat Redis mati, setiap request membaca PostgreSQL (fail-open), lebih lambat tapi tidak pernah gagal.</p>
+<h3>7.5 Uji konkurensi (kebenaran data di bawah beban)</h3>
+<div class="tw"><table class="small"><thead><tr><th>ID</th><th>Skenario</th><th>Perlakuan</th><th>Hasil</th><th>Verifikasi DB</th><th>Status</th></tr></thead><tbody><tr><td>S-C1</td><td>Rebutan stok (flash sale)</td><td>300 pembeli dengan keranjang berisi 1 unit checkout <b>bersamaan</b>; stok 50</td><td>50 pesanan dibuat (201), 250 ditolak 409, 0 lainnya; selesai 303 ms, p95 279 ms</td><td>stok akhir 0, unit terjual 50, pesanan 50</td><td><span class="b b-ok">PASS</span></td></tr><tr><td>S-C2</td><td>Idempotency pembayaran</td><td>100 <code>POST /payments</code> paralel dengan key yang sama, lalu 50 konfirmasi paralel</td><td>status 200×99, 201×1; 1 ID pembayaran unik; konfirmasi 200×50</td><td>1 baris payments (SUCCESS), pesanan PAID</td><td><span class="b b-ok">PASS</span></td></tr><tr><td>S-C3</td><td>Checkout ganda</td><td>1 user menekan checkout 20 kali bersamaan</td><td>status 201×1, 400×19</td><td>1 pesanan; sisanya 400 'Cart is empty' karena keranjang terkunci lalu kosong</td><td><span class="b b-ok">PASS</span></td></tr></tbody></table></div>
+<h3>7.6 Analisis</h3>
+<ul>
+<li><b>Baca katalog memenuhi target dengan jauh.</b> Detail produk dari cache mencapai 23.006 req/detik dengan p95 5,3 ms. List lebih berat (6.304 req/detik) karena respons 20 produk diserialisasi ulang.</li>
+<li><b>Login sengaja lambat.</b> Satu verifikasi bcrypt cost 12 butuh ±226 ms per core; 2 core → maksimum teoretis ≈ 8.8 login/detik, terukur 8,9. Ini fitur keamanan (memperlambat brute force), bukan bug. Kapasitas login naik linear dengan jumlah core.</li>
+<li><b>Endpoint terautentikasi</b> (<code>GET /cart</code>) 2.802 req/detik: verifikasi JWT + 2 query dengan preload, dibatasi pool 25 koneksi DB.</li>
+<li><b>Titik jenuh</b> sekitar c=200: CPU mesin habis (server dan load generator berbagi 2 vCPU). Tidak ada error atau timeout sampai 400 koneksi; antrean memanjang secara wajar.</li>
+<li><b>Konsistensi terjaga di bawah tekanan</b>: tidak ada overselling, tidak ada pembayaran ganda, tidak ada pesanan ganda, tidak ada deadlock.</li>
+</ul>
+<h3>7.7 Rekomendasi kapasitas</h3>
+<div class="tw"><table class=""><thead><tr><th>Langkah</th><th>Dampak yang diharapkan</th></tr></thead><tbody><tr><td>Pisahkan load generator dari server, gunakan ≥ 4 vCPU</td><td>Angka mendekati kapasitas sebenarnya</td></tr><tr><td>Scale horizontal API (stateless, JWT) di belakang load balancer</td><td>Throughput naik hampir linear; Redis & Postgres bersama</td></tr><tr><td>Cache respons list yang sudah diserialisasi</td><td>Mengurangi CPU untuk list produk</td></tr><tr><td>Pisahkan worker login atau naikkan core</td><td>Login/detik naik linear terhadap core</td></tr><tr><td>PgBouncer + tuning DB_MAX_OPEN_CONNS</td><td>Endpoint terautentikasi tidak tertahan di pool koneksi</td></tr><tr><td>Uji ulang dengan k6 dari mesin lain + profil pprof</td><td>Validasi dan cari hotspot</td></tr></tbody></table></div>
+</section><section id="risiko"><h2><span class="num">8</span>Risiko, batasan & rencana</h2><div class="tw"><table class=""><thead><tr><th>Item</th><th>Status / rencana</th></tr></thead><tbody><tr><td>Aplikasi Flutter belum pernah dicompile</td><td><span class="b b-warn">Risiko tinggi</span> jalankan <code>flutter analyze</code> &amp; <code>flutter test</code> (CI) sebelum dianggap selesai</td></tr><tr><td>Payment gateway masih simulasi</td><td>Integrasi Midtrans/Xendit: webhook + verifikasi signature, tetap memakai Idempotency-Key</td></tr><tr><td>Pembayaran kedaluwarsa hanya ditandai saat disentuh</td><td>Tambah job terjadwal untuk menandai EXPIRED dan mengembalikan stok pesanan lama</td></tr><tr><td>Tidak ada foto produk</td><td>Upload ke object storage (S3/GCS) + URL di produk</td></tr><tr><td>Pengecekan error 409 di app memakai isi pesan</td><td>Backend menambahkan kode error spesifik (mis. PAYMENT_EXPIRED) agar app tidak bergantung pada teks</td></tr><tr><td>Observability</td><td>Tambah metrics Prometheus, tracing OpenTelemetry</td></tr><tr><td>Layar Figma</td><td>Komponen dan token sudah ada; layar penuh belum dibuat</td></tr></tbody></table></div></section></main></div>
+<footer>Disusun dari kode sumber dan hasil eksekusi test pada 2026-11-18. Repo: github.com/aulansah/go-ecommerce-api · github.com/aulansah/ecommerce_app</footer>
+<script>
+(function(){try{const links=[...document.querySelectorAll('nav a')];const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+en.target.id));}});},{rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s=>s&&io.observe(s));}catch(e){}})();
+</script>
+</body></html>
