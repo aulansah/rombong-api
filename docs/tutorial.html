@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tutorial: Membangun Aplikasi E-Commerce dari Nol (Go + Flutter)</title>
+<style>
+:root{--pri:#0B7A94;--ink:#14202A;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9;--ok:#1E7B34;--ok-s:#E3F4E6;--warn-s:#FFF4D6}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:15.5px}
+.hero{background:linear-gradient(135deg,#1B1340 0%,#04404F 55%,#0B7A94 100%);color:#fff;padding:50px 24px 42px}
+.hero .w{max-width:1240px;margin:0 auto}
+.hero h1{margin:0 0 8px;font-size:33px;line-height:1.2}
+.hero p{margin:0;max-width:820px;opacity:.9}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stats span{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:5px 12px;font-size:13.5px}
+.pbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px}
+.pbar .track{flex:1;height:8px;background:#EAF0F3;border-radius:8px;overflow:hidden;max-width:700px}
+.pbar .fill{height:100%;width:0;background:linear-gradient(90deg,#0B7A94,#7C3AED);transition:.4s}
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:290px 1fr;gap:26px;padding:24px 18px 90px}
+nav{position:sticky;top:56px;align-self:start;max-height:calc(100vh - 70px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}
+.nphase{display:flex;gap:8px;align-items:center;font-weight:700;font-size:13px;color:var(--pc);margin:12px 6px 4px;text-transform:uppercase;letter-spacing:.5px}
+.nphase span{background:var(--pc);color:#fff;border-radius:6px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center}
+nav a{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:13.5px}
+nav a b{color:var(--muted);font-weight:600;min-width:18px;font-size:12px}
+nav a:hover,nav a.active{background:#EAF5F8}
+.ck{width:14px;height:14px;border:2px solid #C9D2D8;border-radius:4px;flex:none}
+nav a.isdone .ck{background:var(--ok);border-color:var(--ok)}
+nav a.isdone{color:var(--muted)}
+.intro{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:22px}
+.intro h2{margin:0 0 8px;font-size:21px}
+.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.legend div{border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13.5px}
+.phase{margin:34px 0 14px;border-left:6px solid var(--pc);padding-left:14px}
+.phase .pn{font-size:12px;font-weight:700;color:var(--pc);text-transform:uppercase;letter-spacing:1px}
+.phase h2{margin:0;font-size:26px}
+.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:18px;scroll-margin-top:64px;border-top:4px solid var(--pc)}
+.step header{display:flex;gap:14px;align-items:center}
+.step .num{background:var(--pc);color:#fff;font-weight:800;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;font-size:17px}
+.step .ht{flex:1}
+.step h3{margin:0;font-size:19px}
+.time{font-size:12.5px;color:var(--muted)}
+.done{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}
+.step.isdone .done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.step.isdone{opacity:.8}
+.goal{font-size:16px;margin:14px 0 10px}
+.why{background:#EAF5F8;border-left:4px solid var(--pri);border-radius:8px;padding:10px 14px;margin:10px 0;font-size:14.5px}
+.code{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid #1E2C33}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#18262D;color:#C9D6DC;padding:7px 12px;font-size:12.5px;flex-wrap:wrap}
+.ch code.p{background:none;color:#7FD3E6;padding:0;font-size:12.5px}
+.ca{display:flex;gap:10px;align-items:center}
+.ca a{color:#9CC9D6;font-size:12px}
+.copy{border:1px solid #3A4B53;background:#22343C;color:#D7E3E8;border-radius:6px;padding:3px 10px;font:inherit;font-size:12px;cursor:pointer}
+.copy.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+pre{margin:0;background:#0F1B21;color:#D7E3E8;padding:14px 16px;overflow:auto;font-size:12.8px;line-height:1.55;max-height:520px}
+pre code{font-family:"JetBrains Mono",Consolas,monospace;background:none;padding:0}
+.c{color:#7A8F99;font-style:italic}.s{color:#A5D6A7}.k{color:#F7A76C}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.86em;background:#EAF0F3;padding:1px 5px;border-radius:4px}
+.ex{margin:10px 0;padding-left:20px}.ex li{margin:4px 0}
+.check{background:var(--ok-s);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:14.5px}
+.err{margin-top:10px;background:var(--warn-s);border-radius:10px;padding:8px 14px}
+.err summary{cursor:pointer;font-weight:600}
+.err p{margin:8px 0;font-size:14px}
+.finish{background:linear-gradient(135deg,#E3F4E6,#D9F2F8);border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center}
+@media (max-width:960px){.layout{grid-template-columns:1fr}nav{position:static;max-height:none}.legend{grid-template-columns:1fr 1fr}.step{padding:18px 14px}.step header{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style></head><body>
+<div class="hero"><div class="w">
+<h1>Tutorial: membangun aplikasi E-Commerce dari nol</h1>
+<p>Langkah demi langkah membuat backend <b>Go</b> (Fiber, PostgreSQL, Redis) dan aplikasi <b>Flutter</b> (Riverpod, Clean Architecture), sampai test, Docker, dan rilis di GitHub. Semua potongan kode diambil langsung dari repo <code style="background:rgba(255,255,255,.15);color:#fff">go-ecommerce-api</code> dan <code style="background:rgba(255,255,255,.15);color:#fff">ecommerce_app</code>.</p>
+<div class="stats"><span>29 langkah</span><span>4 bagian</span><span>± 60 jam kerja</span><span>Go 1.24 · Flutter 3.35</span></div>
+</div></div>
+<div class="pbar"><b id="ptext">0/29 selesai</b><div class="track"><div class="fill" id="pfill"></div></div><button class="done" id="reset">Reset progres</button></div>
+<div class="layout">
+<nav><div class="nphase" style="--pc:#5B6670"><span>0</span>Persiapan alat</div><a href="#s1" data-step="s1"><i class="ck"></i><b>1</b>Instal alat-alat</a><a href="#s2" data-step="s2"><i class="ck"></i><b>2</b>Rencanakan sebelum ngoding</a><div class="nphase" style="--pc:#0B7A94"><span>A</span>Backend Go</div><a href="#s3" data-step="s3"><i class="ck"></i><b>3</b>Buat project Go dan Git</a><a href="#s4" data-step="s4"><i class="ck"></i><b>4</b>Setelan aplikasi (config)</a><a href="#s5" data-step="s5"><i class="ck"></i><b>5</b>Rancang database (migration)</a><a href="#s6" data-step="s6"><i class="ck"></i><b>6</b>Koneksi database &amp; transaksi</a><a href="#s7" data-step="s7"><i class="ck"></i><b>7</b>Peralatan bersama</a><a href="#s8" data-step="s8"><i class="ck"></i><b>8</b>Middleware (satpam)</a><a href="#s9" data-step="s9"><i class="ck"></i><b>9</b>Pola satu modul: handler → service → repository</a><a href="#s10" data-step="s10"><i class="ck"></i><b>10</b>Modul katalog (kategori &amp; produk)</a><a href="#s11" data-step="s11"><i class="ck"></i><b>11</b>Modul keranjang</a><a href="#s12" data-step="s12"><i class="ck"></i><b>12</b>Modul pesanan (checkout)</a><a href="#s13" data-step="s13"><i class="ck"></i><b>13</b>Modul pembayaran (idempotent)</a><a href="#s14" data-step="s14"><i class="ck"></i><b>14</b>Rakit semuanya &amp; jalankan</a><div class="nphase" style="--pc:#7C3AED"><span>B</span>Aplikasi Flutter</div><a href="#s15" data-step="s15"><i class="ck"></i><b>15</b>Buat project Flutter</a><a href="#s16" data-step="s16"><i class="ck"></i><b>16</b>Fondasi: Result, Failure, alamat API</a><a href="#s17" data-step="s17"><i class="ck"></i><b>17</b>Klien HTTP dengan refresh token otomatis</a><a href="#s18" data-step="s18"><i class="ck"></i><b>18</b>Tema dari Figma &amp; komponen bersama</a><a href="#s19" data-step="s19"><i class="ck"></i><b>19</b>Fitur auth (pola Clean Architecture)</a><a href="#s20" data-step="s20"><i class="ck"></i><b>20</b>Router dengan penjaga</a><a href="#s21" data-step="s21"><i class="ck"></i><b>21</b>Katalog: cari, filter, scroll tanpa ujung</a><a href="#s22" data-step="s22"><i class="ck"></i><b>22</b>Keranjang: terasa instan</a><a href="#s23" data-step="s23"><i class="ck"></i><b>23</b>Checkout &amp; riwayat pesanan</a><a href="#s24" data-step="s24"><i class="ck"></i><b>24</b>Pembayaran dengan Idempotency-Key</a><a href="#s25" data-step="s25"><i class="ck"></i><b>25</b>Panel admin</a><div class="nphase" style="--pc:#1E7B34"><span>C</span>Uji, kemas &amp; rilis</div><a href="#s26" data-step="s26"><i class="ck"></i><b>26</b>Tulis test</a><a href="#s27" data-step="s27"><i class="ck"></i><b>27</b>Bungkus dengan Docker &amp; Makefile</a><a href="#s28" data-step="s28"><i class="ck"></i><b>28</b>CI di GitHub Actions</a><a href="#s29" data-step="s29"><i class="ck"></i><b>29</b>Rilis ke GitHub</a></nav>
+<main>
+<div class="intro"><h2>Cara memakai tutorial ini</h2>
+<p>Ikuti langkah dari atas ke bawah; urutannya disengaja (fondasi dulu, fitur kemudian). Setiap langkah punya <b>tujuan</b>, <b>perintah</b> yang tinggal disalin, <b>potongan kode penting</b> dari file asli, dan cara <b>mengecek</b> bahwa langkah itu berhasil. Kode yang ditampilkan adalah bagian intinya; tombol <i>file lengkap ↗</i> membuka file utuh di GitHub (aktif setelah repo di-push). Klik <b>Tandai selesai</b>: progresmu disimpan di browser ini.</p>
+<div class="legend"><div>⌨️ <b>Perintah</b><br>jalankan di terminal</div><div>📄 <b>File</b><br>buat/isi file di path tersebut</div><div>💡 <b>Kenapa</b><br>alasan desainnya</div><div>✅ <b>Cek</b><br>bukti langkah berhasil</div></div></div>
+<div class="phase" id="phase-prep" style="--pc:#5B6670"><span class="pn">Bagian 0</span><h2>Persiapan alat</h2></div><article class="step" id="s1" style="--pc:#5B6670">
+<header><div class="num">1</div><div class="ht"><h3>Instal alat-alat</h3><span class="time">⏱ 30–60 menit</span></div>
+<button class="done" data-done="s1">Tandai selesai</button></header>
+<p class="goal">Siapkan laptop dengan semua alat yang dibutuhkan. Cukup sekali.</p><div class="code"><div class="ch"><span>⌨️ Cek setelah instal (buka terminal / PowerShell)</span><button class="copy">Salin</button></div><pre><code><span class="k">go</span> version          <span class="c"># go1.24 atau lebih baru</span>
+<span class="k">git</span> --version
+<span class="k">docker</span> --version
+<span class="k">flutter</span> --version   <span class="c"># 3.35 atau lebih baru</span></code></pre></div><ul class="ex"><li><b>Go</b> (go.dev/dl) — bahasa backend.</li><li><b>Git</b> (git-scm.com) — pencatat riwayat kode.</li><li><b>Docker Desktop</b> — menjalankan PostgreSQL dan Redis tanpa instal manual.</li><li><b>VS Code</b> + ekstensi <i>Go</i> dan <i>Flutter</i> — tempat menulis kode.</li><li><b>Flutter SDK</b> + <b>Android Studio</b> (untuk emulator Android).</li><li>Opsional: <b>make</b> (di Windows lewat Git Bash / Chocolatey), <b>Postman</b> atau Bruno untuk mencoba API.</li></ul><div class="check">✅ <b>Cek berhasil:</b> Keempat perintah di atas menampilkan versi, bukan 'command not found'.</div><details class="err"><summary>⚠️ Error yang sering muncul</summary><p><code>&#x27;go&#x27; is not recognized</code><br>Tutup lalu buka lagi terminal setelah instal; pastikan folder bin Go masuk PATH.</p><p><code>Docker: &#x27;cannot connect to the Docker daemon&#x27;</code><br>Buka aplikasi Docker Desktop dan tunggu sampai statusnya Running.</p></details></article><article class="step" id="s2" style="--pc:#5B6670">
+<header><div class="num">2</div><div class="ht"><h3>Rencanakan sebelum ngoding</h3><span class="time">⏱ 1 jam</span></div>
+<button class="done" data-done="s2">Tandai selesai</button></header>
+<p class="goal">Tulis dulu apa yang mau dibuat, supaya tidak bongkar-pasang di tengah jalan.</p><ul class="ex"><li><b>Fitur</b>: daftar/login, katalog + cari, keranjang, checkout, pembayaran, admin.</li><li><b>Aturan penting</b>: stok tidak boleh minus, tidak boleh bayar dua kali, harga pesanan tidak berubah walau harga produk berubah.</li><li><b>Data</b>: users, products, categories, carts, orders, payments (lihat ERD di dokumen rekayasa).</li><li><b>Endpoint</b>: tulis daftar URL seperti <code>POST /auth/login</code>, <code>GET /products</code>, <code>POST /orders</code>.</li><li><b>Git flow</b>: branch <code>main</code> (rilis), <code>develop</code> (kerja), <code>feature/nama-fitur</code> per fitur.</li></ul><div class="check">✅ <b>Cek berhasil:</b> Kamu punya daftar fitur, tabel, dan endpoint di catatan.</div></article><div class="phase" id="phase-be" style="--pc:#0B7A94"><span class="pn">Bagian A</span><h2>Backend Go</h2></div><article class="step" id="s3" style="--pc:#0B7A94">
+<header><div class="num">3</div><div class="ht"><h3>Buat project Go dan Git</h3><span class="time">⏱ 15 menit</span></div>
+<button class="done" data-done="s3">Tandai selesai</button></header>
+<p class="goal">Membuat folder project, inisialisasi Git dengan branch develop, dan modul Go.</p><div class="code"><div class="ch"><span>⌨️ Terminal</span><button class="copy">Salin</button></div><pre><code><span class="k">mkdir</span> go-ecommerce-api &amp;&amp; cd go-ecommerce-api
+<span class="k">git</span> init -b main
+<span class="k">git</span> commit --allow-empty -m <span class="s">&quot;chore: initial commit&quot;</span>
+<span class="k">git</span> checkout -b develop
+<span class="k">git</span> checkout -b feature/foundation
+<span class="k">
+go</span> mod init github.com/aulansah/go-ecommerce-api</code></pre></div><div class="code"><div class="ch"><span>⌨️ Unduh library yang dipakai</span><button class="copy">Salin</button></div><pre><code><span class="k">go</span> get github.com/gofiber/fiber/v2 gorm.io/gorm gorm.io/driver/postgres \
+  github.com/redis/go-redis/v9 github.com/golang-jwt/jwt/v5 github.com/google/uuid \
+  github.com/spf13/viper go.uber.org/zap github.com/go-playground/validator/v10 \
+  golang.org/x/crypto github.com/golang-migrate/migrate/v4 github.com/stretchr/testify</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">.gitignore</code> — File yang tidak boleh ikut ke GitHub</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/.gitignore" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c"># Binaries</span>
+bin/
+*.exe
+*.test
+*.out
+
+<span class="c"># Local configuration and secrets</span>
+.env
+
+<span class="c"># Editors and OS files</span>
+.idea/
+.vscode/
+.DS_Store</code></pre></div><ul class="ex"><li><code>go mod init</code> membuat <code>go.mod</code> (daftar library). <code>go get</code> menambahkan library dan membuat <code>go.sum</code> (sidik jari library).</li><li>Buat struktur folder kosong: <code>cmd/api</code>, <code>internal/</code>, <code>pkg/</code>, <code>migrations/</code>, <code>tests/</code>.</li></ul><div class="check">✅ <b>Cek berhasil:</b> File <code>go.mod</code> berisi daftar library di atas.</div></article><article class="step" id="s4" style="--pc:#0B7A94">
+<header><div class="num">4</div><div class="ht"><h3>Setelan aplikasi (config)</h3><span class="time">⏱ 30 menit</span></div>
+<button class="done" data-done="s4">Tandai selesai</button></header>
+<p class="goal">Semua setelan (port, database, kunci rahasia) dibaca dari file <code>.env</code>, bukan ditulis di kode.</p><div class="why">💡 <b>Kenapa begini:</b> Kode yang sama bisa jalan di laptop, server test, dan production hanya dengan mengganti .env. Rahasia tidak ikut ke GitHub.</div><div class="code file"><div class="ch"><span>📄 <code class="p">.env.example</code> — Contoh setelan (salin menjadi .env)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/.env.example" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c"># Copy to .env for local development. Real environment variables override</span>
+<span class="c"># the values in this file. Never commit a real .env file.</span>
+
+<span class="c"># Application</span>
+APP_NAME=go-ecommerce-api
+APP_ENV=development          <span class="c"># development | production</span>
+APP_PORT=8080
+LOG_LEVEL=info               <span class="c"># debug | info | warn | error</span>
+AUTO_MIGRATE=true            <span class="c"># apply SQL migrations on startup</span>
+BCRYPT_COST=12
+
+<span class="c"># PostgreSQL</span>
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=ecommerce
+DB_SSLMODE=disable
+DB_MAX_OPEN_CONNS=25
+DB_MAX_IDLE_CONNS=5
+
+<span class="c"># Redis (cache + rate limiter; the API keeps working when it is down)</span>
+REDIS_ADDR=localhost:6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+<span class="c"># JWT. Generate a secret with: openssl rand -base64 48</span>
+JWT_SECRET=change-me-to-a-random-string-of-at-least-32-characters
+JWT_ACCESS_TTL=15m
+JWT_REFRESH_TTL=168h</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/config/config.go</code> — Membaca setelan dengan Viper</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/config/config.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Load reads configuration. Real environment variables always win over the</span>
+<span class="c">// .env file, which keeps the same binary usable locally and in containers.</span>
+<span class="k">func</span> Load() (*Config, error) {
+    v := viper.New()
+    v.SetConfigFile(<span class="s">&quot;.env&quot;</span>)
+    v.SetConfigType(<span class="s">&quot;env&quot;</span>)
+    v.AutomaticEnv()
+    setDefaults(v)
+
+    <span class="k">if</span> <span class="k">err</span> := v.ReadInConfig(); <span class="k">err</span> != <span class="k">nil</span> &amp;&amp; !errors.Is(<span class="k">err</span>, fs.ErrNotExist) {
+        <span class="k">return</span> <span class="k">nil</span>, fmt.Errorf(<span class="s">&quot;read .env: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    cfg := &amp;Config{
+        App: AppConfig{
+            Name:        v.GetString(<span class="s">&quot;APP_NAME&quot;</span>),
+            Env:         v.GetString(<span class="s">&quot;APP_ENV&quot;</span>),
+            Port:        v.GetString(<span class="s">&quot;APP_PORT&quot;</span>),
+            LogLevel:    v.GetString(<span class="s">&quot;LOG_LEVEL&quot;</span>),
+            AutoMigrate: v.GetBool(<span class="s">&quot;AUTO_MIGRATE&quot;</span>),
+            BcryptCost:  v.GetInt(<span class="s">&quot;BCRYPT_COST&quot;</span>),
+        },
+        DB: DBConfig{
+            Host:         v.GetString(<span class="s">&quot;DB_HOST&quot;</span>),
+            Port:         v.GetString(<span class="s">&quot;DB_PORT&quot;</span>),
+            User:         v.GetString(<span class="s">&quot;DB_USER&quot;</span>),
+            Password:     v.GetString(<span class="s">&quot;DB_PASSWORD&quot;</span>),
+            Name:         v.GetString(<span class="s">&quot;DB_NAME&quot;</span>),
+            SSLMode:      v.GetString(<span class="s">&quot;DB_SSLMODE&quot;</span>),
+            MaxOpenConns: v.GetInt(<span class="s">&quot;DB_MAX_OPEN_CONNS&quot;</span>),
+            MaxIdleConns: v.GetInt(<span class="s">&quot;DB_MAX_IDLE_CONNS&quot;</span>),
+        },
+        Redis: RedisConfig{
+            Addr:     v.GetString(<span class="s">&quot;REDIS_ADDR&quot;</span>),
+            Password: v.GetString(<span class="s">&quot;REDIS_PASSWORD&quot;</span>),
+            DB:       v.GetInt(<span class="s">&quot;REDIS_DB&quot;</span>),
+        },
+        JWT: JWTConfig{
+            Secret:     v.GetString(<span class="s">&quot;JWT_SECRET&quot;</span>),
+            AccessTTL:  v.GetDuration(<span class="s">&quot;JWT_ACCESS_TTL&quot;</span>),
+            RefreshTTL: v.GetDuration(<span class="s">&quot;JWT_REFRESH_TTL&quot;</span>),
+        },
+        CORS: CORSConfig{AllowOrigins: v.GetString(<span class="s">&quot;CORS_ALLOW_ORIGINS&quot;</span>)},
+        RateLimit: RateLimitConfig{
+            Enabled: v.GetBool(<span class="s">&quot;RATE_LIMIT_ENABLED&quot;</span>),
+            Max:     v.GetInt(<span class="s">&quot;RATE_LIMIT_MAX&quot;</span>),
+            Window:  v.GetDuration(<span class="s">&quot;RATE_LIMIT_WINDOW&quot;</span>),
+        },
+        Cache: CacheConfig{
+            ProductTTL:     v.GetDuration(<span class="s">&quot;CACHE_PRODUCT_TTL&quot;</span>),
+            ProductListTTL: v.GetDuration(<span class="s">&quot;CACHE_PRODUCT_LIST_TTL&quot;</span>),
+        },
+        Payment: PaymentConfig{Expiry: v.GetDuration(<span class="s">&quot;PAYMENT_EXPIRY&quot;</span>)},
+        Admin: AdminConfig{
+            Name:     v.GetString(<span class="s">&quot;ADMIN_NAME&quot;</span>),
+            Email:    strings.ToLower(strings.TrimSpace(v.GetString(<span class="s">&quot;ADMIN_EMAIL&quot;</span>))),
+            Password: v.GetString(<span class="s">&quot;ADMIN_PASSWORD&quot;</span>),
+        },
+    }
+
+    <span class="k">if</span> <span class="k">err</span> := cfg.validate(); <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">err</span>
+    }
+    <span class="k">return</span> cfg, <span class="k">nil</span>
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/config/config.go</code> — Menolak setelan berbahaya</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/config/config.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// validate fails fast on configuration that would make the app insecure or</span>
+<span class="c">// unable to start, instead of discovering it on the first request.</span>
+<span class="k">func</span> (c *Config) validate() error {
+    <span class="k">if</span> len(c.JWT.Secret) &lt; 32 {
+        <span class="k">return</span> errors.New(<span class="s">&quot;JWT_SECRET must be set and at least 32 characters long&quot;</span>)
+    }
+    <span class="k">if</span> c.JWT.AccessTTL &lt;= 0 || c.JWT.RefreshTTL &lt;= 0 {
+        <span class="k">return</span> errors.New(<span class="s">&quot;JWT_ACCESS_TTL and JWT_REFRESH_TTL must be positive durations&quot;</span>)
+    }
+    <span class="k">if</span> c.App.BcryptCost &lt; 4 || c.App.BcryptCost &gt; 31 {
+        <span class="k">return</span> errors.New(<span class="s">&quot;BCRYPT_COST must be between 4 and 31&quot;</span>)
+    }
+    <span class="k">if</span> c.IsProduction() &amp;&amp; strings.TrimSpace(c.CORS.AllowOrigins) == <span class="s">&quot;*&quot;</span> {
+        <span class="k">return</span> errors.New(<span class="s">&quot;CORS_ALLOW_ORIGINS must not be &#x27;*&#x27; in production&quot;</span>)
+    }
+    <span class="k">return</span> <span class="k">nil</span>
+}</code></pre></div><div class="check">✅ <b>Cek berhasil:</b> Belum bisa dijalankan; lanjut ke langkah berikutnya.</div></article><article class="step" id="s5" style="--pc:#0B7A94">
+<header><div class="num">5</div><div class="ht"><h3>Rancang database (migration)</h3><span class="time">⏱ 1 jam</span></div>
+<button class="done" data-done="s5">Tandai selesai</button></header>
+<p class="goal">Tulis tabel dalam SQL. File ini dijalankan otomatis saat server menyala.</p><div class="why">💡 <b>Kenapa begini:</b> Aturan penting dijaga oleh database juga, bukan hanya kode: <code>CHECK (stock >= 0)</code> mencegah stok minus walau ada bug.</div><div class="code file"><div class="ch"><span>📄 <code class="p">migrations/000001_init_schema.up.sql</code> — Sebagian tabel (users, refresh_tokens, categories, products)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/migrations/000001_init_schema.up.sql" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">-- gen_random_uuid() is built into PostgreSQL 13+.</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> users (
+    id            <span class="k">UUID</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="k">DEFAULT</span> gen_random_uuid(),
+    name          <span class="k">VARCHAR</span>(100) <span class="k">NOT</span> <span class="k">NULL</span>,
+    email         <span class="k">VARCHAR</span>(255) <span class="k">NOT</span> <span class="k">NULL</span>,
+    password_hash <span class="k">VARCHAR</span>(255) <span class="k">NOT</span> <span class="k">NULL</span>,
+    role          <span class="k">VARCHAR</span>(20)  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> <span class="s">&#x27;customer&#x27;</span> <span class="k">CHECK</span> (role <span class="k">IN</span> (<span class="s">&#x27;admin&#x27;</span>, <span class="s">&#x27;customer&#x27;</span>)),
+    created_at    <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    updated_at    <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    deleted_at    <span class="k">TIMESTAMPTZ</span>
+);
+<span class="c">-- Partial unique index: the email of a soft-deleted account can be reused.</span>
+<span class="k">CREATE</span> <span class="k">UNIQUE</span> <span class="k">INDEX</span> uq_users_email <span class="k">ON</span> users (email) <span class="k">WHERE</span> deleted_at IS <span class="k">NULL</span>;
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_users_deleted_at <span class="k">ON</span> users (deleted_at);
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> refresh_tokens (
+    id         <span class="k">UUID</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="k">DEFAULT</span> gen_random_uuid(),
+    user_id    <span class="k">UUID</span>        <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">REFERENCES</span> users (id) <span class="k">ON</span> <span class="k">DELETE</span> <span class="k">CASCADE</span>,
+    token_hash <span class="k">CHAR</span>(64)    <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">UNIQUE</span>,
+    expires_at <span class="k">TIMESTAMPTZ</span> <span class="k">NOT</span> <span class="k">NULL</span>,
+    revoked_at <span class="k">TIMESTAMPTZ</span>,
+    created_at <span class="k">TIMESTAMPTZ</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now()
+);
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_refresh_tokens_user_id <span class="k">ON</span> refresh_tokens (user_id);
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> categories (
+    id         <span class="k">UUID</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="k">DEFAULT</span> gen_random_uuid(),
+    name       <span class="k">VARCHAR</span>(100) <span class="k">NOT</span> <span class="k">NULL</span>,
+    slug       <span class="k">VARCHAR</span>(120) <span class="k">NOT</span> <span class="k">NULL</span>,
+    created_at <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    updated_at <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    deleted_at <span class="k">TIMESTAMPTZ</span>
+);
+<span class="k">CREATE</span> <span class="k">UNIQUE</span> <span class="k">INDEX</span> uq_categories_slug <span class="k">ON</span> categories (slug) <span class="k">WHERE</span> deleted_at IS <span class="k">NULL</span>;
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_categories_deleted_at <span class="k">ON</span> categories (deleted_at);
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> products (
+    id          <span class="k">UUID</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="k">DEFAULT</span> gen_random_uuid(),
+    category_id <span class="k">UUID</span>         <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">REFERENCES</span> categories (id) <span class="k">ON</span> <span class="k">DELETE</span> <span class="k">RESTRICT</span>,
+    name        <span class="k">VARCHAR</span>(200) <span class="k">NOT</span> <span class="k">NULL</span>,
+    slug        <span class="k">VARCHAR</span>(220) <span class="k">NOT</span> <span class="k">NULL</span>,
+    description <span class="k">TEXT</span>         <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> <span class="s">&#x27;&#x27;</span>,
+    <span class="c">-- Money is stored as an integer amount of the smallest currency unit.</span>
+    price       <span class="k">BIGINT</span>       <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">CHECK</span> (price &gt;= 0),
+    <span class="c">-- Last line of defence against overselling: stock can never go negative.</span>
+    stock       <span class="k">INTEGER</span>      <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> 0 <span class="k">CHECK</span> (stock &gt;= 0),
+    created_at  <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    updated_at  <span class="k">TIMESTAMPTZ</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),
+    deleted_at  <span class="k">TIMESTAMPTZ</span>
+);
+<span class="k">CREATE</span> <span class="k">UNIQUE</span> <span class="k">INDEX</span> uq_products_slug <span class="k">ON</span> products (slug) <span class="k">WHERE</span> deleted_at IS <span class="k">NULL</span>;
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_products_category_id <span class="k">ON</span> products (category_id);
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_products_created_at <span class="k">ON</span> products (created_at DESC);
+<span class="k">CREATE</span> <span class="k">INDEX</span> idx_products_deleted_at <span class="k">ON</span> products (deleted_at);
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> carts (
+    id         <span class="k">UUID</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="k">DEFAULT</span> gen_random_uuid(),
+    user_id    <span class="k">UUID</span>        <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">UNIQUE</span> <span class="k">REFERENCES</span> users (id) <span class="k">ON</span> <span class="k">DELETE</span> <span class="k">CASCADE</span>,
+    created_at <span class="k">TIMESTAMPTZ</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> now(),</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">migrations/embed.go</code> — Memasukkan file SQL ke dalam program</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/migrations/embed.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Package migrations embeds the SQL migration files into the binary so the</span>
+<span class="c">// container image needs no extra files to migrate the database.</span>
+<span class="k">package</span> migrations
+
+<span class="k">import</span> <span class="s">&quot;embed&quot;</span>
+
+<span class="c">//go:embed *.sql</span>
+<span class="k">var</span> FS embed.FS</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/database/migrate.go</code> — Menjalankan migration saat startup</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/database/migrate.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Migrate applies every pending SQL migration embedded in the binary.</span>
+<span class="c">//</span>
+<span class="c">// It uses its own short-lived connection because golang-migrate closes the</span>
+<span class="c">// connection it is given when it finishes.</span>
+<span class="k">func</span> Migrate(dsn string) error {
+    db, <span class="k">err</span> := sql.Open(<span class="s">&quot;pgx&quot;</span>, dsn)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;open migration connection: %w&quot;</span>, <span class="k">err</span>)
+    }
+    <span class="k">defer</span> db.Close()
+
+    driver, <span class="k">err</span> := migratepgx.WithInstance(db, &amp;migratepgx.Config{})
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;create migration driver: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    source, <span class="k">err</span> := iofs.New(migrations.FS, <span class="s">&quot;.&quot;</span>)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;load migration files: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    m, <span class="k">err</span> := migrate.NewWithInstance(<span class="s">&quot;iofs&quot;</span>, source, <span class="s">&quot;postgres&quot;</span>, driver)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;init migrate: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    <span class="k">if</span> <span class="k">err</span> := m.Up(); <span class="k">err</span> != <span class="k">nil</span> &amp;&amp; !errors.Is(<span class="k">err</span>, migrate.ErrNoChange) {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;apply migrations: %w&quot;</span>, <span class="k">err</span>)
+    }
+    <span class="k">return</span> <span class="k">nil</span>
+}</code></pre></div><ul class="ex"><li>Nama file bernomor: <code>000001_..._up.sql</code> untuk membuat, <code>..._down.sql</code> untuk membatalkan.</li><li>Perubahan berikutnya? Buat file baru <code>000002_...</code>. Jangan mengedit file lama yang sudah dipakai.</li></ul></article><article class="step" id="s6" style="--pc:#0B7A94">
+<header><div class="num">6</div><div class="ht"><h3>Koneksi database &amp; transaksi</h3><span class="time">⏱ 45 menit</span></div>
+<button class="done" data-done="s6">Tandai selesai</button></header>
+<p class="goal">Membuka koneksi PostgreSQL dan menyiapkan cara menjalankan beberapa perintah sebagai satu paket (transaksi).</p><div class="why">💡 <b>Kenapa begini:</b> Checkout harus 'semua berhasil atau semua batal'. TxManager menyimpan transaksi di <code>context</code> sehingga repository mana pun otomatis ikut transaksi yang sama.</div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/database/postgres.go</code> — Koneksi + pool</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/database/postgres.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Connect opens the GORM connection and configures the connection pool.</span>
+<span class="k">func</span> Connect(cfg config.DBConfig, log *zap.Logger) (*gorm.DB, error) {
+    db, <span class="k">err</span> := gorm.Open(postgres.Open(cfg.DSN()), &amp;gorm.Config{
+        <span class="c">// GORM&#x27;s own logger is silenced; errors surface through the</span>
+        <span class="c">// application error handler with a request ID attached.</span>
+        Logger: gormlogger.Default.LogMode(gormlogger.Silent),
+        <span class="c">// TranslateError maps driver errors to gorm.ErrDuplicatedKey etc.,</span>
+        <span class="c">// so repositories do not depend on PostgreSQL error codes.</span>
+        TranslateError: <span class="k">true</span>,
+        NowFunc:        <span class="k">func</span>() time.Time { <span class="k">return</span> time.Now().UTC() },
+    })
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, fmt.Errorf(<span class="s">&quot;open database: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    sqlDB, <span class="k">err</span> := db.DB()
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, fmt.Errorf(<span class="s">&quot;get sql.DB: %w&quot;</span>, <span class="k">err</span>)
+    }
+    sqlDB.SetMaxOpenConns(cfg.MaxOpenConns)
+    sqlDB.SetMaxIdleConns(cfg.MaxIdleConns)
+    sqlDB.SetConnMaxLifetime(30 * time.Minute)
+
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    <span class="k">defer</span> cancel()
+    <span class="k">if</span> <span class="k">err</span> := sqlDB.PingContext(ctx); <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, fmt.Errorf(<span class="s">&quot;ping database: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    log.Info(<span class="s">&quot;database connected&quot;</span>, zap.String(<span class="s">&quot;host&quot;</span>, cfg.Host), zap.String(<span class="s">&quot;name&quot;</span>, cfg.Name))
+    <span class="k">return</span> db, <span class="k">nil</span>
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/database/postgres.go</code> — TxManager</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/database/postgres.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">type</span> txKey <span class="k">struct</span>{}
+
+<span class="c">// TxManager lets the service layer define a transaction boundary without</span>
+<span class="c">// importing GORM. The transaction travels inside the context, and every</span>
+<span class="c">// repository picks it up through FromContext.</span>
+<span class="k">type</span> TxManager <span class="k">struct</span> {
+    db *gorm.DB
+}
+
+<span class="k">func</span> NewTxManager(db *gorm.DB) *TxManager { <span class="k">return</span> &amp;TxManager{db: db} }
+
+<span class="c">// WithinTx runs fn inside one database transaction. Returning an error (or</span>
+<span class="c">// panicking) rolls everything back; returning nil commits.</span>
+<span class="k">func</span> (m *TxManager) WithinTx(ctx context.Context, fn <span class="k">func</span>(ctx context.Context) error) error {
+    <span class="k">return</span> m.db.WithContext(ctx).Transaction(<span class="k">func</span>(tx *gorm.DB) error {
+        <span class="k">return</span> fn(context.WithValue(ctx, txKey{}, tx))
+    })
+}
+
+<span class="c">// FromContext returns the transaction stored in ctx, or fallback when the</span>
+<span class="c">// call is not part of a transaction.</span>
+<span class="k">func</span> FromContext(ctx context.Context, fallback *gorm.DB) *gorm.DB {
+    <span class="k">if</span> tx, ok := ctx.Value(txKey{}).(*gorm.DB); ok {
+        <span class="k">return</span> tx
+    }
+    <span class="k">return</span> fallback.WithContext(ctx)
+}</code></pre></div></article><article class="step" id="s7" style="--pc:#0B7A94">
+<header><div class="num">7</div><div class="ht"><h3>Peralatan bersama</h3><span class="time">⏱ 1,5 jam</span></div>
+<button class="done" data-done="s7">Tandai selesai</button></header>
+<p class="goal">Format error, format jawaban, token JWT, dan cache Redis.</p><div class="code file"><div class="ch"><span>📄 <code class="p">pkg/apperror/apperror.go</code> — Jenis error yang otomatis menjadi kode HTTP</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/pkg/apperror/apperror.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">type</span> FieldError <span class="k">struct</span> {
+    Field   string <span class="s">`json:&quot;field&quot;`</span>
+    Message string <span class="s">`json:&quot;message&quot;`</span>
+}
+
+<span class="c">// AppError is an error that is safe to show to API clients.</span>
+<span class="c">// Err keeps the underlying cause for logging only; it is never serialized.</span>
+<span class="k">type</span> AppError <span class="k">struct</span> {
+    Status  int
+    Code    string
+    Message string
+    Details []FieldError
+    Err     error
+}
+
+<span class="k">func</span> (e *AppError) Error() string {
+    <span class="k">if</span> e.Err != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Sprintf(<span class="s">&quot;%s: %s: %v&quot;</span>, e.Code, e.Message, e.Err)
+    }
+    <span class="k">return</span> fmt.Sprintf(<span class="s">&quot;%s: %s&quot;</span>, e.Code, e.Message)
+}
+
+<span class="c">// Unwrap exposes the underlying cause to errors.Is / errors.As.</span>
+<span class="k">func</span> (e *AppError) Unwrap() error { <span class="k">return</span> e.Err }
+
+<span class="c">// New builds an AppError with an explicit status and code.</span>
+<span class="k">func</span> New(status int, code, message string) *AppError {
+    <span class="k">return</span> &amp;AppError{Status: status, Code: code, Message: message}
+}
+
+<span class="k">func</span> BadRequest(message string) *AppError {
+    <span class="k">return</span> New(http.StatusBadRequest, CodeBadRequest, message)
+}
+
+<span class="k">func</span> Validation(details []FieldError) *AppError {
+    e := New(http.StatusUnprocessableEntity, CodeValidation, <span class="s">&quot;Validation failed&quot;</span>)
+    e.Details = details
+    <span class="k">return</span> e
+}
+
+<span class="k">func</span> Unauthorized(message string) *AppError {
+    <span class="k">return</span> New(http.StatusUnauthorized, CodeUnauthorized, message)
+}
+
+<span class="k">func</span> Forbidden(message string) *AppError {
+    <span class="k">return</span> New(http.StatusForbidden, CodeForbidden, message)
+}
+
+<span class="k">func</span> NotFound(message string) *AppError {
+    <span class="k">return</span> New(http.StatusNotFound, CodeNotFound, message)
+}
+
+<span class="k">func</span> Conflict(message string) *AppError {
+    <span class="k">return</span> New(http.StatusConflict, CodeConflict, message)
+}
+
+<span class="k">func</span> TooManyRequests(message string) *AppError {
+    <span class="k">return</span> New(http.StatusTooManyRequests, CodeTooManyRequests, message)
+}
+
+<span class="c">// Internal wraps an unexpected error. The client only ever sees a generic</span>
+<span class="c">// message; the cause is logged by the error handler.</span>
+<span class="k">func</span> Internal(<span class="k">err</span> error) *AppError {
+    e := New(http.StatusInternalServerError, CodeInternal, <span class="s">&quot;Internal server error&quot;</span>)
+    e.Err = <span class="k">err</span>
+    <span class="k">return</span> e
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">pkg/response/response.go</code> — Amplop jawaban yang seragam</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/pkg/response/response.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">type</span> Envelope <span class="k">struct</span> {
+    Success bool   <span class="s">`json:&quot;success&quot;`</span>
+    Message string <span class="s">`json:&quot;message&quot;`</span>
+    Data    any    <span class="s">`json:&quot;data&quot;`</span>
+    Meta    any    <span class="s">`json:&quot;meta&quot;`</span>
+}
+
+<span class="c">// Meta carries pagination information for list endpoints.</span>
+<span class="k">type</span> Meta <span class="k">struct</span> {
+    Page       int   <span class="s">`json:&quot;page&quot;`</span>
+    Limit      int   <span class="s">`json:&quot;limit&quot;`</span>
+    TotalItems int64 <span class="s">`json:&quot;total_items&quot;`</span>
+    TotalPages int   <span class="s">`json:&quot;total_pages&quot;`</span>
+}
+
+<span class="c">// NewMeta computes the page count for a list response.</span>
+<span class="k">func</span> NewMeta(page, limit int, total int64) Meta {
+    pages := 0
+    <span class="k">if</span> limit &gt; 0 {
+        pages = int((total + int64(limit) - 1) / int64(limit))
+    }
+    <span class="k">return</span> Meta{Page: page, Limit: limit, TotalItems: total, TotalPages: pages}
+}
+
+<span class="c">// ErrorBody is the &quot;error&quot; object of an error response.</span>
+<span class="k">type</span> ErrorBody <span class="k">struct</span> {
+    Code    string                <span class="s">`json:&quot;code&quot;`</span>
+    Details []apperror.FieldError <span class="s">`json:&quot;details,omitempty&quot;`</span>
+}
+
+<span class="c">// ErrorEnvelope is the error response format.</span>
+<span class="k">type</span> ErrorEnvelope <span class="k">struct</span> {
+    Success   bool      <span class="s">`json:&quot;success&quot;`</span>
+    Message   string    <span class="s">`json:&quot;message&quot;`</span>
+    Error     ErrorBody <span class="s">`json:&quot;error&quot;`</span>
+    RequestID string    <span class="s">`json:&quot;request_id,omitempty&quot;`</span>
+}
+
+<span class="k">func</span> OK(c *fiber.Ctx, message string, data any) error {
+    <span class="k">return</span> c.Status(fiber.StatusOK).JSON(Envelope{Success: <span class="k">true</span>, Message: message, Data: data})
+}
+
+<span class="k">func</span> Created(c *fiber.Ctx, message string, data any) error {
+    <span class="k">return</span> c.Status(fiber.StatusCreated).JSON(Envelope{Success: <span class="k">true</span>, Message: message, Data: data})
+}
+
+<span class="k">func</span> Paginated(c *fiber.Ctx, message string, data any, meta Meta) error {
+    <span class="k">return</span> c.Status(fiber.StatusOK).JSON(Envelope{Success: <span class="k">true</span>, Message: message, Data: data, Meta: meta})
+}
+
+<span class="k">func</span> NoContent(c *fiber.Ctx) error {
+    <span class="k">return</span> c.SendStatus(fiber.StatusNoContent)
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">pkg/token/token.go</code> — Membuat token JWT</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/pkg/token/token.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Generate issues a signed access token for the given user.</span>
+<span class="k">func</span> (m *Manager) Generate(userID uuid.UUID, role string) (string, error) {
+    now := time.Now()
+    claims := Claims{
+        Role: role,
+        RegisteredClaims: jwt.RegisteredClaims{
+            Subject:   userID.String(),
+            Issuer:    m.issuer,
+            IssuedAt:  jwt.NewNumericDate(now),
+            ExpiresAt: jwt.NewNumericDate(now.Add(m.ttl)),
+            ID:        uuid.NewString(),
+        },
+    }
+    signed, <span class="k">err</span> := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(m.secret)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="s">&quot;&quot;</span>, fmt.Errorf(<span class="s">&quot;sign access token: %w&quot;</span>, <span class="k">err</span>)
+    }
+    <span class="k">return</span> signed, <span class="k">nil</span>
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/cache/redis.go</code> — Interface cache + implementasi Redis</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/cache/redis.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">type</span> Cache <span class="k">interface</span> {
+    <span class="c">// Get decodes the cached JSON value into dest. found is false on a miss.</span>
+    Get(ctx context.Context, key string, dest any) (found bool, <span class="k">err</span> error)
+    Set(ctx context.Context, key string, value any, ttl time.Duration) error
+    Delete(ctx context.Context, keys ...string) error
+    <span class="c">// Incr atomically increments a counter that never expires.</span>
+    Incr(ctx context.Context, key string) (int64, error)
+    <span class="c">// IncrWithTTL increments a counter and starts its TTL on first use.</span>
+    IncrWithTTL(ctx context.Context, key string, ttl time.Duration) (int64, error)
+    Ping(ctx context.Context) error
+}
+
+<span class="c">// RedisCache is the Redis-backed Cache implementation.</span>
+<span class="k">type</span> RedisCache <span class="k">struct</span> {
+    client *redis.Client
+}
+
+<span class="c">// NewRedis creates the client. Timeouts are short on purpose: when Redis is</span>
+<span class="c">// slow or down, requests must fall back to PostgreSQL quickly instead of</span>
+<span class="c">// queueing behind a dead cache.</span>
+<span class="k">func</span> NewRedis(cfg config.RedisConfig) *RedisCache {
+    <span class="k">return</span> &amp;RedisCache{client: redis.NewClient(&amp;redis.Options{
+        Addr:         cfg.Addr,
+        Password:     cfg.Password,
+        DB:           cfg.DB,
+        DialTimeout:  500 * time.Millisecond,
+        ReadTimeout:  500 * time.Millisecond,
+        WriteTimeout: 500 * time.Millisecond,
+        MaxRetries:   1,
+    })}
+}
+
+<span class="c">// NewRedisFromClient wraps an existing client (used by tests).</span>
+<span class="k">func</span> NewRedisFromClient(client *redis.Client) *RedisCache {
+    <span class="k">return</span> &amp;RedisCache{client: client}
+}
+
+<span class="k">func</span> (r *RedisCache) Get(ctx context.Context, key string, dest any) (bool, error) {
+    raw, <span class="k">err</span> := r.client.Get(ctx, key).Bytes()
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, redis.Nil) {
+        <span class="k">return</span> <span class="k">false</span>, <span class="k">nil</span>
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">false</span>, fmt.Errorf(<span class="s">&quot;redis get %s: %w&quot;</span>, key, <span class="k">err</span>)
+    }
+    <span class="k">if</span> <span class="k">err</span> := json.Unmarshal(raw, dest); <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">false</span>, fmt.Errorf(<span class="s">&quot;decode cached %s: %w&quot;</span>, key, <span class="k">err</span>)
+    }
+    <span class="k">return</span> <span class="k">true</span>, <span class="k">nil</span>
+}
+</code></pre></div><ul class="ex"><li>Service cukup <code>return apperror.Conflict("…")</code>; ErrorHandler pusat yang mengubahnya jadi HTTP 409 + JSON.</li><li>Cache dibuat sebagai <b>interface</b> supaya di test bisa diganti tiruan (miniredis).</li></ul></article><article class="step" id="s8" style="--pc:#0B7A94">
+<header><div class="num">8</div><div class="ht"><h3>Middleware (satpam)</h3><span class="time">⏱ 1 jam</span></div>
+<button class="done" data-done="s8">Tandai selesai</button></header>
+<p class="goal">Pemeriksa yang dilewati setiap request: token login, role admin, batas request.</p><div class="code file"><div class="ch"><span>📄 <code class="p">internal/middleware/auth.go</code> — Cek token JWT</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/middleware/auth.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Auth verifies the Bearer access token and stores the caller&#x27;s identity in</span>
+<span class="c">// the request context. Missing or invalid tokens produce 401.</span>
+<span class="k">func</span> Auth(tokens *token.Manager) fiber.Handler {
+    <span class="k">return</span> <span class="k">func</span>(c *fiber.Ctx) error {
+        header := c.Get(fiber.HeaderAuthorization)
+        scheme, value, found := strings.Cut(header, <span class="s">&quot; &quot;</span>)
+        <span class="k">if</span> !found || !strings.EqualFold(scheme, <span class="s">&quot;Bearer&quot;</span>) || strings.TrimSpace(value) == <span class="s">&quot;&quot;</span> {
+            <span class="k">return</span> apperror.Unauthorized(<span class="s">&quot;Missing or malformed Authorization header&quot;</span>)
+        }
+
+        claims, <span class="k">err</span> := tokens.Parse(strings.TrimSpace(value))
+        <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> apperror.Unauthorized(<span class="s">&quot;Invalid or expired token&quot;</span>)
+        }
+        userID, <span class="k">err</span> := claims.UserID()
+        <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> apperror.Unauthorized(<span class="s">&quot;Invalid or expired token&quot;</span>)
+        }
+
+        c.Locals(localUserID, userID)
+        c.Locals(localRole, claims.Role)
+        <span class="k">return</span> c.Next()
+    }
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/middleware/auth.go</code> — Hanya role tertentu</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/middleware/auth.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// RequireRole allows the request only when the authenticated user has one of</span>
+<span class="c">// the given roles. It must run after Auth. A valid token with the wrong role</span>
+<span class="c">// produces 403, which is different from 401 (no valid identity at all).</span>
+<span class="k">func</span> RequireRole(roles ...string) fiber.Handler {
+    <span class="k">return</span> <span class="k">func</span>(c *fiber.Ctx) error {
+        current := Role(c)
+        <span class="k">for</span> _, r := <span class="k">range</span> roles {
+            <span class="k">if</span> current == r {
+                <span class="k">return</span> c.Next()
+            }
+        }
+        <span class="k">return</span> apperror.Forbidden(<span class="s">&quot;You do not have permission to access this resource&quot;</span>)
+    }
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/middleware/http.go</code> — Batas request per IP (fail-open)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/middleware/http.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// RateLimit is a fixed-window limiter backed by Redis, keyed by client IP.</span>
+<span class="c">//</span>
+<span class="c">// It fails open: when Redis is unavailable the request is allowed, because a</span>
+<span class="c">// cache outage must not take the whole API down.</span>
+<span class="k">func</span> RateLimit(store cache.Cache, max int, window time.Duration, log *zap.Logger) fiber.Handler {
+    <span class="k">return</span> <span class="k">func</span>(c *fiber.Ctx) error {
+        key := <span class="s">&quot;ratelimit:&quot;</span> + c.IP()
+        count, <span class="k">err</span> := store.IncrWithTTL(c.UserContext(), key, window)
+        <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+            log.Warn(<span class="s">&quot;rate limiter unavailable, allowing request&quot;</span>, zap.Error(<span class="k">err</span>))
+            <span class="k">return</span> c.Next()
+        }
+
+        remaining := max - int(count)
+        <span class="k">if</span> remaining &lt; 0 {
+            remaining = 0
+        }
+        c.Set(<span class="s">&quot;X-RateLimit-Limit&quot;</span>, strconv.Itoa(max))
+        c.Set(<span class="s">&quot;X-RateLimit-Remaining&quot;</span>, strconv.Itoa(remaining))
+
+        <span class="k">if</span> int(count) &gt; max {
+            c.Set(fiber.HeaderRetryAfter, strconv.Itoa(int(window.Seconds())))
+            <span class="k">return</span> apperror.TooManyRequests(<span class="s">&quot;Too many requests, please try again later&quot;</span>)
+        }
+        <span class="k">return</span> c.Next()
+    }
+}</code></pre></div><div class="check">✅ <b>Cek berhasil:</b> Commit: <code>git add . && git commit -m "feat(middleware): …"</code>, lalu merge <code>feature/foundation</code> ke develop.</div></article><article class="step" id="s9" style="--pc:#0B7A94">
+<header><div class="num">9</div><div class="ht"><h3>Pola satu modul: handler → service → repository</h3><span class="time">⏱ 3 jam (user + auth)</span></div>
+<button class="done" data-done="s9">Tandai selesai</button></header>
+<p class="goal">Semua fitur dibuat dengan pola yang sama. Contoh: modul auth.</p><div class="why">💡 <b>Kenapa begini:</b> <b>Handler</b> hanya urusan HTTP, <b>service</b> hanya aturan bisnis, <b>repository</b> hanya database. Service bergantung pada <i>interface</i>, jadi bisa dites tanpa database.</div><div class="code"><div class="ch"><span>⌨️ Branch baru per fitur</span><button class="copy">Salin</button></div><pre><code><span class="k">git</span> checkout develop
+<span class="k">git</span> checkout -b feature/user    <span class="c"># buat modul user dulu (auth memakainya)</span>
+<span class="c"># … lalu feature/auth</span></code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/auth/handler.go</code> — Handler: terima request, panggil service</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/auth/handler.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Login handles POST /auth/login.</span>
+<span class="k">func</span> (h *Handler) Login(c *fiber.Ctx) error {
+    <span class="k">var</span> req LoginRequest
+    <span class="k">if</span> <span class="k">err</span> := utils.ParseBody(c, &amp;req); <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">err</span>
+    }
+    res, <span class="k">err</span> := h.svc.Login(c.UserContext(), req)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">err</span>
+    }
+    <span class="k">return</span> response.OK(c, <span class="s">&quot;Login successful&quot;</span>, res)
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/auth/service.go</code> — Service bergantung pada interface</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/auth/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">type</span> UserStore <span class="k">interface</span> {
+    Create(ctx context.Context, u *user.User) error
+    FindByID(ctx context.Context, id uuid.UUID) (*user.User, error)
+    FindByEmail(ctx context.Context, email string) (*user.User, error)
+}
+
+<span class="c">// TokenStore persists refresh tokens.</span>
+<span class="k">type</span> TokenStore <span class="k">interface</span> {
+    Create(ctx context.Context, t *RefreshToken) error
+    FindByHash(ctx context.Context, hash string) (*RefreshToken, error)
+    Revoke(ctx context.Context, id uuid.UUID) (bool, error)
+    RevokeAllForUser(ctx context.Context, userID uuid.UUID) error
+}
+
+<span class="k">type</span> Service <span class="k">struct</span> {
+    users      UserStore
+    tokens     TokenStore
+    jwt        *token.Manager
+    refreshTTL time.Duration
+    bcryptCost int
+}
+
+<span class="k">func</span> NewService(users UserStore, tokens TokenStore, jwt *token.Manager, refreshTTL time.Duration, bcryptCost int) *Service {
+    <span class="k">return</span> &amp;Service{users: users, tokens: tokens, jwt: jwt, refreshTTL: refreshTTL, bcryptCost: bcryptCost}
+}
+
+<span class="c">// errInvalidCredentials is identical for &quot;unknown email&quot; and &quot;wrong</span>
+<span class="c">// password&quot; so the API does not reveal which emails are registered.</span>
+<span class="k">var</span> errInvalidCredentials = apperror.Unauthorized(<span class="s">&quot;Invalid email or password&quot;</span>)
+</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/auth/service.go</code> — Aturan login</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/auth/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Login verifies the credentials and issues a token pair.</span>
+<span class="k">func</span> (s *Service) Login(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
+    u, <span class="k">err</span> := s.users.FindByEmail(ctx, normalizeEmail(req.Email))
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrNotFound) {
+        <span class="k">return</span> <span class="k">nil</span>, errInvalidCredentials
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">if</span> bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(req.Password)) != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, errInvalidCredentials
+    }
+
+    tokens, <span class="k">err</span> := s.issueTokens(ctx, u)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">err</span>
+    }
+    <span class="k">return</span> &amp;LoginResponse{User: user.ToResponse(u), Tokens: *tokens}, <span class="k">nil</span>
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/auth/service.go</code> — Rotasi refresh token + deteksi pemakaian ulang</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/auth/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Refresh rotates the refresh token: the presented token is revoked and a</span>
+<span class="c">// new pair is issued.</span>
+<span class="c">//</span>
+<span class="c">// If a token that was already revoked is presented again, it was either</span>
+<span class="c">// replayed by an attacker or by the legitimate user after theft. Both cases</span>
+<span class="c">// are handled the same way: every session of that user is revoked.</span>
+<span class="k">func</span> (s *Service) Refresh(ctx context.Context, req RefreshRequest) (*TokenResponse, error) {
+    invalid := apperror.Unauthorized(<span class="s">&quot;Invalid or expired refresh token&quot;</span>)
+
+    stored, <span class="k">err</span> := s.tokens.FindByHash(ctx, hashToken(req.RefreshToken))
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrNotFound) {
+        <span class="k">return</span> <span class="k">nil</span>, invalid
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">if</span> time.Now().After(stored.ExpiresAt) {
+        <span class="k">return</span> <span class="k">nil</span>, invalid
+    }
+
+    revoked, <span class="k">err</span> := s.tokens.Revoke(ctx, stored.ID)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">if</span> !revoked {
+        <span class="k">if</span> <span class="k">err</span> := s.tokens.RevokeAllForUser(ctx, stored.UserID); <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+        }
+        <span class="k">return</span> <span class="k">nil</span>, invalid
+    }
+
+    u, <span class="k">err</span> := s.users.FindByID(ctx, stored.UserID)
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrNotFound) {
+        <span class="k">return</span> <span class="k">nil</span>, invalid
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">return</span> s.issueTokens(ctx, u)
+}</code></pre></div><ul class="ex"><li>Urutan menulis per modul: <code>model.go</code> (bentuk data) → <code>repository.go</code> → <code>service.go</code> → <code>handler.go</code> → test.</li><li>Password disimpan dengan bcrypt; refresh token disimpan sebagai hash SHA-256.</li></ul></article><article class="step" id="s10" style="--pc:#0B7A94">
+<header><div class="num">10</div><div class="ht"><h3>Modul katalog (kategori &amp; produk)</h3><span class="time">⏱ 3 jam</span></div>
+<button class="done" data-done="s10">Tandai selesai</button></header>
+<p class="goal">Produk bisa dicari, difilter, dibagi per halaman, dan dibaca dari cache.</p><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/product/service.go</code> — Cache-aside: cek Redis dulu, kalau tidak ada ambil dari DB lalu simpan</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/product/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Get returns a product using the cache-aside strategy:</span>
+<span class="c">//</span>
+<span class="c">//  1. Try Redis.</span>
+<span class="c">//  2. On a miss (or any Redis error) read PostgreSQL.</span>
+<span class="c">//  3. Store the result in Redis with a TTL for the next reader.</span>
+<span class="c">//</span>
+<span class="c">// Redis errors are logged and otherwise ignored: the cache may only ever make</span>
+<span class="c">// a request faster, never make it fail.</span>
+<span class="k">func</span> (s *Service) Get(ctx context.Context, id uuid.UUID) (*Response, error) {
+    key := detailKey(id)
+
+    <span class="k">var</span> cached Response
+    found, <span class="k">err</span> := s.cache.Get(ctx, key, &amp;cached)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        s.log.Warn(<span class="s">&quot;product cache read failed&quot;</span>, zap.Error(<span class="k">err</span>))
+    }
+    <span class="k">if</span> found {
+        <span class="k">return</span> &amp;cached, <span class="k">nil</span>
+    }
+
+    p, <span class="k">err</span> := s.repo.FindByID(ctx, id)
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrNotFound) {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.NotFound(<span class="s">&quot;Product not found&quot;</span>)
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+
+    res := ToResponse(p)
+    <span class="k">if</span> <span class="k">err</span> := s.cache.Set(ctx, key, res, s.detailTTL); <span class="k">err</span> != <span class="k">nil</span> {
+        s.log.Warn(<span class="s">&quot;product cache write failed&quot;</span>, zap.Error(<span class="k">err</span>))
+    }
+    <span class="k">return</span> &amp;res, <span class="k">nil</span>
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/product/repository.go</code> — Kurangi stok HANYA jika cukup (dipakai checkout)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/product/repository.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// DecreaseStock atomically reserves qty units and returns the updated row.</span>
+<span class="c">//</span>
+<span class="c">// The whole check-and-decrement is a single statement:</span>
+<span class="c">//</span>
+<span class="c">//    UPDATE products SET stock = stock - $qty</span>
+<span class="c">//    WHERE id = $id AND stock &gt;= $qty AND deleted_at IS NULL</span>
+<span class="c">//    RETURNING *</span>
+<span class="c">//</span>
+<span class="c">// PostgreSQL takes a row lock for the UPDATE, so two concurrent checkouts</span>
+<span class="c">// cannot both pass the &quot;stock &gt;= qty&quot; condition for the last unit. When no</span>
+<span class="c">// row is affected the product is out of stock (or gone).</span>
+<span class="k">func</span> (r *GormRepository) DecreaseStock(ctx context.Context, id uuid.UUID, qty int) (*Product, error) {
+    <span class="k">var</span> p Product
+    res := database.FromContext(ctx, r.db).Model(&amp;p).
+        Clauses(clause.Returning{}).
+        Where(<span class="s">&quot;id = ? AND stock &gt;= ?&quot;</span>, id, qty).
+        Updates(<span class="k">map</span>[string]any{
+            <span class="s">&quot;stock&quot;</span>:      gorm.Expr(<span class="s">&quot;stock - ?&quot;</span>, qty),
+            <span class="s">&quot;updated_at&quot;</span>: time.Now().UTC(),
+        })
+    <span class="k">if</span> res.Error != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, res.Error
+    }
+    <span class="k">if</span> res.RowsAffected == 0 {
+        <span class="k">return</span> <span class="k">nil</span>, ErrInsufficientStock
+    }
+    <span class="k">return</span> &amp;p, <span class="k">nil</span>
+}</code></pre></div><ul class="ex"><li><code>WHERE stock >= ?</code> adalah kunci anti-overselling: kalau stok kurang, tidak ada baris yang berubah dan service tahu harus menolak.</li></ul></article><article class="step" id="s11" style="--pc:#0B7A94">
+<header><div class="num">11</div><div class="ht"><h3>Modul keranjang</h3><span class="time">⏱ 2 jam</span></div>
+<button class="done" data-done="s11">Tandai selesai</button></header>
+<p class="goal">Keranjang per user. Tidak menyimpan harga; total selalu dihitung dari harga terbaru.</p><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/cart/cart.go</code> — Total dihitung saat dibaca</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/cart/cart.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// ToResponse computes subtotals and the cart total from current prices.</span>
+<span class="c">// Totals are derived on every read instead of being stored, so they can</span>
+<span class="c">// never drift from the items.</span>
+<span class="k">func</span> ToResponse(c *Cart) Response {
+    res := Response{ID: c.ID, Items: make([]ItemResponse, 0, len(c.Items))}
+    <span class="k">for</span> _, it := <span class="k">range</span> c.Items {
+        exists := it.Product.ID != uuid.Nil
+        line := ItemResponse{
+            ID:          it.ID,
+            ProductID:   it.ProductID,
+            ProductName: it.Product.Name,
+            ProductSlug: it.Product.Slug,
+            UnitPrice:   it.Product.Price,
+            Quantity:    it.Quantity,
+            Subtotal:    it.Product.Price * int64(it.Quantity),
+            Available:   exists &amp;&amp; it.Product.Stock &gt;= it.Quantity,
+        }
+        res.Items = append(res.Items, line)
+        res.TotalItems += it.Quantity
+        res.TotalAmount += line.Subtotal
+    }
+    <span class="k">return</span> res
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/cart/service.go</code> — Tambah item dengan cek stok</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/cart/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// AddItem adds a product to the cart. Adding a product that is already in</span>
+<span class="c">// the cart increases its quantity. The resulting quantity may not exceed the</span>
+<span class="c">// available stock.</span>
+<span class="c">//</span>
+<span class="c">// This check is a courtesy to the user, not the oversell protection: stock</span>
+<span class="c">// can still change before checkout, where it is enforced atomically.</span>
+<span class="k">func</span> (s *Service) AddItem(ctx context.Context, userID uuid.UUID, req AddItemRequest) (*Cart, error) {
+    productID, <span class="k">err</span> := uuid.Parse(req.ProductID)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.BadRequest(<span class="s">&quot;Invalid product_id&quot;</span>)
+    }
+
+    p, <span class="k">err</span> := s.products.FindByID(ctx, productID)
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrNotFound) {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.NotFound(<span class="s">&quot;Product not found&quot;</span>)
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">if</span> p.Stock &lt;= 0 {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Conflict(<span class="s">&quot;Product is out of stock&quot;</span>)
+    }
+
+    c, <span class="k">err</span> := s.Get(ctx, userID)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">err</span>
+    }
+
+    quantity := req.Quantity
+    <span class="k">for</span> _, it := <span class="k">range</span> c.Items {
+        <span class="k">if</span> it.ProductID == productID {
+            quantity += it.Quantity
+            <span class="k">break</span>
+        }
+    }
+    <span class="k">if</span> quantity &gt; p.Stock {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Conflict(fmt.Sprintf(<span class="s">&quot;Only %d unit(s) of this product are available&quot;</span>, p.Stock))
+    }
+
+    <span class="k">if</span> <span class="k">err</span> := s.repo.UpsertItem(ctx, c.ID, productID, quantity); <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">return</span> s.Get(ctx, userID)
+}</code></pre></div></article><article class="step" id="s12" style="--pc:#0B7A94">
+<header><div class="num">12</div><div class="ht"><h3>Modul pesanan (checkout)</h3><span class="time">⏱ 3 jam</span></div>
+<button class="done" data-done="s12">Tandai selesai</button></header>
+<p class="goal">Bagian terpenting: keranjang menjadi pesanan dalam satu transaksi tanpa overselling.</p><div class="why">💡 <b>Kenapa begini:</b> Ini yang membedakan portfolio biasa dengan yang 'production-minded'. Tes rebutan stok membuktikannya: 300 pembeli, stok 50 → tepat 50 pesanan.</div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/order/service.go</code> — Checkout transaksional</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/order/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Create converts the user&#x27;s cart into an order.</span>
+<span class="c">//</span>
+<span class="c">// Everything runs in one transaction: reserving stock for every item,</span>
+<span class="c">// inserting the order with its item snapshots, and clearing the cart. If any</span>
+<span class="c">// step fails (for example one product is out of stock) the whole checkout is</span>
+<span class="c">// rolled back and no stock is lost.</span>
+<span class="c">//</span>
+<span class="c">// Prices and names come from the row returned by the stock update itself,</span>
+<span class="c">// never from the request, so the client cannot influence what it pays.</span>
+<span class="k">func</span> (s *Service) Create(ctx context.Context, userID uuid.UUID) (*Order, error) {
+    <span class="k">var</span> created *Order
+    <span class="k">var</span> productIDs []uuid.UUID
+
+    <span class="k">err</span> := s.tx.WithinTx(ctx, <span class="k">func</span>(ctx context.Context) error {
+        c, <span class="k">err</span> := s.carts.GetForCheckout(ctx, userID)
+        <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">err</span>
+        }
+        <span class="k">if</span> len(c.Items) == 0 {
+            <span class="k">return</span> apperror.BadRequest(<span class="s">&quot;Cart is empty&quot;</span>)
+        }
+
+        <span class="c">// Always lock product rows in the same order. Two checkouts that</span>
+        <span class="c">// share products would otherwise be able to deadlock each other.</span>
+        items := append([]cart.Item(<span class="k">nil</span>), c.Items...)
+        sort.Slice(items, <span class="k">func</span>(i, j int) bool {
+            <span class="k">return</span> items[i].ProductID.String() &lt; items[j].ProductID.String()
+        })
+
+        order := &amp;Order{
+            UserID: userID,
+            Status: StatusPending,
+            Items:  make([]Item, 0, len(items)),
+        }
+        <span class="k">for</span> _, it := <span class="k">range</span> items {
+            p, <span class="k">err</span> := s.stock.DecreaseStock(ctx, it.ProductID, it.Quantity)
+            <span class="k">if</span> errors.Is(<span class="k">err</span>, product.ErrInsufficientStock) {
+                name := it.Product.Name
+                <span class="k">if</span> name == <span class="s">&quot;&quot;</span> {
+                    name = <span class="s">&quot;A product in your cart&quot;</span>
+                }
+                <span class="k">return</span> apperror.Conflict(fmt.Sprintf(<span class="s">&quot;%s is out of stock or no longer available in the requested quantity&quot;</span>, name))
+            }
+            <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+                <span class="k">return</span> <span class="k">err</span>
+            }
+
+            productID := p.ID
+            subtotal := p.Price * int64(it.Quantity)
+            order.Items = append(order.Items, Item{
+                ProductID:   &amp;productID,
+                ProductName: p.Name,
+                UnitPrice:   p.Price,
+                Quantity:    it.Quantity,
+                Subtotal:    subtotal,
+            })
+            order.TotalAmount += subtotal
+            productIDs = append(productIDs, p.ID)
+        }
+
+        number, <span class="k">err</span> := newOrderNumber()
+        <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">err</span>
+        }
+        order.OrderNumber = number
+
+        <span class="k">if</span> <span class="k">err</span> := s.repo.Create(ctx, order); <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">err</span>
+        }
+        <span class="k">if</span> <span class="k">err</span> := s.carts.Clear(ctx, c.ID); <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">err</span>
+        }
+        created = order
+        <span class="k">return</span> <span class="k">nil</span>
+    })
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, wrap(<span class="k">err</span>)
+    }
+
+    <span class="c">// Only after a successful commit: cached products now show stale stock.</span>
+    <span class="c">// … (lanjutan ada di file lengkap)</span></code></pre></div><ul class="ex"><li><code>GetForCheckout</code> mengunci baris keranjang (<code>SELECT … FOR UPDATE</code>): tap ganda tidak membuat dua pesanan.</li><li>Produk diurutkan per ID sebelum dikunci, supaya dua checkout tidak saling menunggu selamanya (deadlock).</li><li>Harga disalin ke <code>order_items</code> (snapshot).</li></ul></article><article class="step" id="s13" style="--pc:#0B7A94">
+<header><div class="num">13</div><div class="ht"><h3>Modul pembayaran (idempotent)</h3><span class="time">⏱ 3 jam</span></div>
+<button class="done" data-done="s13">Tandai selesai</button></header>
+<p class="goal">Pembayaran simulasi yang aman diulang: header <code>Idempotency-Key</code> yang sama → pembayaran yang sama.</p><div class="code file"><div class="ch"><span>📄 <code class="p">internal/modules/payment/service.go</code> — Buat atau kembalikan pembayaran yang sudah ada</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/modules/payment/service.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Create starts a payment for a PENDING order.</span>
+<span class="c">//</span>
+<span class="c">// The Idempotency-Key header makes the call safe to retry: sending the same</span>
+<span class="c">// key again returns the payment created the first time (created = false)</span>
+<span class="c">// instead of creating a second one. The unique index on idempotency_key is</span>
+<span class="c">// what guarantees this under concurrency; the lookup before the insert is</span>
+<span class="c">// only the fast path.</span>
+<span class="k">func</span> (s *Service) Create(ctx context.Context, caller Caller, idempotencyKey string, req CreateRequest) (p *Payment, created bool, <span class="k">err</span> error) {
+    key := strings.TrimSpace(idempotencyKey)
+    <span class="k">if</span> key == <span class="s">&quot;&quot;</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.BadRequest(<span class="s">&quot;Idempotency-Key header is required&quot;</span>)
+    }
+    <span class="k">if</span> len(key) &gt; 100 {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.BadRequest(<span class="s">&quot;Idempotency-Key must be at most 100 characters&quot;</span>)
+    }
+    orderID, <span class="k">err</span> := uuid.Parse(req.OrderID)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.BadRequest(<span class="s">&quot;Invalid order_id&quot;</span>)
+    }
+
+    o, <span class="k">err</span> := s.ownedOrder(ctx, caller, orderID)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, <span class="k">err</span>
+    }
+
+    <span class="k">if</span> existing, <span class="k">err</span> := s.replay(ctx, key, orderID); <span class="k">err</span> != <span class="k">nil</span> || existing != <span class="k">nil</span> {
+        <span class="k">return</span> existing, <span class="k">false</span>, <span class="k">err</span>
+    }
+
+    <span class="k">if</span> o.Status != order.StatusPending {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.Conflict(fmt.Sprintf(<span class="s">&quot;Order with status %s cannot be paid&quot;</span>, o.Status))
+    }
+    <span class="k">if</span> existing, <span class="k">err</span> := s.activePayment(ctx, orderID, key); <span class="k">err</span> != <span class="k">nil</span> || existing != <span class="k">nil</span> {
+        <span class="k">return</span> existing, <span class="k">false</span>, <span class="k">err</span>
+    }
+
+    ref, <span class="k">err</span> := newReference()
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    p = &amp;Payment{
+        OrderID:        orderID,
+        Reference:      ref,
+        IdempotencyKey: key,
+        Amount:         o.TotalAmount,
+        Status:         StatusPending,
+        ExpiresAt:      time.Now().UTC().Add(s.expiry),
+    }
+
+    <span class="k">err</span> = s.repo.Create(ctx, p)
+    <span class="k">if</span> errors.Is(<span class="k">err</span>, apperror.ErrDuplicate) {
+        <span class="c">// Lost a race. Either the same key was inserted concurrently (replay</span>
+        <span class="c">// it) or the order already has another active payment.</span>
+        <span class="k">if</span> existing, rerr := s.replay(ctx, key, orderID); rerr != <span class="k">nil</span> || existing != <span class="k">nil</span> {
+            <span class="k">return</span> existing, <span class="k">false</span>, rerr
+        }
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.Conflict(<span class="s">&quot;Order already has an active payment&quot;</span>)
+    }
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">nil</span>, <span class="k">false</span>, apperror.Internal(<span class="k">err</span>)
+    }
+    <span class="k">return</span> p, <span class="k">true</span>, <span class="k">nil</span>
+}</code></pre></div><ul class="ex"><li>Unique index pada <code>idempotency_key</code> dan partial unique index <code>(order_id) WHERE status='PENDING'</code> menjamin kebenaran walau ada request bersamaan.</li></ul></article><article class="step" id="s14" style="--pc:#0B7A94">
+<header><div class="num">14</div><div class="ht"><h3>Rakit semuanya &amp; jalankan</h3><span class="time">⏱ 2 jam</span></div>
+<button class="done" data-done="s14">Tandai selesai</button></header>
+<p class="goal">Sambungkan modul, daftarkan URL, nyalakan server.</p><div class="code"><div class="ch"><span>⌨️ Nyalakan database dulu (Docker), lalu server</span><button class="copy">Salin</button></div><pre><code><span class="k">docker</span> compose up -d postgres redis
+<span class="k">cp</span> .env.example .env
+<span class="k">go</span> run ./cmd/api</code></pre></div><div class="code"><div class="ch"><span>⌨️ Coba dari terminal lain</span><button class="copy">Salin</button></div><pre><code><span class="k">curl</span> http://localhost:8080/health
+<span class="k">curl</span> http://localhost:8080/api/v1/products</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/routes/routes.go</code> — Daftar endpoint</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/routes/routes.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// Register mounts all /api/v1 routes.</span>
+<span class="c">// authn verifies the access token; admin additionally requires the admin role.</span>
+<span class="k">func</span> Register(app *fiber.App, h Handlers, authn fiber.Handler) {
+    admin := middleware.RequireRole(middleware.RoleAdmin)
+    v1 := app.Group(<span class="s">&quot;/api/v1&quot;</span>)
+
+    <span class="c">// Authentication</span>
+    a := v1.Group(<span class="s">&quot;/auth&quot;</span>)
+    a.Post(<span class="s">&quot;/register&quot;</span>, h.Auth.Register)
+    a.Post(<span class="s">&quot;/login&quot;</span>, h.Auth.Login)
+    a.Post(<span class="s">&quot;/refresh&quot;</span>, h.Auth.Refresh)
+    a.Post(<span class="s">&quot;/logout&quot;</span>, authn, h.Auth.Logout)
+
+    <span class="c">// Users. &quot;/me&quot; routes are registered before &quot;/:id&quot; so &quot;me&quot; is never</span>
+    <span class="c">// parsed as an ID.</span>
+    u := v1.Group(<span class="s">&quot;/users&quot;</span>, authn)
+    u.Get(<span class="s">&quot;/me&quot;</span>, h.User.GetProfile)
+    u.Put(<span class="s">&quot;/me&quot;</span>, h.User.UpdateProfile)
+    u.Put(<span class="s">&quot;/me/password&quot;</span>, h.User.ChangePassword)
+    u.Get(<span class="s">&quot;/&quot;</span>, admin, h.User.List)
+    u.Get(<span class="s">&quot;/:id&quot;</span>, admin, h.User.GetByID)
+
+    <span class="c">// Categories: public reads, admin writes.</span>
+    c := v1.Group(<span class="s">&quot;/categories&quot;</span>)
+    c.Get(<span class="s">&quot;/&quot;</span>, h.Category.List)
+    c.Get(<span class="s">&quot;/:id&quot;</span>, h.Category.Get)
+    c.Post(<span class="s">&quot;/&quot;</span>, authn, admin, h.Category.Create)
+    c.Put(<span class="s">&quot;/:id&quot;</span>, authn, admin, h.Category.Update)
+    c.Delete(<span class="s">&quot;/:id&quot;</span>, authn, admin, h.Category.Delete)
+
+    <span class="c">// Products: public reads, admin writes.</span>
+    p := v1.Group(<span class="s">&quot;/products&quot;</span>)
+    p.Get(<span class="s">&quot;/&quot;</span>, h.Product.List)
+    p.Get(<span class="s">&quot;/:id&quot;</span>, h.Product.Get)
+    p.Post(<span class="s">&quot;/&quot;</span>, authn, admin, h.Product.Create)
+    p.Put(<span class="s">&quot;/:id&quot;</span>, authn, admin, h.Product.Update)
+    p.Patch(<span class="s">&quot;/:id/stock&quot;</span>, authn, admin, h.Product.UpdateStock)
+    p.Delete(<span class="s">&quot;/:id&quot;</span>, authn, admin, h.Product.Delete)
+
+    <span class="c">// Cart</span>
+    ct := v1.Group(<span class="s">&quot;/cart&quot;</span>, authn)
+    ct.Get(<span class="s">&quot;/&quot;</span>, h.Cart.Get)
+    ct.Delete(<span class="s">&quot;/&quot;</span>, h.Cart.Clear)
+    ct.Post(<span class="s">&quot;/items&quot;</span>, h.Cart.AddItem)
+    ct.Put(<span class="s">&quot;/items/:id&quot;</span>, h.Cart.UpdateItem)
+    ct.Delete(<span class="s">&quot;/items/:id&quot;</span>, h.Cart.RemoveItem)
+
+    <span class="c">// Orders. Ownership is enforced in the service layer.</span>
+    o := v1.Group(<span class="s">&quot;/orders&quot;</span>, authn)
+    o.Post(<span class="s">&quot;/&quot;</span>, h.Order.Create)
+    o.Get(<span class="s">&quot;/&quot;</span>, h.Order.List)
+    o.Get(<span class="s">&quot;/:id&quot;</span>, h.Order.Get)
+    o.Post(<span class="s">&quot;/:id/cancel&quot;</span>, h.Order.Cancel)
+    o.Patch(<span class="s">&quot;/:id/status&quot;</span>, admin, h.Order.UpdateStatus)
+
+    <span class="c">// Payments</span>
+    pay := v1.Group(<span class="s">&quot;/payments&quot;</span>, authn)
+    pay.Post(<span class="s">&quot;/&quot;</span>, h.Payment.Create)
+    pay.Get(<span class="s">&quot;/:id&quot;</span>, h.Payment.Get)
+    pay.Post(<span class="s">&quot;/:id/simulate-success&quot;</span>, h.Payment.SimulateSuccess)
+    pay.Post(<span class="s">&quot;/:id/simulate-failure&quot;</span>, h.Payment.SimulateFailure)
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">internal/app/app.go</code> — Merakit dependency (DI manual)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/internal/app/app.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// New builds the fully wired application.</span>
+<span class="k">func</span> New(d Deps) *App {
+    cfg := d.Config
+
+    <span class="c">// Infrastructure helpers</span>
+    txManager := database.NewTxManager(d.DB)
+    tokens := token.NewManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.App.Name)
+
+    <span class="c">// Repositories</span>
+    userRepo := user.NewRepository(d.DB)
+    tokenRepo := auth.NewRepository(d.DB)
+    categoryRepo := category.NewRepository(d.DB)
+    productRepo := product.NewRepository(d.DB)
+    cartRepo := cart.NewRepository(d.DB)
+    orderRepo := order.NewRepository(d.DB)
+    paymentRepo := payment.NewRepository(d.DB)
+
+    <span class="c">// Services</span>
+    authSvc := auth.NewService(userRepo, tokenRepo, tokens, cfg.JWT.RefreshTTL, cfg.App.BcryptCost)
+    userSvc := user.NewService(userRepo, tokenRepo, txManager, cfg.App.BcryptCost)
+    categorySvc := category.NewService(categoryRepo)
+    productSvc := product.NewService(productRepo, categorySvc, d.Cache, d.Log, cfg.Cache.ProductTTL, cfg.Cache.ProductListTTL)
+    cartSvc := cart.NewService(cartRepo, productRepo)
+    orderSvc := order.NewService(orderRepo, cartRepo, productRepo, productSvc, txManager)
+    paymentSvc := payment.NewService(paymentRepo, orderRepo, txManager, cfg.Payment.Expiry)
+
+    f := fiber.New(fiber.Config{
+        AppName:               cfg.App.Name,
+        ErrorHandler:          response.ErrorHandler(d.Log),
+        DisableStartupMessage: <span class="k">true</span>,
+        ReadTimeout:           10 * time.Second,
+        WriteTimeout:          10 * time.Second,
+        IdleTimeout:           60 * time.Second,
+        BodyLimit:             1 * 1024 * 1024,
+    })
+
+    <span class="c">// Global middleware. Order matters: the request ID must exist before</span>
+    <span class="c">// anything logs, and recover must wrap everything that can panic.</span>
+    f.Use(requestid.New())
+    f.Use(middleware.RequestLogger(d.Log))
+    f.Use(recover.New())
+    f.Use(cors.New(cors.Config{
+        AllowOrigins: cfg.CORS.AllowOrigins,
+        AllowMethods: <span class="s">&quot;GET,POST,PUT,PATCH,DELETE,OPTIONS&quot;</span>,
+        AllowHeaders: <span class="s">&quot;Origin,Content-Type,Accept,Authorization,Idempotency-Key,X-Request-ID&quot;</span>,
+    }))
+
+    f.Get(<span class="s">&quot;/health&quot;</span>, healthHandler(d))
+    registerDocs(f)
+
+    <span class="k">if</span> cfg.RateLimit.Enabled {
+        f.Use(<span class="s">&quot;/api&quot;</span>, middleware.RateLimit(d.Cache, cfg.RateLimit.Max, cfg.RateLimit.Window, d.Log))
+    }
+
+    routes.Register(f, routes.Handlers{
+        Auth:     auth.NewHandler(authSvc),
+        User:     user.NewHandler(userSvc),
+        Category: category.NewHandler(categorySvc),
+        Product:  product.NewHandler(productSvc),
+        Cart:     cart.NewHandler(cartSvc),
+        Order:    order.NewHandler(orderSvc),
+        Payment:  payment.NewHandler(paymentSvc),
+    }, middleware.Auth(tokens))
+
+    <span class="c">// Anything that did not match a route.</span>
+    f.Use(<span class="k">func</span>(c *fiber.Ctx) error {
+        <span class="k">return</span> fiber.NewError(fiber.StatusNotFound, <span class="s">&quot;Route not found&quot;</span>)
+    })
+
+    <span class="k">return</span> &amp;App{Fiber: f, Auth: authSvc}
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">cmd/api/main.go</code> — Startup &amp; graceful shutdown</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/cmd/api/main.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// run holds the real startup logic so that deferred cleanups execute before</span>
+<span class="c">// the process exits (os.Exit in main would skip them).</span>
+<span class="k">func</span> run() error {
+    migrateOnly := flag.Bool(<span class="s">&quot;migrate-only&quot;</span>, <span class="k">false</span>, <span class="s">&quot;apply database migrations and exit&quot;</span>)
+    flag.Parse()
+
+    cfg, <span class="k">err</span> := config.Load()
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;load config: %w&quot;</span>, <span class="k">err</span>)
+    }
+
+    log, <span class="k">err</span> := logger.New(cfg.App.LogLevel, cfg.App.Env)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;init logger: %w&quot;</span>, <span class="k">err</span>)
+    }
+    <span class="k">defer</span> <span class="k">func</span>() { _ = log.Sync() }()
+
+    <span class="k">if</span> cfg.App.AutoMigrate || *migrateOnly {
+        <span class="k">if</span> <span class="k">err</span> := database.Migrate(cfg.DB.DSN()); <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> <span class="k">err</span>
+        }
+        log.Info(<span class="s">&quot;database migrations applied&quot;</span>)
+        <span class="k">if</span> *migrateOnly {
+            <span class="k">return</span> <span class="k">nil</span>
+        }
+    }
+
+    db, <span class="k">err</span> := database.Connect(cfg.DB, log)
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">err</span>
+    }
+    sqlDB, <span class="k">err</span> := db.DB()
+    <span class="k">if</span> <span class="k">err</span> != <span class="k">nil</span> {
+        <span class="k">return</span> <span class="k">err</span>
+    }
+    <span class="k">defer</span> sqlDB.Close()
+
+    <span class="c">// Redis is optional at startup: the API runs without it, just slower.</span>
+    redisCache := cache.NewRedis(cfg.Redis)
+    <span class="k">defer</span> redisCache.Close()
+    pingCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+    <span class="k">if</span> <span class="k">err</span> := redisCache.Ping(pingCtx); <span class="k">err</span> != <span class="k">nil</span> {
+        log.Warn(<span class="s">&quot;redis unavailable, continuing without cache&quot;</span>, zap.Error(<span class="k">err</span>))
+    } <span class="k">else</span> {
+        log.Info(<span class="s">&quot;redis connected&quot;</span>, zap.String(<span class="s">&quot;addr&quot;</span>, cfg.Redis.Addr))
+    }
+    cancel()
+
+    application := app.New(app.Deps{Config: cfg, DB: db, Cache: redisCache, Log: log})
+
+    <span class="k">if</span> cfg.Admin.Email != <span class="s">&quot;&quot;</span> &amp;&amp; cfg.Admin.Password != <span class="s">&quot;&quot;</span> {
+        <span class="k">if</span> <span class="k">err</span> := application.Auth.EnsureAdmin(context.Background(), cfg.Admin.Name, cfg.Admin.Email, cfg.Admin.Password); <span class="k">err</span> != <span class="k">nil</span> {
+            <span class="k">return</span> fmt.Errorf(<span class="s">&quot;seed admin: %w&quot;</span>, <span class="k">err</span>)
+        }
+    }
+
+    <span class="c">// Graceful shutdown: stop accepting connections on SIGINT/SIGTERM and</span>
+    <span class="c">// let in-flight requests finish, so a deploy does not cut off a checkout.</span>
+    serverErr := make(<span class="k">chan</span> error, 1)
+    <span class="k">go</span> <span class="k">func</span>() {
+        log.Info(<span class="s">&quot;server started&quot;</span>, zap.String(<span class="s">&quot;port&quot;</span>, cfg.App.Port), zap.String(<span class="s">&quot;env&quot;</span>, cfg.App.Env))
+        serverErr &lt;- application.Fiber.Listen(<span class="s">&quot;:&quot;</span> + cfg.App.Port)
+    }()
+
+    quit := make(<span class="k">chan</span> os.Signal, 1)
+    signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+    <span class="k">select</span> {
+    <span class="k">case</span> <span class="k">err</span> := &lt;-serverErr:
+        <span class="k">return</span> fmt.Errorf(<span class="s">&quot;server stopped: %w&quot;</span>, <span class="k">err</span>)
+    <span class="k">case</span> sig := &lt;-quit:
+        log.Info(<span class="s">&quot;shutting down&quot;</span>, zap.String(<span class="s">&quot;signal&quot;</span>, sig.String()))
+    }
+
+    <span class="k">if</span> <span class="k">err</span> := application.Fiber.ShutdownWithTimeout(15 * time.Second); <span class="k">err</span> != <span class="k">nil</span> {
+    <span class="c">// … (lanjutan ada di file lengkap)</span></code></pre></div><div class="check">✅ <b>Cek berhasil:</b> <code>/health</code> menjawab <code>{"status":"ok","database":"up","redis":"up"}</code> dan <code>http://localhost:8080/docs</code> menampilkan Swagger.</div><details class="err"><summary>⚠️ Error yang sering muncul</summary><p><code>connection refused :5432</code><br>PostgreSQL belum jalan: <code>docker compose up -d postgres</code>.</p><p><code>JWT_SECRET must be at least 32 characters</code><br>Isi JWT_SECRET di .env dengan teks acak panjang.</p></details></article><div class="phase" id="phase-fe" style="--pc:#7C3AED"><span class="pn">Bagian B</span><h2>Aplikasi Flutter</h2></div><article class="step" id="s15" style="--pc:#7C3AED">
+<header><div class="num">15</div><div class="ht"><h3>Buat project Flutter</h3><span class="time">⏱ 20 menit</span></div>
+<button class="done" data-done="s15">Tandai selesai</button></header>
+<p class="goal">Project baru dengan library yang dibutuhkan.</p><div class="code"><div class="ch"><span>⌨️ Terminal</span><button class="copy">Salin</button></div><pre><code><span class="k">flutter</span> create --org com.aulansah --project-name ecommerce_app ecommerce_app
+<span class="k">cd</span> ecommerce_app
+<span class="k">flutter</span> pub add flutter_riverpod dio go_router flutter_secure_storage equatable
+<span class="k">flutter</span> pub add --dev mocktail</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">pubspec.yaml</code> — Hasil akhir pubspec.yaml</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/pubspec.yaml" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">name</span>: ecommerce_app
+<span class="k">description</span>: Flutter client for go-ecommerce-api (Clean Architecture + Riverpod).
+<span class="k">publish_to</span>: <span class="s">&quot;none&quot;</span>
+<span class="k">version</span>: 0.1.0+1
+<span class="k">
+environment</span>:
+<span class="k">  sdk</span>: <span class="s">&quot;&gt;=3.9.0 &lt;4.0.0&quot;</span>
+<span class="k">  flutter</span>: <span class="s">&quot;&gt;=3.35.0&quot;</span> <span class="c"># Riverpod 3 + DropdownButtonFormField.initialValue</span>
+
+<span class="c"># Version ranges (not exact pins) so `flutter pub get` picks the newest</span>
+<span class="c"># release that is compatible with the Flutter SDK installed on your machine.</span>
+<span class="k">dependencies</span>:
+<span class="k">  flutter</span>:
+<span class="k">    sdk</span>: flutter
+<span class="k">  flutter_riverpod</span>: ^3.0.0
+<span class="k">  equatable</span>: <span class="s">&quot;&gt;=2.0.7 &lt;4.0.0&quot;</span>
+<span class="k">  dio</span>: ^5.8.0
+<span class="k">  go_router</span>: <span class="s">&quot;&gt;=14.8.0 &lt;19.0.0&quot;</span>
+<span class="k">  flutter_secure_storage</span>: <span class="s">&quot;&gt;=9.2.2 &lt;11.0.0&quot;</span>
+<span class="k">
+dev_dependencies</span>:
+<span class="k">  flutter_test</span>:
+<span class="k">    sdk</span>: flutter
+<span class="k">  flutter_lints</span>: <span class="s">&quot;&gt;=4.0.0 &lt;7.0.0&quot;</span>
+<span class="k">  mocktail</span>: ^1.0.4
+<span class="k">
+flutter</span>:
+<span class="k">  uses-material-design</span>: true</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/main.dart</code> — Titik masuk aplikasi</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/main.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:flutter/material.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;package:flutter_riverpod/flutter_riverpod.dart&#x27;</span>;
+
+<span class="k">import</span> <span class="s">&#x27;app.dart&#x27;</span>;
+
+<span class="k">void</span> main() {
+  <span class="c">// ProviderScope holds the state of every provider: it is the app&#x27;s</span>
+  <span class="c">// dependency container. Tests create their own with overrides.</span>
+  runApp(<span class="k">const</span> ProviderScope(child: App()));
+}</code></pre></div><ul class="ex"><li>Susun folder: <code>lib/core/</code> (dipakai bersama) dan <code>lib/features/&lt;fitur&gt;/{domain,data,presentation}</code>.</li></ul><div class="check">✅ <b>Cek berhasil:</b> <code>flutter run</code> menampilkan aplikasi contoh Flutter.</div></article><article class="step" id="s16" style="--pc:#7C3AED">
+<header><div class="num">16</div><div class="ht"><h3>Fondasi: Result, Failure, alamat API</h3><span class="time">⏱ 45 menit</span></div>
+<button class="done" data-done="s16">Tandai selesai</button></header>
+<p class="goal">Cara seragam mengembalikan hasil (berhasil/gagal) dan alamat backend per platform.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/result.dart</code> — Ok / Err</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/result.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;error/failure.dart&#x27;</span>;
+
+<span class="c">/// The outcome of a use case: either a value or a [Failure].</span>
+<span class="c">///</span>
+<span class="c">/// A sealed class lets callers handle both cases with an exhaustive `switch`,</span>
+<span class="c">/// so a forgotten error path is a compile error instead of a crash:</span>
+<span class="c">///</span>
+<span class="c">///   switch (result) {</span>
+<span class="c">///     case Ok(:final value): ...</span>
+<span class="c">///     case Err(:final failure): ...</span>
+<span class="c">///   }</span>
+<span class="k">sealed</span> <span class="k">class</span> Result&lt;T&gt; {
+  <span class="k">const</span> Result();
+}
+
+<span class="k">final</span> <span class="k">class</span> Ok&lt;T&gt; <span class="k">extends</span> Result&lt;T&gt; {
+  <span class="k">const</span> Ok(<span class="k">this</span>.value);
+  <span class="k">final</span> T value;
+}
+
+<span class="k">final</span> <span class="k">class</span> Err&lt;T&gt; <span class="k">extends</span> Result&lt;T&gt; {
+  <span class="k">const</span> Err(<span class="k">this</span>.failure);
+  <span class="k">final</span> Failure failure;
+}
+
+extension ResultX&lt;T&gt; on Result&lt;T&gt; {
+  <span class="c">/// The failure, or null when the result is [Ok].</span>
+  Failure? get failureOrNull =&gt; <span class="k">switch</span> (<span class="k">this</span>) {
+        Ok() =&gt; <span class="k">null</span>,
+        Err(:<span class="k">final</span> failure) =&gt; failure,
+      };
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/error/failure.dart</code> — Jenis kegagalan</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/error/failure.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:equatable/equatable.dart&#x27;</span>;
+
+<span class="c">/// A failure the UI can show. Exceptions never leave the data layer; they are</span>
+<span class="c">/// converted into one of these.</span>
+<span class="k">sealed</span> <span class="k">class</span> Failure <span class="k">extends</span> Equatable {
+  <span class="k">const</span> Failure(<span class="k">this</span>.message);
+
+  <span class="k">final</span> String message;
+
+  @<span class="k">override</span>
+  List&lt;Object?&gt; get props =&gt; [message];
+}
+
+<span class="c">/// The server could not be reached (backend down, wrong URL, no network).</span>
+<span class="k">final</span> <span class="k">class</span> NetworkFailure <span class="k">extends</span> Failure {
+  <span class="k">const</span> NetworkFailure(<span class="k">super</span>.message);
+}
+
+<span class="c">/// 401: the session is missing or expired.</span>
+<span class="k">final</span> <span class="k">class</span> UnauthorizedFailure <span class="k">extends</span> Failure {
+  <span class="k">const</span> UnauthorizedFailure(<span class="k">super</span>.message);
+}
+
+<span class="c">/// Any other error response from the API, using the backend&#x27;s error format:</span>
+<span class="c">/// { &quot;message&quot;: &quot;...&quot;, &quot;error&quot;: { &quot;code&quot;: &quot;...&quot;, &quot;details&quot;: [{field, message}] } }</span>
+<span class="k">final</span> <span class="k">class</span> ServerFailure <span class="k">extends</span> Failure {
+  <span class="k">const</span> ServerFailure(
+    <span class="k">super</span>.message, {
+    <span class="k">required</span> <span class="k">this</span>.statusCode,
+    <span class="k">this</span>.code,
+    <span class="k">this</span>.fieldErrors = <span class="k">const</span> {},
+  });
+
+  <span class="k">final</span> int statusCode;
+  <span class="k">final</span> String? code;
+
+  <span class="c">/// Field name → message, from a 422 VALIDATION_ERROR.</span>
+  <span class="k">final</span> Map&lt;String, String&gt; fieldErrors;
+
+  @<span class="k">override</span>
+  List&lt;Object?&gt; get props =&gt; [message, statusCode, code, fieldErrors];
+}
+
+<span class="c">/// Something the app did not expect (a bug or a malformed response).</span>
+<span class="k">final</span> <span class="k">class</span> UnexpectedFailure <span class="k">extends</span> Failure {
+  <span class="k">const</span> UnexpectedFailure(<span class="k">super</span>.message);
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/config/env.dart</code> — Alamat backend (emulator Android = 10.0.2.2)</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/config/env.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:flutter/foundation.dart&#x27;</span>;
+
+<span class="c">/// Runtime configuration.</span>
+<span class="c">///</span>
+<span class="c">/// The API URL can be overridden at build time:</span>
+<span class="c">///   flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8080/api/v1</span>
+<span class="k">abstract</span> <span class="k">final</span> <span class="k">class</span> Env {
+  <span class="k">static</span> <span class="k">const</span> _override = String.fromEnvironment(<span class="s">&#x27;API_BASE_URL&#x27;</span>);
+
+  <span class="k">static</span> String get apiBaseUrl {
+    <span class="k">if</span> (_override.isNotEmpty) <span class="k">return</span> _override;
+    <span class="k">if</span> (kIsWeb) <span class="k">return</span> <span class="s">&#x27;http://localhost:8080/api/v1&#x27;</span>;
+    <span class="c">// Inside the Android emulator, &quot;localhost&quot; is the emulator itself.</span>
+    <span class="c">// 10.0.2.2 is the emulator&#x27;s alias for the host machine.</span>
+    <span class="k">if</span> (defaultTargetPlatform == TargetPlatform.android) {
+      <span class="k">return</span> <span class="s">&#x27;http://10.0.2.2:8080/api/v1&#x27;</span>;
+    }
+    <span class="k">return</span> <span class="s">&#x27;http://localhost:8080/api/v1&#x27;</span>;
+  }
+}</code></pre></div></article><article class="step" id="s17" style="--pc:#7C3AED">
+<header><div class="num">17</div><div class="ht"><h3>Klien HTTP dengan refresh token otomatis</h3><span class="time">⏱ 2 jam</span></div>
+<button class="done" data-done="s17">Tandai selesai</button></header>
+<p class="goal">Dio + interceptor yang menempel token dan memperbaruinya diam-diam saat kedaluwarsa.</p><div class="why">💡 <b>Kenapa begini:</b> Access token hanya 15 menit. Tanpa ini, user dipaksa login ulang setiap 15 menit.</div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/network/auth_interceptor.dart</code> — Saat 401: refresh lalu ulangi</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/network/auth_interceptor.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="k">void</span> onError(DioException err, ErrorInterceptorHandler handler) <span class="k">async</span> {
+    <span class="k">final</span> request = err.requestOptions;
+    <span class="k">if</span> (err.response?.statusCode != 401 || _publicPaths.contains(request.path)) {
+      <span class="k">return</span> handler.next(err);
+    }
+
+    <span class="k">try</span> {
+      <span class="k">final</span> current = <span class="k">await</span> _storage.readAccessToken();
+      <span class="k">if</span> (current == <span class="k">null</span>) <span class="k">return</span> handler.next(err);
+
+      <span class="c">// Another queued request already refreshed: just retry with the new token.</span>
+      <span class="k">if</span> (request.headers[<span class="s">&#x27;Authorization&#x27;</span>] != <span class="s">&#x27;Bearer $current&#x27;</span>) {
+        <span class="k">return</span> handler.resolve(<span class="k">await</span> _retry(request, current));
+      }
+
+      <span class="k">final</span> refreshToken = <span class="k">await</span> _storage.readRefreshToken();
+      <span class="k">if</span> (refreshToken == <span class="k">null</span>) {
+        <span class="k">await</span> _expire();
+        <span class="k">return</span> handler.next(err);
+      }
+
+      <span class="k">final</span> res = <span class="k">await</span> _plain.post&lt;Map&lt;String, dynamic&gt;&gt;(
+        <span class="s">&#x27;/auth/refresh&#x27;</span>,
+        data: {<span class="s">&#x27;refresh_token&#x27;</span>: refreshToken},
+      );
+      <span class="k">final</span> data = res.data![<span class="s">&#x27;data&#x27;</span>] as Map&lt;String, dynamic&gt;;
+      <span class="k">final</span> access = data[<span class="s">&#x27;access_token&#x27;</span>] as String;
+      <span class="k">await</span> _storage.save(
+        accessToken: access,
+        refreshToken: data[<span class="s">&#x27;refresh_token&#x27;</span>] as String,
+      );
+
+      handler.resolve(<span class="k">await</span> _retry(request, access));
+    } on DioException <span class="k">catch</span> (e) {
+      <span class="c">// Refresh rejected → the session is over. A network error is not a</span>
+      <span class="c">// reason to log the user out, so only 401 from /auth/refresh expires.</span>
+      <span class="k">if</span> (e.requestOptions.path == <span class="s">&#x27;/auth/refresh&#x27;</span> &amp;&amp; e.response?.statusCode == 401) {
+        <span class="k">await</span> _expire();
+        <span class="k">return</span> handler.next(err);
+      }
+      handler.next(e);
+    }
+  }</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/storage/token_storage.dart</code> — Token di brankas HP</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/storage/token_storage.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">/// Stores tokens in the platform keystore (Android Keystore, iOS Keychain).</span>
+<span class="c">/// SharedPreferences would keep them in plain text.</span>
+<span class="c">///</span>
+<span class="c">/// The access token is also cached in memory because it is read on every</span>
+<span class="c">/// request and keystore reads are comparatively slow.</span>
+<span class="k">class</span> SecureTokenStorage <span class="k">implements</span> TokenStorage {
+  SecureTokenStorage(<span class="k">this</span>._storage);
+
+  <span class="k">final</span> FlutterSecureStorage _storage;
+  String? _accessToken;
+  bool _loaded = <span class="k">false</span>;
+
+  <span class="k">static</span> <span class="k">const</span> _accessKey = <span class="s">&#x27;access_token&#x27;</span>;
+  <span class="k">static</span> <span class="k">const</span> _refreshKey = <span class="s">&#x27;refresh_token&#x27;</span>;
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;String?&gt; readAccessToken() <span class="k">async</span> {
+    <span class="k">if</span> (!_loaded) {
+      _accessToken = <span class="k">await</span> _storage.read(key: _accessKey);
+      _loaded = <span class="k">true</span>;
+    }
+    <span class="k">return</span> _accessToken;
+  }
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;String?&gt; readRefreshToken() =&gt; _storage.read(key: _refreshKey);
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;<span class="k">void</span>&gt; save({<span class="k">required</span> String accessToken, <span class="k">required</span> String refreshToken}) <span class="k">async</span> {
+    _accessToken = accessToken;
+    _loaded = <span class="k">true</span>;
+    <span class="k">await</span> _storage.write(key: _accessKey, value: accessToken);
+    <span class="k">await</span> _storage.write(key: _refreshKey, value: refreshToken);
+  }
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;<span class="k">void</span>&gt; clear() <span class="k">async</span> {
+    _accessToken = <span class="k">null</span>;
+    _loaded = <span class="k">true</span>;
+    <span class="k">await</span> _storage.delete(key: _accessKey);
+    <span class="k">await</span> _storage.delete(key: _refreshKey);
+  }
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/providers.dart</code> — Mendaftarkan objek bersama di Riverpod</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/providers.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:dio/dio.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;package:flutter_riverpod/flutter_riverpod.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;package:flutter_secure_storage/flutter_secure_storage.dart&#x27;</span>;
+
+<span class="k">import</span> <span class="s">&#x27;config/env.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;network/api_client.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;network/session_events.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;storage/token_storage.dart&#x27;</span>;
+
+<span class="c">// Dependency injection through Riverpod: every shared object is a Provider.</span>
+<span class="c">// A provider is created once per ProviderScope (lazily, on first read) and</span>
+<span class="c">// can be replaced in tests with `overrideWithValue`.</span>
+
+<span class="k">final</span> tokenStorageProvider = Provider&lt;TokenStorage&gt;(
+  (ref) =&gt; SecureTokenStorage(<span class="k">const</span> FlutterSecureStorage()),
+);
+
+<span class="k">final</span> sessionEventsProvider = Provider&lt;SessionEvents&gt;((ref) {
+  <span class="k">final</span> events = SessionEvents();
+  ref.onDispose(events.dispose);
+  <span class="k">return</span> events;
+});
+
+<span class="c">/// The single Dio instance (and therefore the single AuthInterceptor) of the app.</span>
+<span class="k">final</span> dioProvider = Provider&lt;Dio&gt;((ref) {
+  <span class="k">final</span> dio = createDio(
+    baseUrl: Env.apiBaseUrl,
+    storage: ref.watch(tokenStorageProvider),
+    session: ref.watch(sessionEventsProvider),
+  );
+  ref.onDispose(dio.close);
+  <span class="k">return</span> dio;
+});</code></pre></div></article><article class="step" id="s18" style="--pc:#7C3AED">
+<header><div class="num">18</div><div class="ht"><h3>Tema dari Figma &amp; komponen bersama</h3><span class="time">⏱ 1,5 jam</span></div>
+<button class="done" data-done="s18">Tandai selesai</button></header>
+<p class="goal">Warna, ukuran, dan font disalin dari Figma; tombol dan input dibuat sekali.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/theme/app_theme.dart</code> — Token warna</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/theme/app_theme.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:flutter/material.dart&#x27;</span>;
+
+<span class="c">/// Colors from the Figma variables collection &quot;Color&quot;</span>
+<span class="c">/// (file: E-Commerce App — UI Design). Keep the names in sync with Figma.</span>
+<span class="k">abstract</span> <span class="k">final</span> <span class="k">class</span> AppColors {
+  <span class="k">static</span> <span class="k">const</span> primary = Color(0xFF0B7A94);
+  <span class="k">static</span> <span class="k">const</span> onPrimary = Color(0xFFFFFFFF);
+  <span class="k">static</span> <span class="k">const</span> primaryContainer = Color(0xFFD9F2F8);
+  <span class="k">static</span> <span class="k">const</span> onPrimaryContainer = Color(0xFF04404F);
+  <span class="k">static</span> <span class="k">const</span> background = Color(0xFFF6F8F9);
+  <span class="k">static</span> <span class="k">const</span> surface = Color(0xFFFFFFFF);
+  <span class="k">static</span> <span class="k">const</span> surfaceVariant = Color(0xFFEEF2F4);
+  <span class="k">static</span> <span class="k">const</span> border = Color(0xFFDDE3E7);
+  <span class="k">static</span> <span class="k">const</span> text = Color(0xFF12181D);
+  <span class="k">static</span> <span class="k">const</span> textMuted = Color(0xFF5B6670);
+  <span class="k">static</span> <span class="k">const</span> error = Color(0xFFB3261E);
+  <span class="k">static</span> <span class="k">const</span> errorContainer = Color(0xFFFCE8E6);
+  <span class="k">static</span> <span class="k">const</span> success = Color(0xFF1E7B34);
+  <span class="k">static</span> <span class="k">const</span> successContainer = Color(0xFFE3F4E6);
+}
+
+<span class="c">/// Spacing and radius from the Figma &quot;Size&quot; collection.</span>
+<span class="k">abstract</span> <span class="k">final</span> <span class="k">class</span> AppSizes {
+  <span class="k">static</span> <span class="k">const</span> space4 = 4.0;
+  <span class="k">static</span> <span class="k">const</span> space8 = 8.0;
+  <span class="k">static</span> <span class="k">const</span> space12 = 12.0;
+  <span class="k">static</span> <span class="k">const</span> space16 = 16.0;
+  <span class="k">static</span> <span class="k">const</span> space24 = 24.0;
+  <span class="k">static</span> <span class="k">const</span> radius8 = 8.0;
+  <span class="k">static</span> <span class="k">const</span> radius12 = 12.0;
+  <span class="k">static</span> <span class="k">const</span> radiusFull = 999.0;
+}
+
+<span class="c">/// Text styles from Figma (Roboto). Flutter uses Roboto by default on Android.</span>
+<span class="k">abstract</span> <span class="k">final</span> <span class="k">class</span> AppTextStyles {
+  <span class="k">static</span> <span class="k">const</span> headline = TextStyle(fontSize: 24, height: 32 / 24, fontWeight: FontWeight.w700, color: AppColors.text);
+  <span class="k">static</span> <span class="k">const</span> title = TextStyle(fontSize: 18, height: 24 / 18, fontWeight: FontWeight.w500, color: AppColors.text);
+  <span class="k">static</span> <span class="k">const</span> titleSmall = TextStyle(fontSize: 15, height: 20 / 15, fontWeight: FontWeight.w500, color: AppColors.text);
+  <span class="k">static</span> <span class="k">const</span> body = TextStyle(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w400, color: AppColors.text);
+  <span class="k">static</span> <span class="k">const</span> bodyMedium = TextStyle(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w500, color: AppColors.text);</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/widgets/app_text_field.dart</code> — Komponen input</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/widgets/app_text_field.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  Widget build(BuildContext context) {
+    <span class="k">return</span> Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTextStyles.label.copyWith(color: AppColors.textMuted)),
+        <span class="k">const</span> SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
+          autofillHints: autofillHints,
+          validator: validator,
+          style: AppTextStyles.body,
+          decoration: InputDecoration(
+            hintText: hint,
+            helperText: helperText,
+            helperMaxLines: 2,
+            prefixIcon: icon == <span class="k">null</span> ? <span class="k">null</span> : Icon(icon, size: 20),
+            suffixIcon: suffix,
+          ),
+        ),
+      ],
+    );
+  }</code></pre></div></article><article class="step" id="s19" style="--pc:#7C3AED">
+<header><div class="num">19</div><div class="ht"><h3>Fitur auth (pola Clean Architecture)</h3><span class="time">⏱ 4 jam</span></div>
+<button class="done" data-done="s19">Tandai selesai</button></header>
+<p class="goal">Satu fitur lengkap tiga lapis. Fitur lain tinggal meniru polanya.</p><div class="why">💡 <b>Kenapa begini:</b> <b>Domain</b> (aturan) tidak tahu Flutter atau Dio, jadi mudah dites. <b>Data</b> bicara ke API. <b>Presentation</b> menggambar layar dan menyimpan state.</div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/auth/domain/repositories/auth_repository.dart</code> — 1. Domain: kontrak</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/auth/domain/repositories/auth_repository.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;../../../../core/result.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;../entities/user.dart&#x27;</span>;
+
+<span class="c">/// The contract the domain layer needs. The data layer implements it.</span>
+<span class="c">/// This is the dependency inversion at the heart of Clean Architecture:</span>
+<span class="c">/// domain defines the interface, data depends on domain, never the reverse.</span>
+<span class="k">abstract</span> <span class="k">interface</span> <span class="k">class</span> AuthRepository {
+  <span class="k">Future</span>&lt;Result&lt;User&gt;&gt; login({<span class="k">required</span> String email, <span class="k">required</span> String password});
+
+  <span class="k">Future</span>&lt;Result&lt;User&gt;&gt; register({
+    <span class="k">required</span> String name,
+    <span class="k">required</span> String email,
+    <span class="k">required</span> String password,
+  });
+
+  <span class="c">/// The user of the saved session, or null when nobody is signed in.</span>
+  <span class="k">Future</span>&lt;Result&lt;User?&gt;&gt; currentUser();
+
+  <span class="k">Future</span>&lt;Result&lt;<span class="k">void</span>&gt;&gt; logout();
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/auth/domain/usecases/auth_usecases.dart</code> — 2. Domain: use case</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/auth/domain/usecases/auth_usecases.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">class</span> Login <span class="k">implements</span> UseCase&lt;User, LoginParams&gt; {
+  <span class="k">const</span> Login(<span class="k">this</span>._repository);
+  <span class="k">final</span> AuthRepository _repository;
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;User&gt;&gt; call(LoginParams p) =&gt;
+      _repository.login(email: p.email.trim(), password: p.password);
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/auth/data/repositories/auth_repository_impl.dart</code> — 3. Data: implementasi kontrak</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/auth/data/repositories/auth_repository_impl.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">class</span> AuthRepositoryImpl <span class="k">implements</span> AuthRepository {
+  AuthRepositoryImpl({<span class="k">required</span> AuthRemoteDataSource remote, <span class="k">required</span> TokenStorage storage})
+      : _remote = remote,
+        _storage = storage;
+
+  <span class="k">final</span> AuthRemoteDataSource _remote;
+  <span class="k">final</span> TokenStorage _storage;
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;User&gt;&gt; login({<span class="k">required</span> String email, <span class="k">required</span> String password}) {
+    <span class="k">return</span> guard(() <span class="k">async</span> {
+      <span class="k">final</span> (user, tokens) = <span class="k">await</span> _remote.login(email, password);
+      <span class="k">await</span> _storage.save(accessToken: tokens.accessToken, refreshToken: tokens.refreshToken);
+      <span class="k">return</span> user;
+    });
+  }
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;User&gt;&gt; register({
+    <span class="k">required</span> String name,
+    <span class="k">required</span> String email,
+    <span class="k">required</span> String password,
+  }) {
+    <span class="k">return</span> guard(() =&gt; _remote.register(name, email, password));
+  }
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;User?&gt;&gt; currentUser() <span class="k">async</span> {
+    <span class="k">if</span> (<span class="k">await</span> _storage.readRefreshToken() == <span class="k">null</span>) <span class="k">return</span> <span class="k">const</span> Ok(<span class="k">null</span>);
+
+    <span class="c">// The interceptor refreshes an expired access token transparently, so</span>
+    <span class="c">// reaching 401 here means the whole session is gone.</span>
+    <span class="k">final</span> result = <span class="k">await</span> guard(_remote.me);
+    <span class="k">if</span> (result <span class="k">case</span> Err(failure: UnauthorizedFailure())) {
+      <span class="k">await</span> _storage.clear();
+      <span class="k">return</span> <span class="k">const</span> Ok(<span class="k">null</span>);
+    }
+    <span class="k">return</span> result;
+  }
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;<span class="k">void</span>&gt;&gt; logout() <span class="k">async</span> {
+    <span class="k">final</span> refreshToken = <span class="k">await</span> _storage.readRefreshToken();
+    <span class="k">if</span> (refreshToken != <span class="k">null</span>) {
+      <span class="c">// Best effort: even if the server cannot be reached, the local session</span>
+      <span class="c">// is cleared so the user is logged out on this device.</span>
+      <span class="k">await</span> guard(() =&gt; _remote.logout(refreshToken));
+    }
+    <span class="k">await</span> _storage.clear();
+    <span class="k">return</span> <span class="k">const</span> Ok(<span class="k">null</span>);
+    <span class="c">// … (lanjutan ada di file lengkap)</span></code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/auth/auth_providers.dart</code> — 4. Merangkai lapisan dengan provider</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/auth/auth_providers.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">import</span> <span class="s">&#x27;package:flutter_riverpod/flutter_riverpod.dart&#x27;</span>;
+
+<span class="k">import</span> <span class="s">&#x27;../../core/providers.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;data/datasources/auth_remote_data_source.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;data/repositories/auth_repository_impl.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;domain/repositories/auth_repository.dart&#x27;</span>;
+<span class="k">import</span> <span class="s">&#x27;domain/usecases/auth_usecases.dart&#x27;</span>;
+
+<span class="c">// Wiring of the auth feature: data → domain. Presentation code only reads</span>
+<span class="c">// the use case providers; tests override them with mocks.</span>
+
+<span class="k">final</span> authRemoteDataSourceProvider = Provider&lt;AuthRemoteDataSource&gt;(
+  (ref) =&gt; AuthRemoteDataSource(ref.watch(dioProvider)),
+);
+
+<span class="c">/// Typed as the domain interface, so nothing above this line knows about</span>
+<span class="c">/// AuthRepositoryImpl.</span>
+<span class="k">final</span> authRepositoryProvider = Provider&lt;AuthRepository&gt;(
+  (ref) =&gt; AuthRepositoryImpl(
+    remote: ref.watch(authRemoteDataSourceProvider),
+    storage: ref.watch(tokenStorageProvider),
+  ),
+);
+
+<span class="k">final</span> loginUseCaseProvider = Provider&lt;Login&gt;((ref) =&gt; Login(ref.watch(authRepositoryProvider)));
+
+<span class="k">final</span> registerUseCaseProvider = Provider&lt;Register&gt;((ref) =&gt; Register(ref.watch(authRepositoryProvider)));
+
+<span class="k">final</span> getCurrentUserUseCaseProvider =
+    Provider&lt;GetCurrentUser&gt;((ref) =&gt; GetCurrentUser(ref.watch(authRepositoryProvider)));
+
+<span class="k">final</span> logoutUseCaseProvider = Provider&lt;Logout&gt;((ref) =&gt; Logout(ref.watch(authRepositoryProvider)));</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/auth/presentation/controllers/auth_controller.dart</code> — 5. Presentation: state sesi (AsyncNotifier)</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/auth/presentation/controllers/auth_controller.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">/// App-wide session state, expressed as `AsyncValue&lt;User?&gt;`:</span>
+<span class="c">///</span>
+<span class="c">///   AsyncLoading      → checking the saved session (splash screen)</span>
+<span class="c">///   AsyncData(user)   → signed in</span>
+<span class="c">///   AsyncData(null)   → signed out</span>
+<span class="c">///</span>
+<span class="c">/// The router watches this provider, so screens never navigate after login</span>
+<span class="c">/// or logout themselves.</span>
+<span class="k">class</span> AuthController <span class="k">extends</span> AsyncNotifier&lt;User?&gt; {
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;User?&gt; build() <span class="k">async</span> {
+    <span class="c">// The network layer reports a rejected refresh token through a stream;</span>
+    <span class="c">// the session ends wherever the user is in the app.</span>
+    <span class="k">final</span> sub = ref.watch(sessionEventsProvider).expired.listen((_) {
+      state = <span class="k">const</span> AsyncData(<span class="k">null</span>);
+    });
+    ref.onDispose(sub.cancel);
+
+    <span class="k">final</span> result = <span class="k">await</span> ref.read(getCurrentUserUseCaseProvider)(<span class="k">const</span> NoParams());
+    <span class="k">return</span> <span class="k">switch</span> (result) {
+      Ok(:<span class="k">final</span> value) =&gt; value,
+      <span class="c">// Backend unreachable on startup: show the login screen, which will</span>
+      <span class="c">// display the connection error on the next attempt.</span>
+      Err() =&gt; <span class="k">null</span>,
+    };
+  }
+
+  <span class="c">/// Called by the login and register screens after a successful submit.</span>
+  <span class="k">void</span> signedIn(User user) =&gt; state = AsyncData(user);
+
+  <span class="k">Future</span>&lt;<span class="k">void</span>&gt; logout() <span class="k">async</span> {
+    <span class="k">await</span> ref.read(logoutUseCaseProvider)(<span class="k">const</span> NoParams());
+    state = <span class="k">const</span> AsyncData(<span class="k">null</span>);
+  }
+}</code></pre></div></article><article class="step" id="s20" style="--pc:#7C3AED">
+<header><div class="num">20</div><div class="ht"><h3>Router dengan penjaga</h3><span class="time">⏱ 1 jam</span></div>
+<button class="done" data-done="s20">Tandai selesai</button></header>
+<p class="goal">Belum login → layar login. Bukan admin → tidak boleh ke /admin.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/core/router/app_router.dart</code> — Aturan pindah layar</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/core/router/app_router.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>    redirect: (context, state) {
+      <span class="k">final</span> auth = ref.read(authControllerProvider);
+      <span class="k">final</span> location = state.matchedLocation;
+      <span class="k">final</span> onAuthPage = location == <span class="s">&#x27;/login&#x27;</span> || location == <span class="s">&#x27;/register&#x27;</span>;
+
+      <span class="k">if</span> (auth.isLoading &amp;&amp; !auth.hasValue) {
+        <span class="k">return</span> location == <span class="s">&#x27;/splash&#x27;</span> ? <span class="k">null</span> : <span class="s">&#x27;/splash&#x27;</span>;
+      }
+      <span class="k">final</span> user = auth.value;
+      <span class="k">if</span> (user == <span class="k">null</span>) <span class="k">return</span> onAuthPage ? <span class="k">null</span> : <span class="s">&#x27;/login&#x27;</span>;
+      <span class="k">if</span> (onAuthPage || location == <span class="s">&#x27;/splash&#x27;</span>) <span class="k">return</span> <span class="s">&#x27;/home&#x27;</span>;
+      <span class="c">// Hiding the admin screens is convenience; the backend enforces the role.</span>
+      <span class="k">if</span> (location.startsWith(<span class="s">&#x27;/admin&#x27;</span>) &amp;&amp; !user.isAdmin) <span class="k">return</span> <span class="s">&#x27;/home&#x27;</span>;
+      <span class="k">return</span> <span class="k">null</span>;
+    },</code></pre></div><div class="check">✅ <b>Cek berhasil:</b> Jalankan backend + <code>flutter run</code>: daftar akun, login, dan masuk ke beranda.</div></article><article class="step" id="s21" style="--pc:#7C3AED">
+<header><div class="num">21</div><div class="ht"><h3>Katalog: cari, filter, scroll tanpa ujung</h3><span class="time">⏱ 4 jam</span></div>
+<button class="done" data-done="s21">Tandai selesai</button></header>
+<p class="goal">Daftar produk berhalaman yang memuat halaman berikutnya saat mendekati bawah.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/catalog/presentation/controllers/catalog_filter_controller.dart</code> — Debounce 400 ms</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/catalog/presentation/controllers/catalog_filter_controller.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="c">/// Called on every keystroke. Without a debounce, typing &quot;kopi arabika&quot;</span>
+  <span class="c">/// would fire 12 requests; with it, only the final term is searched.</span>
+  <span class="k">void</span> setSearch(String text) {
+    _debounce?.cancel();
+    _debounce = Timer(ref.read(searchDebounceProvider), () {
+      <span class="k">final</span> term = text.trim();
+      <span class="k">if</span> (term != state.search) state = CatalogFilter(search: term, categoryId: state.categoryId);
+    });
+  }</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/catalog/presentation/controllers/product_list_controller.dart</code> — Muat halaman berikutnya + buang hasil basi</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/catalog/presentation/controllers/product_list_controller.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="k">Future</span>&lt;<span class="k">void</span>&gt; loadMore() <span class="k">async</span> {
+    <span class="k">final</span> current = state.value;
+    <span class="c">// Ignore when: nothing loaded yet, a reload is running, a page is already</span>
+    <span class="c">// on its way (scroll events fire many times), or there is nothing left.</span>
+    <span class="k">if</span> (current == <span class="k">null</span> || state.isLoading || current.isLoadingMore || !current.hasMore) <span class="k">return</span>;
+
+    state = AsyncData(current.copyWith(isLoadingMore: <span class="k">true</span>, clearError: <span class="k">true</span>));
+    <span class="k">final</span> result = <span class="k">await</span> ref.read(getProductsUseCaseProvider)(ProductQuery(
+      page: current.page + 1,
+      limit: pageSize,
+      search: current.filter.search,
+      categoryId: current.filter.categoryId,
+    ));
+
+    <span class="c">// The filter may have changed while this page was loading: that rebuild</span>
+    <span class="c">// owns the state now, so this (stale) response is dropped.</span>
+    <span class="k">final</span> latest = state.value;
+    <span class="k">if</span> (!ref.mounted || state.isLoading || latest == <span class="k">null</span> || latest.filter != current.filter) <span class="k">return</span>;
+
+    state = AsyncData(<span class="k">switch</span> (result) {
+      Ok(:<span class="k">final</span> value) =&gt; latest.copyWith(
+          items: [...latest.items, ...value.items],
+          page: value.page,
+          totalPages: value.totalPages,
+          totalItems: value.totalItems,
+          isLoadingMore: <span class="k">false</span>,
+        ),
+      Err(:<span class="k">final</span> failure) =&gt; latest.copyWith(isLoadingMore: <span class="k">false</span>, loadMoreError: failure),
+    });
+  }</code></pre></div></article><article class="step" id="s22" style="--pc:#7C3AED">
+<header><div class="num">22</div><div class="ht"><h3>Keranjang: terasa instan</h3><span class="time">⏱ 4 jam</span></div>
+<button class="done" data-done="s22">Tandai selesai</button></header>
+<p class="goal">Angka langsung berubah saat ditekan; request dikirim berurutan; dikembalikan jika server menolak.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/cart/presentation/controllers/cart_controller.dart</code> — Antrean request + optimistic update</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/cart/presentation/controllers/cart_controller.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="k">Future</span>&lt;Failure?&gt; _send(<span class="k">Future</span>&lt;Result&lt;Cart&gt;&gt; Function() request) {
+    _pending++;
+    <span class="k">final</span> task = _queue.then((_) <span class="k">async</span> {
+      <span class="k">final</span> result = <span class="k">await</span> request();
+      _pending--;
+      <span class="k">if</span> (!ref.mounted) <span class="k">return</span> <span class="k">null</span>;
+
+      <span class="k">switch</span> (result) {
+        <span class="k">case</span> Ok(:<span class="k">final</span> value):
+          <span class="k">if</span> (_pending == 0) state = AsyncData(value);
+          <span class="k">return</span> <span class="k">null</span>;
+        <span class="k">case</span> Err(:<span class="k">final</span> failure):
+          <span class="k">await</span> _reload();
+          <span class="k">return</span> failure;
+      }
+    });
+    _queue = task.then((_) {}, onError: (_) {});
+    <span class="k">return</span> task;
+  }</code></pre></div></article><article class="step" id="s23" style="--pc:#7C3AED">
+<header><div class="num">23</div><div class="ht"><h3>Checkout &amp; riwayat pesanan</h3><span class="time">⏱ 4 jam</span></div>
+<button class="done" data-done="s23">Tandai selesai</button></header>
+<p class="goal">Buat pesanan dengan pengaman tap ganda, lalu riwayat dan detail.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/orders/presentation/controllers/order_controllers.dart</code> — Checkout aman</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/orders/presentation/controllers/order_controllers.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="c">/// Returns the new order, or null on failure or a duplicate tap.</span>
+  <span class="k">Future</span>&lt;Order?&gt; placeOrder() <span class="k">async</span> {
+    <span class="c">// A second tap while the first request is running is ignored. The</span>
+    <span class="c">// backend would reject it anyway (the cart row is locked and then</span>
+    <span class="c">// empty), but the user should not see an error for a double tap.</span>
+    <span class="k">if</span> (state.isLoading) <span class="k">return</span> <span class="k">null</span>;
+    state = <span class="k">const</span> AsyncLoading();
+
+    <span class="k">final</span> result = <span class="k">await</span> ref.read(placeOrderUseCaseProvider)(<span class="k">const</span> NoParams());
+    <span class="k">if</span> (!ref.mounted) <span class="k">return</span> <span class="k">null</span>;
+
+    <span class="k">switch</span> (result) {
+      <span class="k">case</span> Ok(:<span class="k">final</span> value):
+        state = AsyncData(value);
+        ref.invalidate(cartControllerProvider); <span class="c">// the backend emptied it</span>
+        ref.invalidate(orderListControllerProvider);
+        <span class="k">return</span> value;
+      <span class="k">case</span> Err(:<span class="k">final</span> failure):
+        state = AsyncError(failure, StackTrace.current);
+        <span class="c">// 409: stock changed since the cart was loaded. Reload the cart so</span>
+        <span class="c">// the unavailable items are highlighted.</span>
+        <span class="k">if</span> (failure is ServerFailure &amp;&amp; failure.statusCode == 409) {
+          ref.invalidate(cartControllerProvider);
+        }
+        <span class="k">return</span> <span class="k">null</span>;
+    }
+  }</code></pre></div></article><article class="step" id="s24" style="--pc:#7C3AED">
+<header><div class="num">24</div><div class="ht"><h3>Pembayaran dengan Idempotency-Key</h3><span class="time">⏱ 3 jam</span></div>
+<button class="done" data-done="s24">Tandai selesai</button></header>
+<p class="goal">Key disimpan per pesanan sebelum request dikirim; retry selalu memakai key yang sama.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/payment/domain/usecases/payment_usecases.dart</code> — Mulai atau lanjutkan pembayaran</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/payment/domain/usecases/payment_usecases.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">/// Starts (or resumes) the payment of an order.</span>
+<span class="c">///</span>
+<span class="c">/// Safe to call any number of times, e.g. after a timeout, reopening the</span>
+<span class="c">/// screen or restarting the app: the stored Idempotency-Key makes the</span>
+<span class="c">/// backend return the same payment. A FAILED or EXPIRED payment is</span>
+<span class="c">/// replaced by a new attempt with a new key.</span>
+<span class="k">class</span> StartPayment <span class="k">implements</span> UseCase&lt;Payment, String&gt; {
+  StartPayment(<span class="k">this</span>._repository, <span class="k">this</span>._keys, {DateTime Function()? now}) : _now = now ?? DateTime.now;
+  <span class="k">final</span> PaymentRepository _repository;
+  <span class="k">final</span> IdempotencyKeyStore _keys;
+  <span class="k">final</span> DateTime Function() _now;
+
+  @<span class="k">override</span>
+  <span class="k">Future</span>&lt;Result&lt;Payment&gt;&gt; call(String orderId) <span class="k">async</span> {
+    <span class="k">final</span> first = <span class="k">await</span> _create(orderId);
+    <span class="c">// A replayed key returns the stored payment as it is, even when its time</span>
+    <span class="c">// is up. A new key makes the backend expire it and create a fresh one.</span>
+    <span class="k">if</span> (first <span class="k">case</span> Ok(:<span class="k">final</span> value) when value.status.isFinalFailure || value.isExpiredAt(_now())) {
+      <span class="k">await</span> _keys.clear(orderId);
+      <span class="k">return</span> _create(orderId);
+    }
+    <span class="k">return</span> first;
+  }
+
+  <span class="k">Future</span>&lt;Result&lt;Payment&gt;&gt; _create(String orderId) <span class="k">async</span> =&gt;
+      _repository.createPayment(orderId: orderId, idempotencyKey: <span class="k">await</span> _keys.keyFor(orderId));
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/payment/data/repositories/payment_repository_impl.dart</code> — Key tersimpan di brankas HP</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/payment/data/repositories/payment_repository_impl.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  <span class="k">Future</span>&lt;String&gt; keyFor(String orderId) <span class="k">async</span> {
+    <span class="k">final</span> existing = <span class="k">await</span> _storage.read(key: _name(orderId));
+    <span class="k">if</span> (existing != <span class="k">null</span>) <span class="k">return</span> existing;
+    <span class="k">final</span> key = _generate();
+    <span class="c">// Stored BEFORE the request is sent: if the app dies mid-request, the</span>
+    <span class="c">// retry uses the same key.</span>
+    <span class="k">await</span> _storage.write(key: _name(orderId), value: key);
+    <span class="k">return</span> key;
+  }</code></pre></div></article><article class="step" id="s25" style="--pc:#7C3AED">
+<header><div class="num">25</div><div class="ht"><h3>Panel admin</h3><span class="time">⏱ 4 jam</span></div>
+<button class="done" data-done="s25">Tandai selesai</button></header>
+<p class="goal">Kelola produk, kategori, dan status pesanan, hanya untuk role admin.</p><div class="code file"><div class="ch"><span>📄 <code class="p">lib/features/admin/domain/usecases/admin_usecases.dart</code> — Validasi produk sebelum dikirim</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/lib/features/admin/domain/usecases/admin_usecases.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">/// Creates or updates a product after checking the same rules as the</span>
+<span class="c">/// backend validator, so the form can show the error without a request.</span>
+<span class="k">class</span> SaveProduct {
+  <span class="k">const</span> SaveProduct(<span class="k">this</span>._repository);
+  <span class="k">final</span> AdminRepository _repository;
+
+  <span class="c">/// [id] null → create, otherwise update.</span>
+  <span class="k">Future</span>&lt;Result&lt;Product&gt;&gt; call(ProductDraft input, {String? id}) <span class="k">async</span> {
+    <span class="k">final</span> draft = input.trimmed();
+    <span class="k">final</span> problems = &lt;String, String&gt;{
+      <span class="k">if</span> (draft.name.length &lt; 3) <span class="s">&#x27;name&#x27;</span>: <span class="s">&#x27;Minimal 3 karakter&#x27;</span>,
+      <span class="k">if</span> (draft.name.length &gt; 200) <span class="s">&#x27;name&#x27;</span>: <span class="s">&#x27;Maksimal 200 karakter&#x27;</span>,
+      <span class="k">if</span> (draft.description.length &gt; 5000) <span class="s">&#x27;description&#x27;</span>: <span class="s">&#x27;Maksimal 5000 karakter&#x27;</span>,
+      <span class="k">if</span> (draft.price &lt;= 0) <span class="s">&#x27;price&#x27;</span>: <span class="s">&#x27;Harga harus lebih dari 0&#x27;</span>,
+      <span class="k">if</span> (draft.stock &lt; 0) <span class="s">&#x27;stock&#x27;</span>: <span class="s">&#x27;Stok tidak boleh negatif&#x27;</span>,
+      <span class="k">if</span> (draft.categoryId.isEmpty) <span class="s">&#x27;category_id&#x27;</span>: <span class="s">&#x27;Pilih kategori&#x27;</span>,
+    };
+    <span class="k">if</span> (problems.isNotEmpty) {
+      <span class="k">return</span> Err(ServerFailure(<span class="s">&#x27;Periksa kembali isian produk.&#x27;</span>, statusCode: 422, fieldErrors: problems));
+    }
+    <span class="k">return</span> id == <span class="k">null</span> ? _repository.createProduct(draft) : _repository.updateProduct(id, draft);
+  }
+}</code></pre></div></article><div class="phase" id="phase-ship" style="--pc:#1E7B34"><span class="pn">Bagian C</span><h2>Uji, kemas &amp; rilis</h2></div><article class="step" id="s26" style="--pc:#1E7B34">
+<header><div class="num">26</div><div class="ht"><h3>Tulis test</h3><span class="time">⏱ 6 jam</span></div>
+<button class="done" data-done="s26">Tandai selesai</button></header>
+<p class="goal">Unit test untuk aturan, integration test untuk alur lengkap.</p><div class="code"><div class="ch"><span>⌨️ Backend</span><button class="copy">Salin</button></div><pre><code><span class="k">go</span> test -race ./...                              <span class="c"># unit test</span>
+<span class="k">docker</span> compose up -d postgres redis
+<span class="k">go</span> test -tags integration -race ./tests/...       <span class="c"># integration test</span></code></pre></div><div class="code"><div class="ch"><span>⌨️ Flutter</span><button class="copy">Salin</button></div><pre><code><span class="k">flutter</span> analyze
+<span class="k">flutter</span> test</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">tests/cart_order_test.go</code> — Integration test: rebutan stok</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/tests/cart_order_test.go" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c">// TestConcurrentCheckoutNeverOversells is the core correctness test: 20</span>
+<span class="c">// customers try to buy the last 5 units at the same moment.</span>
+<span class="k">func</span> TestConcurrentCheckoutNeverOversells(t *testing.T) {
+    resetDB(t)
+    admin := adminToken(t)
+    categoryID := createCategory(t, admin, <span class="s">&quot;Flash Sale&quot;</span>)
+    <span class="k">const</span> stock, buyers = 5, 20
+    productID := createProduct(t, admin, categoryID, <span class="s">&quot;Limited Sneakers&quot;</span>, 500000, stock)
+
+    tokens := make([]string, buyers)
+    <span class="k">for</span> i := <span class="k">range</span> tokens {
+        tokens[i] = newCustomer(t)
+        require.Equal(t, http.StatusOK, addToCart(t, tokens[i], productID, 1).Status)
+    }
+
+    <span class="k">var</span> created, conflict, other atomic.Int32
+    <span class="k">var</span> wg sync.WaitGroup
+    start := make(<span class="k">chan</span> <span class="k">struct</span>{})
+    <span class="k">for</span> _, tok := <span class="k">range</span> tokens {
+        wg.Add(1)
+        <span class="k">go</span> <span class="k">func</span>(tok string) {
+            <span class="k">defer</span> wg.Done()
+            &lt;-start
+            <span class="k">switch</span> call(t, http.MethodPost, <span class="s">&quot;/orders&quot;</span>, tok, <span class="k">nil</span>).Status {
+            <span class="k">case</span> http.StatusCreated:
+                created.Add(1)
+            <span class="k">case</span> http.StatusConflict:
+                conflict.Add(1)
+            <span class="k">default</span>:
+                other.Add(1)
+            }
+        }(tok)
+    }
+    close(start)
+    wg.Wait()
+
+    assert.EqualValues(t, stock, created.Load(), <span class="s">&quot;exactly as many orders as units in stock&quot;</span>)
+    assert.EqualValues(t, buyers-stock, conflict.Load(), <span class="s">&quot;everyone else gets 409&quot;</span>)
+    assert.EqualValues(t, 0, other.Load())
+    assert.Equal(t, 0, productStock(t, productID), <span class="s">&quot;stock ends at zero, never negative&quot;</span>)
+
+    <span class="k">var</span> sold int64
+    require.NoError(t, testDB.Raw(<span class="s">&quot;SELECT COALESCE(SUM(quantity), 0) FROM order_items WHERE product_id = ?&quot;</span>, productID).Scan(&amp;sold).Error)
+    assert.EqualValues(t, stock, sold)
+}</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">test/features/cart/cart_controller_test.dart</code> — Test Flutter: tap cepat di keranjang</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/test/features/cart/cart_controller_test.dart" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>  test(<span class="s">&#x27;rapid taps: requests go out in order and older responses do not undo newer taps&#x27;</span>, () <span class="k">async</span> {
+    <span class="k">final</span> sent = &lt;int&gt;[];
+    <span class="k">final</span> responses = &lt;int, Completer&lt;Result&lt;Cart&gt;&gt;&gt;{};
+    when(() =&gt; repo.getCart()).thenAnswer((_) <span class="k">async</span> =&gt; Ok(_cart([_item(<span class="s">&#x27;a&#x27;</span>, 1)])));
+    when(() =&gt; repo.updateItem(itemId: <span class="s">&#x27;a&#x27;</span>, quantity: any(named: <span class="s">&#x27;quantity&#x27;</span>))).thenAnswer((inv) {
+      <span class="k">final</span> q = inv.namedArguments[#quantity] as int;
+      sent.add(q);
+      <span class="k">return</span> (responses[q] = Completer()).future;
+    });
+    <span class="k">final</span> container = makeContainer();
+    <span class="k">final</span> seen = &lt;int&gt;[];
+    container.listen(cartControllerProvider, (previous, next) {
+      <span class="k">final</span> qty = next.value?.items.single.quantity;
+      <span class="k">if</span> (qty != <span class="k">null</span>) seen.add(qty);
+    });
+    <span class="k">await</span> container.read(cartControllerProvider.future);
+    seen.clear();
+    <span class="k">final</span> cart = container.read(cartControllerProvider.notifier);
+
+    <span class="k">final</span> taps = [cart.updateQuantity(<span class="s">&#x27;a&#x27;</span>, 2), cart.updateQuantity(<span class="s">&#x27;a&#x27;</span>, 3), cart.updateQuantity(<span class="s">&#x27;a&#x27;</span>, 4)];
+    <span class="k">await</span> <span class="k">Future</span>&lt;<span class="k">void</span>&gt;.delayed(Duration.zero);
+    expect(sent, [2], reason: <span class="s">&#x27;one request at a time&#x27;</span>);
+
+    responses[2]!.complete(Ok(_cart([_item(<span class="s">&#x27;a&#x27;</span>, 2)])));
+    <span class="k">await</span> <span class="k">Future</span>&lt;<span class="k">void</span>&gt;.delayed(Duration.zero);
+    responses[3]!.complete(Ok(_cart([_item(<span class="s">&#x27;a&#x27;</span>, 3)])));
+    <span class="k">await</span> <span class="k">Future</span>&lt;<span class="k">void</span>&gt;.delayed(Duration.zero);
+    responses[4]!.complete(Ok(_cart([_item(<span class="s">&#x27;a&#x27;</span>, 4)])));
+    <span class="k">await</span> <span class="k">Future</span>.wait(taps);
+
+    expect(sent, [2, 3, 4]);
+    expect(seen.take(3), [2, 3, 4], reason: <span class="s">&#x27;optimistic updates&#x27;</span>);
+    expect(seen.skip(3), everyElement(4), reason: <span class="s">&#x27;older server responses never move it back to 2 or 3&#x27;</span>);
+    expect(container.read(cartControllerProvider).value!.items.single.quantity, 4);
+  });</code></pre></div><div class="check">✅ <b>Cek berhasil:</b> Semua test hijau. Hasil saat ini: backend 53 unit + 70 integration lulus; Flutter 91 test belum dijalankan.</div></article><article class="step" id="s27" style="--pc:#1E7B34">
+<header><div class="num">27</div><div class="ht"><h3>Bungkus dengan Docker &amp; Makefile</h3><span class="time">⏱ 1 jam</span></div>
+<button class="done" data-done="s27">Tandai selesai</button></header>
+<p class="goal">Satu perintah untuk menyalakan semuanya.</p><div class="code"><div class="ch"><span>⌨️ Coba</span><button class="copy">Salin</button></div><pre><code><span class="k">docker</span> compose up --build
+<span class="c"># atau</span>
+<span class="k">make</span> up</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">Dockerfile</code> — Resep image (multi-stage)</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/Dockerfile" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="c"># syntax=docker/dockerfile:1</span>
+
+<span class="c"># ---- Build stage: full Go toolchain, never shipped -------------------------</span>
+<span class="k">FROM</span> golang:1.24-alpine AS builder
+<span class="k">WORKDIR</span> /src
+
+<span class="c"># Dependencies are downloaded in their own layer, so they are only fetched</span>
+<span class="c"># again when go.mod or go.sum changes.</span>
+<span class="k">COPY</span> go.mod go.sum ./
+<span class="k">RUN</span> go mod download
+
+<span class="k">COPY</span> . .
+
+<span class="c"># CGO is disabled to get a static binary; -s -w strips debug information.</span>
+<span class="k">RUN</span> CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags=<span class="s">&quot;-s -w&quot;</span> -o /out/api ./cmd/api
+
+<span class="c"># ---- Runtime stage: only the binary on a minimal base ----------------------</span>
+<span class="k">FROM</span> alpine:3.20
+<span class="k">RUN</span> apk add --no-cache ca-certificates tzdata \
+    &amp;&amp; addgroup -S app &amp;&amp; adduser -S app -G app
+
+<span class="k">WORKDIR</span> /app
+<span class="k">COPY</span> --from=builder /out/api /app/api
+
+<span class="c"># Run as an unprivileged user.</span>
+<span class="k">USER</span> app
+<span class="k">EXPOSE</span> 8080
+
+<span class="k">HEALTHCHECK</span> --interval=15s --timeout=3s --start-period=10s --retries=3 \
+    CMD wget -qO- <span class="s">&quot;http://127.0.0.1:${APP_PORT:-8080}/health&quot;</span> &gt;/dev/null || exit 1
+
+<span class="k">ENTRYPOINT</span> [<span class="s">&quot;/app/api&quot;</span>]</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">docker-compose.yml</code> — Tiga container sekaligus</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/docker-compose.yml" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">name</span>: go-ecommerce-api
+<span class="k">
+services</span>:
+<span class="k">  api</span>:
+<span class="k">    build</span>: .
+<span class="k">    ports</span>:
+      - <span class="s">&quot;8080:8080&quot;</span>
+<span class="k">    environment</span>:
+<span class="k">      APP_ENV</span>: development
+<span class="k">      APP_PORT</span>: <span class="s">&quot;8080&quot;</span>
+<span class="k">      LOG_LEVEL</span>: info
+<span class="k">      AUTO_MIGRATE</span>: <span class="s">&quot;true&quot;</span> <span class="c"># migrations run on startup, before the server listens</span>
+<span class="k">      DB_HOST</span>: postgres
+<span class="k">      DB_PORT</span>: <span class="s">&quot;5432&quot;</span>
+<span class="k">      DB_USER</span>: postgres
+<span class="k">      DB_PASSWORD</span>: postgres
+<span class="k">      DB_NAME</span>: ecommerce
+<span class="k">      DB_SSLMODE</span>: disable
+<span class="k">      REDIS_ADDR</span>: redis:6379
+      <span class="c"># Override JWT_SECRET and the admin password outside local development.</span>
+<span class="k">      JWT_SECRET</span>: ${JWT_SECRET:-local-development-secret-change-me-please-32}
+<span class="k">      CORS_ALLOW_ORIGINS</span>: http://localhost:3000
+<span class="k">      ADMIN_EMAIL</span>: ${ADMIN_EMAIL:-admin@example.com}
+<span class="k">      ADMIN_PASSWORD</span>: ${ADMIN_PASSWORD:-Admin12345}
+<span class="k">    depends_on</span>:
+<span class="k">      postgres</span>:
+<span class="k">        condition</span>: service_healthy
+<span class="k">      redis</span>:
+<span class="k">        condition</span>: service_healthy
+<span class="k">    restart</span>: unless-stopped
+<span class="k">
+  postgres</span>:
+<span class="k">    image</span>: postgres:16-alpine
+<span class="k">    environment</span>:
+<span class="k">      POSTGRES_USER</span>: postgres
+<span class="k">      POSTGRES_PASSWORD</span>: postgres
+<span class="k">      POSTGRES_DB</span>: ecommerce
+<span class="k">    ports</span>:
+      - <span class="s">&quot;5432:5432&quot;</span>
+<span class="k">    volumes</span>:
+      - postgres_data:/var/lib/postgresql/data
+      <span class="c"># Creates the ecommerce_test database used by the integration tests.</span>
+      - ./scripts/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+<span class="k">    healthcheck</span>:
+<span class="k">      test</span>: [<span class="s">&quot;CMD-SHELL&quot;</span>, <span class="s">&quot;pg_isready -U postgres -d ecommerce&quot;</span>]
+<span class="k">      interval</span>: 5s
+<span class="k">      timeout</span>: 3s
+<span class="k">      retries</span>: 10
+<span class="k">
+  redis</span>:
+<span class="k">    image</span>: redis:7-alpine
+<span class="k">    ports</span>:
+      - <span class="s">&quot;6379:6379&quot;</span>
+<span class="k">    healthcheck</span>:
+<span class="k">      test</span>: [<span class="s">&quot;CMD&quot;</span>, <span class="s">&quot;redis-cli&quot;</span>, <span class="s">&quot;ping&quot;</span>]
+<span class="k">      interval</span>: 5s
+<span class="k">      timeout</span>: 3s
+<span class="k">      retries</span>: 10
+<span class="k">
+volumes</span>:
+<span class="k">  postgres_data</span>:</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">Makefile</code> — Jalan pintas perintah</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/Makefile" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code>.PHONY: help run build fmt vet test test-integration test-all migrate up down logs tidy
+
+<span class="k">help</span>: <span class="c">## Show available commands</span>
+    @grep -E <span class="s">&#x27;^[a-zA-Z_-]+:.*?## &#x27;</span> $(MAKEFILE_LIST) | awk <span class="s">&#x27;BEGIN {FS = &quot;:.*?## &quot;}; {printf &quot;  %-18s %s\n&quot;, $$1, $$2}&#x27;</span>
+
+<span class="k">run</span>: <span class="c">## Run the API locally (needs PostgreSQL and Redis, see .env.example)</span>
+    go run ./cmd/api
+
+<span class="k">build</span>: <span class="c">## Build the production binary into bin/api</span>
+    CGO_ENABLED=0 go build -trimpath -ldflags=<span class="s">&quot;-s -w&quot;</span> -o bin/api ./cmd/api
+
+<span class="k">fmt</span>: <span class="c">## Format all Go files</span>
+    gofmt -w .
+
+<span class="k">vet</span>: <span class="c">## Run go vet (including integration test files)</span>
+    go vet -tags integration ./...
+
+<span class="k">test</span>: <span class="c">## Run unit tests (no external services needed)</span>
+    go test -race -count=1 ./...
+
+<span class="k">test-integration</span>: <span class="c">## Run integration tests (needs PostgreSQL: make up)</span>
+    go test -tags integration -race -count=1 ./tests/...
+
+<span class="k">test-all</span>: test test-integration <span class="c">## Run every test</span>
+
+<span class="k">migrate</span>: <span class="c">## Apply database migrations and exit</span>
+    go run ./cmd/api -migrate-only
+
+<span class="k">up</span>: <span class="c">## Start API, PostgreSQL and Redis with Docker Compose</span>
+    docker compose up --build -d
+
+<span class="k">down</span>: <span class="c">## Stop the Docker Compose stack</span>
+    docker compose down
+
+<span class="k">logs</span>: <span class="c">## Follow API logs</span>
+    docker compose logs -f api
+
+<span class="k">tidy</span>: <span class="c">## Tidy go.mod and go.sum</span>
+    go mod tidy</code></pre></div><div class="check">✅ <b>Cek berhasil:</b> <code>http://localhost:8080/docs</code> terbuka tanpa menjalankan Go secara manual.</div></article><article class="step" id="s28" style="--pc:#1E7B34">
+<header><div class="num">28</div><div class="ht"><h3>CI di GitHub Actions</h3><span class="time">⏱ 30 menit</span></div>
+<button class="done" data-done="s28">Tandai selesai</button></header>
+<p class="goal">Setiap push, GitHub menjalankan semua pemeriksaan otomatis.</p><div class="code file"><div class="ch"><span>📄 <code class="p">.github/workflows/go-ci.yml</code> — CI backend</span><span class="ca"><a href="https://github.com/aulansah/go-ecommerce-api/blob/main/.github/workflows/go-ci.yml" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">name</span>: Go CI
+<span class="k">
+on</span>:
+<span class="k">  push</span>:
+<span class="k">    branches</span>: [main, develop]
+<span class="k">  pull_request</span>:
+<span class="k">
+jobs</span>:
+<span class="k">  test</span>:
+<span class="k">    runs-on</span>: ubuntu-latest
+<span class="k">
+    services</span>:
+<span class="k">      postgres</span>:
+<span class="k">        image</span>: postgres:16-alpine
+<span class="k">        env</span>:
+<span class="k">          POSTGRES_USER</span>: postgres
+<span class="k">          POSTGRES_PASSWORD</span>: postgres
+<span class="k">          POSTGRES_DB</span>: ecommerce_test
+<span class="k">        ports</span>:
+          - 5432:5432
+<span class="k">        options</span>: &gt;-
+          --health-cmd <span class="s">&quot;pg_isready -U postgres&quot;</span>
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+<span class="k">
+    steps</span>:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+<span class="k">        with</span>:
+<span class="k">          go-version-file</span>: go.mod
+
+      - name: Check formatting
+<span class="k">        run</span>: test -z <span class="s">&quot;$(gofmt -l .)&quot;</span>
+
+      - name: Vet
+<span class="k">        run</span>: go vet -tags integration ./...
+
+      - name: Unit tests
+<span class="k">        run</span>: go test -race -count=1 ./...
+
+      - name: Integration tests
+<span class="k">        env</span>:
+<span class="k">          TEST_DB_HOST</span>: localhost
+<span class="k">          TEST_DB_PORT</span>: <span class="s">&quot;5432&quot;</span>
+<span class="k">        run</span>: go test -tags integration -race -count=1 ./tests/...
+
+      - name: Build
+<span class="k">        run</span>: go build ./cmd/api</code></pre></div><div class="code file"><div class="ch"><span>📄 <code class="p">.github/workflows/flutter-ci.yml</code> — CI Flutter</span><span class="ca"><a href="https://github.com/aulansah/ecommerce_app/blob/main/.github/workflows/flutter-ci.yml" target="_blank" rel="noopener">file lengkap ↗</a><button class="copy">Salin</button></span></div><pre><code><span class="k">name</span>: Flutter CI
+<span class="k">
+on</span>:
+<span class="k">  push</span>:
+<span class="k">    branches</span>: [main, develop]
+<span class="k">  pull_request</span>:
+<span class="k">
+jobs</span>:
+<span class="k">  analyze-and-test</span>:
+<span class="k">    runs-on</span>: ubuntu-latest
+<span class="k">    steps</span>:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+<span class="k">        with</span>:
+<span class="k">          channel</span>: stable
+<span class="k">          cache</span>: true
+
+      - name: Install packages
+<span class="k">        run</span>: flutter pub get
+
+      - name: Static analysis
+<span class="k">        run</span>: flutter analyze
+
+      - name: Tests
+<span class="k">        run</span>: flutter test --coverage
+
+      - name: Upload coverage
+<span class="k">        uses</span>: actions/upload-artifact@v4
+<span class="k">        with</span>:
+<span class="k">          name</span>: coverage
+<span class="k">          path</span>: coverage/lcov.info</code></pre></div></article><article class="step" id="s29" style="--pc:#1E7B34">
+<header><div class="num">29</div><div class="ht"><h3>Rilis ke GitHub</h3><span class="time">⏱ 30 menit</span></div>
+<button class="done" data-done="s29">Tandai selesai</button></header>
+<p class="goal">Gabungkan develop ke main, beri tag versi, lalu push.</p><div class="code"><div class="ch"><span>⌨️ Terminal</span><button class="copy">Salin</button></div><pre><code><span class="k">git</span> checkout main
+<span class="k">git</span> merge --no-ff develop -m <span class="s">&quot;release: v1.0.0&quot;</span>
+<span class="k">git</span> tag -a v1.0.0 -m <span class="s">&quot;First release&quot;</span>
+<span class="k">
+git</span> remote add origin https://github.com/aulansah/go-ecommerce-api.git
+<span class="k">git</span> push -u origin main develop
+<span class="k">git</span> push origin --tags</code></pre></div><ul class="ex"><li>Buat repo kosong di GitHub dulu (tanpa README).</li><li>Setelah push: cek tab Actions hijau, buat Release dari tag v1.0.0, tambahkan screenshot di README.</li></ul><div class="check">✅ <b>Cek berhasil:</b> Repo terlihat di GitHub dan badge CI hijau.</div></article>
+<div class="finish"><h2>🎉 Selesai!</h2><p>Kamu sudah membangun backend yang aman dari overselling dan pembayaran ganda, aplikasi Flutter berarsitektur rapi, test otomatis, Docker, dan CI. Lanjutkan dengan <b>dokumen rekayasa</b> (FRD/FSD/stress test) dan <b>panduan pemula</b> untuk menjelaskan project ini saat interview.</p></div>
+</main></div>
+<script>
+(function(){
+const KEY="ecom-tutorial-done";
+let done={};try{done=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const total=29;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}}
+function paint(){let c=0;document.querySelectorAll(".step").forEach(s=>{const on=!!done[s.id];if(on)c++;s.classList.toggle("isdone",on);s.querySelector(".done").textContent=on?"✓ Selesai":"Tandai selesai";
+ const a=document.querySelector('nav a[data-step="'+s.id+'"]');if(a)a.classList.toggle("isdone",on);});
+ document.getElementById("ptext").textContent=c+"/"+total+" selesai";document.getElementById("pfill").style.width=(c/total*100)+"%";}
+document.querySelectorAll(".step .done").forEach(b=>b.onclick=()=>{const id=b.dataset.done;done[id]=!done[id];save();paint();});
+document.getElementById("reset").onclick=()=>{done={};save();paint();};
+document.querySelectorAll(".copy").forEach(b=>b.onclick=async()=>{const t=b.closest(".code").querySelector("pre").innerText;
+ try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(_){}ta.remove();}
+ b.textContent="Tersalin ✓";b.classList.add("ok");setTimeout(()=>{b.textContent="Salin";b.classList.remove("ok")},1500);});
+try{const links=[...document.querySelectorAll("nav a")];const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting)links.forEach(l=>l.classList.toggle("active",l.getAttribute("href")==="#"+en.target.id));}),{rootMargin:"-30% 0px -60% 0px"});
+ document.querySelectorAll(".step").forEach(s=>io.observe(s));}catch(e){}
+paint();
+})();
+</script></body></html>
