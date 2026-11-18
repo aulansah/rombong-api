@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>go-ecommerce-api — Penjelasan Kode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117; --panel:#151b24; --panel2:#1b2330; --line:#263042; --text:#e6edf3; --muted:#8b98a9;
+  --go:#00add8; --go2:#5dc9e2; --amber:#f2b84b; --green:#3fb950; --red:#f0605d; --violet:#a78bfa;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6}
+a{color:var(--go2)}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 22px 80px}
+header.hero{position:relative;padding:28px 0 8px}
+.eyebrow{font-family:"JetBrains Mono",monospace;color:var(--go);font-size:13px;letter-spacing:.08em}
+h1{font-family:"Space Grotesk",sans-serif;font-size:clamp(30px,5vw,50px);line-height:1.1;margin:10px 0 12px;font-weight:700}
+h1 span{color:var(--go)}
+.lead{color:var(--muted);max-width:760px;font-size:17px}
+.gopher{position:absolute;right:0;top:10px;width:120px;opacity:.9}
+@media(max-width:760px){.gopher{display:none}}
+.toolbar{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 75%,transparent);padding:18px 0 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1 1 240px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:10px 16px;font:inherit;outline:none}
+.search:focus{border-color:var(--go)}
+.chip{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 14px;font:500 13px Inter,sans-serif;cursor:pointer;transition:.2s}
+.chip:hover{color:var(--text);border-color:var(--go)}
+.chip.on{background:var(--go);border-color:var(--go);color:#04202a}
+.count{color:var(--muted);font-size:13px;margin-left:auto}
+section.mod{margin-top:34px}
+.mod-head{display:flex;align-items:baseline;gap:4px 12px;margin-bottom:14px;flex-wrap:wrap}
+.mod-head h2{font-family:"Space Grotesk",sans-serif;margin:0;font-size:24px}
+.mod-head p{margin:0;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 16px;cursor:pointer;overflow:hidden;
+  opacity:0;transform:translateY(14px);animation:rise .5s forwards;transition:border-color .2s, transform .2s, box-shadow .2s}
+.card:hover{border-color:var(--go);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,173,216,.12)}
+.card::after{content:"";position:absolute;inset:auto -40% -60% auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(var(--glow,rgba(0,173,216,.18)),transparent 70%);transition:.3s}
+.card:hover::after{inset:auto -20% -40% auto}
+@keyframes rise{to{opacity:1;transform:none}}
+.tag{display:inline-block;font:600 11px "JetBrains Mono",monospace;letter-spacing:.04em;padding:3px 8px;border-radius:6px;margin-bottom:10px}
+.t-go{background:rgba(0,173,216,.15);color:var(--go2)}
+.t-pattern{background:rgba(167,139,250,.15);color:var(--violet)}
+.t-db{background:rgba(242,184,75,.15);color:var(--amber)}
+.t-sec{background:rgba(240,96,93,.15);color:var(--red)}
+.t-test{background:rgba(63,185,80,.15);color:var(--green)}
+.card h3{margin:0 0 6px;font:600 17px "Space Grotesk",sans-serif}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.card .file{margin-top:12px;font:12px "JetBrains Mono",monospace;color:#6b7a8f}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.empty{color:var(--muted);padding:40px 0;text-align:center;display:none}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(3,6,10,.72);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{width:min(980px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  transform:translateY(30px) scale(.96);opacity:0;transition:transform .35s cubic-bezier(.2,.9,.25,1.2),opacity .25s}
+.overlay.open .modal{transform:none;opacity:1}
+.m-top{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:18px 22px;display:flex;gap:14px;align-items:flex-start;z-index:2}
+.m-top h2{margin:2px 0 2px;font:700 24px "Space Grotesk",sans-serif}
+.m-top .file{font:12px "JetBrains Mono",monospace;color:var(--muted)}
+.x{margin-left:auto;background:var(--panel2);border:1px solid var(--line);color:var(--text);width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;flex:none}
+.x:hover{border-color:var(--go)}
+.m-body{padding:6px 22px 24px}
+.tabs{display:flex;gap:6px;margin:16px 0 4px;flex-wrap:wrap}
+.tab{background:none;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:7px 14px;font:500 14px Inter,sans-serif;cursor:pointer}
+.tab.on{background:var(--panel2);color:var(--text);border-color:var(--go)}
+.pane{display:none;animation:fade .35s}
+.pane.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pane h4{font:600 13px "JetBrains Mono",monospace;color:var(--go);letter-spacing:.05em;margin:20px 0 6px;text-transform:uppercase}
+.pane p,.pane li{color:#c9d4df;font-size:15.5px}
+.pane ul{padding-left:20px;margin:6px 0}
+.callout{border-left:3px solid var(--amber);background:rgba(242,184,75,.07);padding:10px 14px;border-radius:0 10px 10px 0;margin:14px 0;color:#e8d9b5;font-size:15px}
+.callout.good{border-color:var(--green);background:rgba(63,185,80,.07);color:#c8e6cc}
+.callout.bad{border-color:var(--red);background:rgba(240,96,93,.07);color:#f1c9c8}
+pre{background:#0a0e14;color:#d6deeb;padding:14px 16px;overflow:auto;white-space:pre;tab-size:4}
+pre[class*=language-]{border-radius:12px;margin:10px 0 !important;font-size:13.5px !important;border:1px solid var(--line)}
+.token.comment{color:#6b7a8f;font-style:italic}.token.string{color:#a5d6a7}.token.keyword{color:#c792ea}
+.token.function{color:#82aaff}.token.number,.token.boolean{color:#f78c6c}.token.operator,.token.punctuation{color:#89ddff}
+.token.builtin,.token.class-name{color:#ffcb6b}
+code{font-family:"JetBrains Mono",monospace}
+:not(pre)>code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em;color:var(--go2)}
+.codehead{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font:12px "JetBrains Mono",monospace;color:var(--muted)}
+.copy{background:var(--panel2);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:4px 10px;cursor:pointer;font:12px Inter,sans-serif}
+.copy:hover{color:var(--text)}
+.qa{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.qa b{display:block;color:var(--text);margin-bottom:6px}
+.qa span{color:#c9d4df}
+.navrow{display:flex;justify-content:space-between;margin-top:22px;gap:10px}
+.nav{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 14px;cursor:pointer;font:500 14px Inter,sans-serif}
+.nav:hover{border-color:var(--go)}
+
+/* visuals */
+.viz{background:#0a0e14;border:1px solid var(--line);border-radius:12px;padding:16px;margin:12px 0}
+.viz-title{font:600 12px "JetBrains Mono",monospace;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.play{background:var(--go);color:#04202a;border:0;border-radius:8px;padding:5px 12px;font:600 12px Inter,sans-serif;cursor:pointer}
+.lane{display:flex;align-items:center;gap:10px;margin:8px 0;font:12px "JetBrains Mono",monospace;color:var(--muted)}
+.lane .lbl{width:150px;flex:none}
+.track{position:relative;flex:1;height:24px;background:#111823;border-radius:6px;overflow:hidden}
+.bar{position:absolute;top:3px;bottom:3px;left:0;width:0;border-radius:4px;background:var(--go)}
+.bar.b2{background:var(--violet)} .bar.b3{background:var(--amber)} .bar.b4{background:var(--green)}
+.buyers{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:10px 0}
+.buyer{height:30px;border-radius:7px;background:#1b2330;display:flex;align-items:center;justify-content:center;font:600 11px "JetBrains Mono",monospace;color:var(--muted);transition:.3s}
+.buyer.ok{background:rgba(63,185,80,.25);color:var(--green)}
+.buyer.no{background:rgba(240,96,93,.2);color:var(--red)}
+.stockbox{display:flex;gap:6px;align-items:center;font:13px "JetBrains Mono",monospace;color:var(--muted)}
+.unit{width:26px;height:26px;border-radius:6px;background:var(--amber);transition:.3s}
+.unit.gone{background:#1b2330;transform:scale(.7)}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
+.node{padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:#111823;font:12.5px "JetBrains Mono",monospace;color:var(--muted);transition:.3s}
+.node.hot{border-color:var(--go);color:var(--text);background:rgba(0,173,216,.12);box-shadow:0 0 0 3px rgba(0,173,216,.12)}
+.node.miss{border-color:var(--amber);color:var(--text);background:rgba(242,184,75,.12)}
+.arrow{color:#4a5668}
+.log{font:12.5px "JetBrains Mono",monospace;color:var(--muted);min-height:20px;margin-top:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.card{opacity:1;transform:none}}
+.views{display:flex;gap:6px;flex-wrap:wrap;margin:26px 0 4px;padding:5px;background:var(--panel);border:1px solid var(--line);border-radius:14px;width:fit-content;max-width:100%}
+.vbtn{background:none;border:0;color:var(--muted);padding:9px 16px;border-radius:10px;font:600 14px Inter,sans-serif;cursor:pointer;transition:.2s}
+.vbtn:hover{color:var(--text)}
+.vbtn.on{background:var(--go);color:#04202a}
+.view{display:none}.view.on{display:block;animation:fade .4s}
+.journey{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.jstep{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;cursor:pointer;color:var(--text);opacity:0;transform:translateY(10px);animation:rise .45s forwards;transition:border-color .2s}
+.jstep:hover,.jstep.on{border-color:var(--go);box-shadow:0 0 0 3px rgba(0,173,216,.12)}
+.jwho{font:600 11px "JetBrains Mono",monospace;color:var(--go2)}.jwho.admin{color:var(--violet)}.jwho.done{color:var(--green)}
+.jwhat{font:600 14px Inter,sans-serif}
+.jarrow{color:#4a5668;font-size:18px}
+.flowchips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.seqcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;scroll-margin-top:16px}
+.seqhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.seqhead h3{margin:0;font:700 22px "Space Grotesk",sans-serif}.seqhead p{margin:4px 0 0;color:var(--muted)}
+.seqctl{display:flex;gap:8px}.play{font-size:13px;padding:8px 14px}.nav.small{padding:7px 12px;font-size:13px}
+.legend2{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0 8px;font-size:12.5px;color:var(--muted)}
+.lg{display:inline-block;width:22px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.lg.req{background:#00add8}.lg.ret{background:repeating-linear-gradient(90deg,#8b98a9 0 5px,transparent 5px 9px)}.lg.db{background:#f2b84b}.lg.err{background:repeating-linear-gradient(90deg,#f0605d 0 5px,transparent 5px 9px)}
+.seqscroll{overflow-x:auto;border-radius:12px;background:#0a0e14;border:1px solid var(--line)}
+#seq{display:block}
+#seq .life{stroke:#2a3546;stroke-dasharray:3 5}
+#seq .lanehd rect{fill:#151b24;stroke:#2a3546;transition:.25s}
+#seq .lanehd text{fill:#c9d4df;font:600 13px Inter,sans-serif}
+#seq .lanehd.on rect{fill:rgba(0,173,216,.16);stroke:#00add8}
+#seq .step{cursor:pointer}
+#seq .step .hit{fill:transparent}
+#seq .step:hover .hit,#seq .step:focus .hit{fill:rgba(255,255,255,.035)}
+#seq .step.active .hit{fill:rgba(0,173,216,.09)}
+#seq .step .lbl{fill:#c9d4df;font:500 12.5px Inter,sans-serif;paint-order:stroke;stroke:#0a0e14;stroke-width:5px}
+#seq .step.done{opacity:.55}
+#seq .step.active .lbl{fill:#fff}
+#packet{filter:drop-shadow(0 0 6px currentColor)}
+.seqcard .caption{position:sticky;bottom:12px;box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.caption{margin-top:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:#c9d4df;font-size:15px;min-height:48px}
+.cap-who{font:12px "JetBrains Mono",monospace;color:var(--go2);margin-left:6px}
+.cap-file{display:inline-block;font:12px "JetBrains Mono",monospace;color:var(--muted);margin-top:4px}
+.flowwho{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.who{font:600 12px "JetBrains Mono",monospace;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 9px}
+.kind{font:12px "JetBrains Mono",monospace;margin-left:4px}
+.runtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.rtab{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:9px 16px;font:600 14px Inter,sans-serif;cursor:pointer}
+.rtab.on{border-color:var(--go);color:var(--text);background:var(--panel2)}
+.runpane{display:none}.runpane.on{display:block;animation:fade .35s}
+.need{background:rgba(0,173,216,.08);border:1px solid rgba(0,173,216,.3);border-radius:12px;padding:12px 16px;color:#cfe9f2;margin-bottom:8px}
+ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+ol.steps>li{counter-increment:s;position:relative;padding:4px 0 10px 48px;border-left:2px solid var(--line);margin-left:16px}
+ol.steps>li::before{content:counter(s);position:absolute;left:-17px;top:4px;width:32px;height:32px;border-radius:50%;background:var(--panel2);border:2px solid var(--go);color:var(--go2);font:700 14px "JetBrains Mono",monospace;display:flex;align-items:center;justify-content:center}
+ol.steps>li:last-child{border-left-color:transparent}
+ol.steps h4{margin:6px 0 4px;font:600 16px "Space Grotesk",sans-serif}
+ol.steps p{color:#c9d4df;margin:6px 0}
+ol.steps.compact>li{padding-bottom:14px;color:#c9d4df;padding-top:9px}
+.whybox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;color:#c9d4df}
+.whybox li{margin:4px 0}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.vs{grid-template-columns:1fr}}
+.vscol{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;color:#c9d4df}
+.vscol h4{margin:4px 0 6px;font:600 16px "Space Grotesk",sans-serif;color:var(--text)}
+.vscol.bad{border-color:rgba(240,96,93,.4)}.vscol.good{border-color:rgba(63,185,80,.45)}
+.vscol li{margin:5px 0}
+h3.sub{font:600 18px "Space Grotesk",sans-serif;margin:24px 0 10px}
+.dockflow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dstep{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;color:var(--text);font:500 13.5px Inter,sans-serif;cursor:pointer;display:flex;gap:8px;align-items:center}
+.dstep:hover,.dstep.on{border-color:var(--go)}
+.dn{width:20px;height:20px;border-radius:50%;background:var(--go);color:#04202a;font:700 11px Inter,sans-serif;display:inline-flex;align-items:center;justify-content:center}
+.card.static{cursor:default}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">go-ecommerce-api / docs</div>
+    <h1>Kenapa kodenya <span>ditulis begini?</span></h1>
+    <p class="lead">Panduan visual project go-ecommerce-api: konsep Go yang dipakai beserta kode aslinya, alur sistem dalam bentuk sequence diagram yang bisa diklik per langkah, cara menjalankan dengan atau tanpa Docker, dan alasan di balik setiap keputusan.</p>
+    <div class="legend">
+      <span class="tag t-go">GO</span><span class="tag t-pattern">PATTERN</span><span class="tag t-db">DATABASE</span><span class="tag t-sec">SECURITY</span><span class="tag t-test">TESTING</span>
+    </div>
+    <svg class="gopher" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="64" r="44" fill="#00add8"/><circle cx="44" cy="52" r="12" fill="#fff"/><circle cx="76" cy="52" r="12" fill="#fff"/>
+      <circle cx="47" cy="54" r="5" fill="#0d1117"/><circle cx="79" cy="54" r="5" fill="#0d1117"/>
+      <ellipse cx="60" cy="72" rx="8" ry="5" fill="#f2b84b"/><rect x="55" y="75" width="10" height="7" rx="2" fill="#fff"/>
+      <circle cx="22" cy="40" r="8" fill="#00add8"/><circle cx="98" cy="40" r="8" fill="#00add8"/>
+    </svg>
+  </header>
+  <nav class="views" id="views">
+    <button class="vbtn on" data-view="konsep">Konsep kode</button>
+    <button class="vbtn" data-view="alur">Alur sistem</button>
+    <button class="vbtn" data-view="jalankan">Cara menjalankan</button>
+    <button class="vbtn" data-view="kenapa">Kenapa begini?</button>
+  </nav>
+
+  <div class="view on" id="v-konsep">
+  <div class="toolbar">
+    <input class="search" id="q" placeholder="Cari konsep: goroutine, singleton, cache, transaksi…" aria-label="Cari konsep">
+    <div id="chips" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    <span class="count" id="count"></span>
+  </div>
+
+  <main id="sections"></main>
+  <div class="empty" id="empty">Tidak ada konsep yang cocok.</div>
+  </div>
+<div class="view" id="v-alur">
+  <section class="mod">
+    <div class="mod-head"><h2>User flow</h2><p>perjalanan dari katalog kosong sampai pesanan selesai. Klik satu tahap untuk melihat sequence diagram-nya.</p></div>
+    <div class="journey" id="journey"></div>
+  </section>
+
+  <section class="mod">
+    <div class="mod-head"><h2>Sequence diagram</h2><p>urutan pesan antar komponen. Klik panah untuk detail service, file, dan kodenya.</p></div>
+    <div class="flowchips" id="flowchips"></div>
+    <div class="seqcard">
+      <div class="seqhead">
+        <div><h3 id="flow-title"></h3><p id="flow-desc"></p></div>
+        <div class="seqctl">
+          <button class="play" id="flow-play">Putar alur</button>
+          <button class="nav small" id="flow-reset">Reset</button>
+        </div>
+      </div>
+      <div class="legend2">
+        <span><i class="lg req"></i>request</span><span><i class="lg ret"></i>respons</span>
+        <span><i class="lg db"></i>database / Redis</span><span><i class="lg err"></i>kalau gagal</span>
+      </div>
+      <div class="seqscroll"><svg id="seq" role="img" aria-label="Sequence diagram"></svg></div>
+      <div class="caption" id="flow-caption">Tekan "Putar alur" atau klik salah satu panah.</div>
+    </div>
+  </section>
+</div>
+<div class="view" id="v-jalankan">
+  <section class="mod">
+    <div class="mod-head"><h2>Pilih cara menjalankan</h2><p>dua-duanya menjalankan aplikasi yang sama</p></div>
+    <div class="runtabs">
+      <button class="rtab on" data-run="docker">Pakai Docker (disarankan)</button>
+      <button class="rtab" data-run="manual">Tanpa Docker</button>
+      <button class="rtab" data-run="test">Menjalankan test</button>
+    </div>
+
+    <div class="runpane on" data-run="docker">
+      <div class="need">Yang perlu ter-install: <b>Docker Desktop</b> saja. Go, PostgreSQL, dan Redis tidak perlu di-install.</div>
+      <ol class="steps">
+        <li><h4>Buka terminal di folder project</h4>
+<pre><code>cd "I:\Fullstack Web Developer and Flutter Developer\ECommerce API"</code></pre></li>
+        <li><h4>Build dan jalankan semuanya</h4>
+<pre><code>docker compose up --build -d</code></pre>
+<p>Docker membuat tiga container: <code>api</code>, <code>postgres</code>, <code>redis</code>. API baru start setelah PostgreSQL dan Redis lolos health check. Migration database jalan otomatis, dan akun admin dibuat: <code>admin@example.com</code> / <code>Admin12345</code>.</p></li>
+        <li><h4>Cek sudah hidup</h4>
+<pre><code>curl.exe http://localhost:8080/health</code></pre>
+<p>Hasil yang benar: <code>{"database":"up","redis":"up","status":"ok"}</code>. Di PowerShell pakai <code>curl.exe</code>, karena <code>curl</code> di sana adalah alias untuk perintah lain.</p></li>
+        <li><h4>Coba API-nya</h4>
+<p>Buka <code>http://localhost:8080/docs</code> di browser untuk Swagger UI. Base URL API: <code>http://localhost:8080/api/v1</code>.</p></li>
+        <li><h4>Perintah sehari-hari</h4>
+<pre><code>docker compose logs -f api     # lihat log API
+docker compose ps              # status container
+docker compose down            # matikan (data tetap tersimpan)
+docker compose down -v         # matikan + hapus data database</code></pre></li>
+      </ol>
+      <div class="callout">Port bentrok? Kalau 5432, 6379, atau 8080 sudah dipakai aplikasi lain, ubah angka sebelah <b>kiri</b> di bagian <code>ports</code> pada <code>docker-compose.yml</code>, misalnya <code>"8081:8080"</code>.</div>
+    </div>
+
+    <div class="runpane" data-run="manual">
+      <div class="need">Yang perlu ter-install: <b>Go 1.24+</b>, <b>PostgreSQL 13+</b>, dan <b>Redis</b> (opsional: tanpa Redis API tetap jalan, hanya tanpa cache dan rate limit).</div>
+      <ol class="steps">
+        <li><h4>Siapkan file konfigurasi</h4>
+<pre><code>copy .env.example .env      # Windows
+cp .env.example .env        # macOS / Linux</code></pre>
+<p>Buka <code>.env</code>, lalu isi minimal: <code>JWT_SECRET</code> (minimal 32 karakter), dan <code>DB_USER</code> / <code>DB_PASSWORD</code> sesuai PostgreSQL di laptopmu. Kalau <code>JWT_SECRET</code> kurang dari 32 karakter, aplikasi sengaja menolak jalan.</p></li>
+        <li><h4>Buat database</h4>
+<pre><code>createdb -U postgres ecommerce</code></pre>
+<p>Atau lewat pgAdmin / DBeaver: buat database bernama <code>ecommerce</code>. Tabelnya tidak perlu dibuat manual.</p></li>
+        <li><h4>Jalankan</h4>
+<pre><code>go run ./cmd/api</code></pre>
+<p>Saat start, aplikasi menjalankan migration (<code>AUTO_MIGRATE=true</code>), membuat admin dari <code>ADMIN_EMAIL</code> / <code>ADMIN_PASSWORD</code>, lalu listen di port 8080.</p></li>
+        <li><h4>Cek</h4>
+<pre><code>curl.exe http://localhost:8080/health</code></pre>
+<p>Kalau Redis tidak jalan, hasilnya <code>"status":"degraded"</code>. Itu normal; API tetap berfungsi.</p></li>
+        <li><h4>Build binary untuk produksi (opsional)</h4>
+<pre><code>go build -o bin/api ./cmd/api        # hasilnya satu file
+go run ./cmd/api -migrate-only       # hanya jalankan migration lalu keluar</code></pre></li>
+      </ol>
+      <div class="callout">Di Windows biasanya tidak ada <code>make</code>. Semua perintah di <code>Makefile</code> bisa diganti dengan perintah <code>go</code> langsung seperti di atas.</div>
+    </div>
+
+    <div class="runpane" data-run="test">
+      <ol class="steps">
+        <li><h4>Unit test (tanpa database)</h4>
+<pre><code>go test ./...</code></pre>
+<p>Tambahkan <code>-race</code> untuk mendeteksi data race. Di Windows, <code>-race</code> butuh compiler C (gcc); kalau belum ada, jalankan tanpa flag itu.</p></li>
+        <li><h4>Integration test (butuh PostgreSQL)</h4>
+<p>Pakai PostgreSQL dari Docker (database <code>ecommerce_test</code> otomatis dibuat):</p>
+<pre><code>docker compose up -d postgres
+go test -tags integration ./tests/...</code></pre>
+<p>Tanpa Docker: buat database <code>ecommerce_test</code>, lalu atur koneksinya lewat env var.</p>
+<pre><code>createdb -U postgres ecommerce_test
+# PowerShell
+$env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code></pre></li>
+      </ol>
+      <div class="callout bad">Integration test mengosongkan semua tabel di database test. Jangan arahkan ke database <code>ecommerce</code> yang berisi data penting.</div>
+    </div>
+  </section>
+
+  <section class="mod">
+    <div class="mod-head"><h2>Coba alur lengkap</h2><p>setelah server jalan; pakai Swagger UI kalau tidak mau mengetik curl</p></div>
+    <ol class="steps compact">
+      <li><b>Login admin</b> <code>POST /auth/login</code> → salin <code>access_token</code></li>
+      <li><b>Buat kategori</b> <code>POST /categories</code> dengan header <code>Authorization: Bearer &lt;token admin&gt;</code></li>
+      <li><b>Buat produk</b> <code>POST /products</code> berisi <code>category_id</code> dari langkah 2</li>
+      <li><b>Daftar customer</b> <code>POST /auth/register</code>, lalu <code>POST /auth/login</code></li>
+      <li><b>Masukkan ke cart</b> <code>POST /cart/items</code> dengan token customer</li>
+      <li><b>Checkout</b> <code>POST /orders</code> (tanpa body)</li>
+      <li><b>Bayar</b> <code>POST /payments</code> dengan header <code>Idempotency-Key</code> berisi teks acak, lalu <code>POST /payments/:id/simulate-success</code></li>
+      <li><b>Cek</b> <code>GET /orders/:id</code> → status <code>PAID</code></li>
+    </ol>
+  </section>
+</div>
+<div class="view" id="v-kenapa">
+  <section class="mod">
+    <div class="mod-head"><h2>Kenapa API ini ada?</h2></div>
+    <div class="whybox">
+      <p>API ini adalah <b>backend toko online</b>: semua aturan bisnis dan data ada di server, dan aplikasi apa pun (web React, Flutter, Android) cukup memanggil endpoint-nya. Frontend tidak menyimpan harga, stok, atau status pesanan sendiri.</p>
+      <p>Sebagai portfolio, e-commerce dipilih karena memaksa kita menyelesaikan masalah backend yang sungguhan, bukan sekadar CRUD:</p>
+      <ul>
+        <li><b>Uang:</b> harga tidak boleh dipercaya dari klien, total harus tepat, dan pembayaran tidak boleh terproses dua kali.</li>
+        <li><b>Konkurensi:</b> banyak orang membeli barang terakhir di detik yang sama.</li>
+        <li><b>Keamanan:</b> login, token, hak akses admin vs customer, data milik orang lain.</li>
+        <li><b>Performa:</b> katalog dibaca jauh lebih sering daripada diubah, cocok untuk cache.</li>
+      </ul>
+      <p>Itu semua adalah topik yang paling sering ditanyakan di interview backend.</p>
+    </div>
+  </section>
+
+  <section class="mod">
+    <div class="mod-head"><h2>Kenapa tiap modul ada?</h2><p>klik untuk melihat alurnya</p></div>
+    <div class="grid" id="whymods"></div>
+  </section>
+
+  <section class="mod">
+    <div class="mod-head"><h2>Kenapa pakai Docker?</h2></div>
+    <div class="vs">
+      <div class="vscol bad"><h4>Tanpa Docker</h4><ul>
+        <li>Install Go, PostgreSQL, Redis satu per satu, versi bisa beda tiap laptop.</li>
+        <li>"Di laptop saya jalan kok" — tapi di server tidak.</li>
+        <li>Orang yang mau mencoba portfolio-mu harus setup 30 menit.</li>
+        <li>Database lokal tercampur dengan project lain.</li></ul></div>
+      <div class="vscol good"><h4>Dengan Docker</h4><ul>
+        <li><b>Satu perintah</b> <code>docker compose up</code>: API, PostgreSQL 16, Redis 7 langsung jalan.</li>
+        <li><b>Versi sama persis</b> di laptop, CI, dan server, karena semuanya ditulis di <code>Dockerfile</code> dan <code>docker-compose.yml</code>.</li>
+        <li><b>Terisolasi:</b> tiap project punya database sendiri, hapus bersih dengan <code>docker compose down -v</code>.</li>
+        <li><b>Siap produksi:</b> image yang sama bisa langsung dipakai di Kubernetes / OpenShift.</li></ul></div>
+    </div>
+    <h3 class="sub">Yang terjadi saat <code>docker compose up --build</code></h3>
+    <div class="dockflow" id="dockflow"></div>
+    <div class="caption" id="dock-caption">Klik salah satu tahap.</div>
+    <h3 class="sub">Kenapa Dockerfile-nya multi-stage?</h3>
+    <div class="vs">
+      <div class="vscol"><h4>Stage 1: builder</h4><p>Image <code>golang:1.24-alpine</code> yang besar (ada compiler Go) dipakai untuk <code>go build</code>. Stage ini dibuang setelah selesai.</p></div>
+      <div class="vscol"><h4>Stage 2: runtime</h4><p>Image <code>alpine</code> kecil, hanya berisi satu binary hasil build. Berjalan sebagai user non-root. Lebih kecil = lebih cepat di-deploy dan lebih sedikit celah keamanan.</p></div>
+    </div>
+  </section>
+
+  <section class="mod">
+    <div class="mod-head"><h2>Kenapa teknologi ini?</h2></div>
+    <div class="grid" id="whytech"></div>
+  </section>
+</div>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="modal" id="modal"></div>
+</div>
+
+<!-- ====================================================== CODE SNIPPETS -->
+<script type="text/plain" id="c-goroutine-mini">package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func getCurrency()     { fmt.Println("Get Currency") }
+func getExchangeRate() { fmt.Println("Get Exchange Rate") }
+
+func main() {
+    go getCurrency()     // jalan di goroutine baru
+    go getExchangeRate() // jalan bersamaan
+
+    time.Sleep(time.Second) // tunggu, kalau tidak main() selesai duluan
+}</script>
+<script type="text/plain" id="c-goroutine">// cmd/api/main.go
+serverErr := make(chan error, 1)
+go func() {
+    log.Info("server started", zap.String("port", cfg.App.Port))
+    // Listen() memblok selamanya, jadi dijalankan di goroutine sendiri
+    serverErr <- application.Fiber.Listen(":" + cfg.App.Port)
+}()
+
+quit := make(chan os.Signal, 1)
+signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+select {
+case err := <-serverErr: // server mati sendiri (misal port bentrok)
+    return fmt.Errorf("server stopped: %w", err)
+case sig := <-quit: // Ctrl+C atau docker stop
+    log.Info("shutting down", zap.String("signal", sig.String()))
+}
+
+// berhenti menerima koneksi baru, selesaikan request yang sedang jalan
+application.Fiber.ShutdownWithTimeout(15 * time.Second)</script>
+<script type="text/plain" id="c-channel-mini">func main() {
+    result := make(chan string)
+
+    go func() {
+        time.Sleep(500 * time.Millisecond)
+        result <- "kurs USD: 16.200" // kirim ke channel
+    }()
+
+    select {
+    case r := <-result: // siapa duluan, dia yang dipilih
+        fmt.Println(r)
+    case <-time.After(time.Second):
+        fmt.Println("timeout")
+    }
+}</script>
+<script type="text/plain" id="c-defer">// cmd/api/main.go
+func main() {
+    if err := run(); err != nil {
+        fmt.Fprintln(os.Stderr, "fatal:", err)
+        os.Exit(1)
+    }
+}
+
+func run() error {
+    db, err := database.Connect(cfg.DB, log)
+    if err != nil {
+        return err
+    }
+    sqlDB, _ := db.DB()
+    defer sqlDB.Close()      // dijalankan saat run() selesai
+
+    redisCache := cache.NewRedis(cfg.Redis)
+    defer redisCache.Close() // urutan LIFO: Redis ditutup duluan, lalu DB
+    ...
+}</script>
+<script type="text/plain" id="c-singleton">// internal/utils/validator.go
+
+// validate is safe for concurrent use and caches struct metadata, so a
+// single instance is shared by the whole application.
+var validate = newValidator()
+
+func newValidator() *validator.Validate {
+    v := validator.New()
+    v.RegisterTagNameFunc(func(f reflect.StructField) string {
+        name := strings.SplitN(f.Tag.Get("json"), ",", 2)[0]
+        if name == "" || name == "-" {
+            return f.Name
+        }
+        return name
+    })
+    _ = v.RegisterValidation("password", func(fl validator.FieldLevel) bool {
+        return IsStrongPassword(fl.Field().String())
+    })
+    return v
+}
+
+func ValidateStruct(v any) error {
+    err := validate.Struct(v) // semua request memakai instance yang sama
+    ...
+}</script>
+<script type="text/plain" id="c-singleton-mini">// Alternatif kalau inisialisasinya mahal dan baru boleh jalan saat dipakai:
+var (
+    instance *validator.Validate
+    once     sync.Once
+)
+
+func Validator() *validator.Validate {
+    once.Do(func() {        // dijamin cuma sekali, walau dipanggil
+        instance = validator.New() // dari banyak goroutine sekaligus
+    })
+    return instance
+}</script>
+<script type="text/plain" id="c-di">// internal/app/app.go — composition root
+txManager := database.NewTxManager(d.DB)
+tokens := token.NewManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.App.Name)
+
+// Repositories
+userRepo := user.NewRepository(d.DB)
+productRepo := product.NewRepository(d.DB)
+cartRepo := cart.NewRepository(d.DB)
+orderRepo := order.NewRepository(d.DB)
+
+// Services: semua dependency masuk lewat parameter constructor
+categorySvc := category.NewService(categoryRepo)
+productSvc := product.NewService(productRepo, categorySvc, d.Cache, d.Log,
+    cfg.Cache.ProductTTL, cfg.Cache.ProductListTTL)
+cartSvc := cart.NewService(cartRepo, productRepo)
+orderSvc := order.NewService(orderRepo, cartRepo, productRepo, productSvc, txManager)</script>
+<script type="text/plain" id="c-interface">// internal/modules/order/service.go
+// Interface didefinisikan di sini, oleh PEMAKAI-nya, dan isinya
+// hanya method yang dibutuhkan order.
+
+// StockManager changes product stock atomically.
+type StockManager interface {
+    DecreaseStock(ctx context.Context, id uuid.UUID, qty int) (*product.Product, error)
+    IncreaseStock(ctx context.Context, id uuid.UUID, qty int) error
+}
+
+// CacheInvalidator drops cached product data after stock changed.
+type CacheInvalidator interface {
+    InvalidateCache(ctx context.Context, ids ...uuid.UUID)
+}
+
+type Service struct {
+    repo  Repository
+    carts CartStore
+    stock StockManager     // diisi product.GormRepository
+    cache CacheInvalidator // diisi product.Service
+    tx    Transactor
+}</script>
+<script type="text/plain" id="c-interface-mini">// Go: implementasi interface itu IMPLISIT. Tidak ada kata "implements".
+type Notifier interface{ Send(msg string) error }
+
+type EmailSender struct{}
+func (EmailSender) Send(msg string) error { /* kirim email */ return nil }
+
+type FakeSender struct{ Sent []string } // untuk test
+func (f *FakeSender) Send(msg string) error { f.Sent = append(f.Sent, msg); return nil }
+
+func Checkout(n Notifier) { n.Send("order dibuat") } // terima apa saja yang punya Send()</script>
+<script type="text/plain" id="c-ctxtx">// internal/database/postgres.go
+type txKey struct{} // tipe privat → key tidak bisa bentrok dengan package lain
+
+func (m *TxManager) WithinTx(ctx context.Context, fn func(ctx context.Context) error) error {
+    return m.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+        // titipkan transaksi di context, lalu jalankan fn
+        return fn(context.WithValue(ctx, txKey{}, tx))
+    })
+}
+
+// Dipakai semua repository: pakai transaksi kalau ada, kalau tidak pakai DB biasa
+func FromContext(ctx context.Context, fallback *gorm.DB) *gorm.DB {
+    if tx, ok := ctx.Value(txKey{}).(*gorm.DB); ok {
+        return tx
+    }
+    return fallback.WithContext(ctx)
+}
+
+// Di service:
+err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
+    if _, err := s.stock.DecreaseStock(ctx, id, qty); err != nil {
+        return err // → ROLLBACK
+    }
+    return s.repo.Create(ctx, order) // nil → COMMIT
+})</script>
+<script type="text/plain" id="c-errors">// pkg/apperror/apperror.go
+var (
+    ErrNotFound  = errors.New("record not found") // sentinel error
+    ErrDuplicate = errors.New("duplicate record")
+)
+
+type AppError struct {
+    Status  int    // HTTP status
+    Code    string // "NOT_FOUND", "CONFLICT", ...
+    Message string // aman ditampilkan ke klien
+    Details []FieldError
+    Err     error  // penyebab asli, hanya untuk log
+}
+
+func (e *AppError) Error() string { ... }
+func (e *AppError) Unwrap() error { return e.Err } // supaya errors.Is/As bisa "menembus"
+
+// Di service:
+u, err := s.repo.FindByID(ctx, id)
+if errors.Is(err, apperror.ErrNotFound) {
+    return nil, apperror.NotFound("User not found") // → 404
+}
+if err != nil {
+    return nil, apperror.Internal(err)              // → 500, detail ke log
+}</script>
+<script type="text/plain" id="c-errhandler">// pkg/response/response.go
+func ErrorHandler(log *zap.Logger) fiber.ErrorHandler {
+    return func(c *fiber.Ctx, err error) error {
+        var appErr *apperror.AppError
+        var fiberErr *fiber.Error
+
+        switch {
+        case errors.As(err, &appErr):  // error bisnis yang kita buat
+        case errors.As(err, &fiberErr): // error bawaan Fiber (404 route, dll)
+            appErr = apperror.New(fiberErr.Code, codeForStatus(fiberErr.Code), fiberErr.Message)
+        default:                         // error tak dikenal → jangan bocorkan
+            appErr = apperror.Internal(err)
+        }
+
+        if appErr.Status >= 500 {
+            log.Error("request failed", zap.String("request_id", RequestID(c)), zap.Error(err))
+        }
+        return c.Status(appErr.Status).JSON(ErrorEnvelope{
+            Success: false, Message: appErr.Message,
+            Error: ErrorBody{Code: appErr.Code, Details: appErr.Details},
+            RequestID: RequestID(c),
+        })
+    }
+}</script>
+<script type="text/plain" id="c-middleware">// internal/middleware/auth.go
+// Fungsi yang MENGEMBALIKAN fungsi (closure). `tokens` "diingat"
+// oleh handler yang dikembalikan.
+func Auth(tokens *token.Manager) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        header := c.Get(fiber.HeaderAuthorization)
+        scheme, value, found := strings.Cut(header, " ")
+        if !found || !strings.EqualFold(scheme, "Bearer") {
+            return apperror.Unauthorized("Missing or malformed Authorization header")
+        }
+        claims, err := tokens.Parse(strings.TrimSpace(value))
+        if err != nil {
+            return apperror.Unauthorized("Invalid or expired token")
+        }
+        userID, _ := claims.UserID()
+        c.Locals("user_id", userID) // titipkan identitas untuk handler berikutnya
+        c.Locals("role", claims.Role)
+        return c.Next()             // lanjut ke middleware/handler berikutnya
+    }
+}
+
+func RequireRole(roles ...string) fiber.Handler { // variadic
+    return func(c *fiber.Ctx) error {
+        for _, r := range roles {
+            if Role(c) == r {
+                return c.Next()
+            }
+        }
+        return apperror.Forbidden("You do not have permission to access this resource")
+    }
+}
+
+// routes.go
+p.Post("/", authn, admin, h.Product.Create) // rantai: auth → cek role → handler</script>
+<script type="text/plain" id="c-tags">// internal/modules/auth/model.go
+type RegisterRequest struct {
+    Name     string `json:"name" validate:"required,min=2,max=100"`
+    Email    string `json:"email" validate:"required,email,max=255"`
+    Password string `json:"password" validate:"required,password"` // tag custom
+}
+
+// internal/modules/user/model.go — entity DB TIDAK punya tag json
+type User struct {
+    ID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+    Email        string
+    PasswordHash string // tidak pernah dikirim: response selalu lewat DTO
+    ...
+}
+
+type Response struct { // DTO untuk klien
+    ID    uuid.UUID `json:"id"`
+    Email string    `json:"email"`
+    Role  string    `json:"role"`
+}</script>
+<script type="text/plain" id="c-embed">// migrations/embed.go
+package migrations
+
+import "embed"
+
+//go:embed *.sql
+var FS embed.FS // semua file .sql ikut masuk ke dalam binary saat compile
+
+// internal/database/migrate.go
+source, err := iofs.New(migrations.FS, ".")
+m, err := migrate.NewWithInstance("iofs", source, "postgres", driver)
+if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+    return fmt.Errorf("apply migrations: %w", err)
+}</script>
+<script type="text/plain" id="c-config">// internal/config/config.go
+func (c *Config) validate() error {
+    if len(c.JWT.Secret) < 32 {
+        return errors.New("JWT_SECRET must be set and at least 32 characters long")
+    }
+    if c.App.BcryptCost < 4 || c.App.BcryptCost > 31 {
+        return errors.New("BCRYPT_COST must be between 4 and 31")
+    }
+    if c.IsProduction() && strings.TrimSpace(c.CORS.AllowOrigins) == "*" {
+        return errors.New("CORS_ALLOW_ORIGINS must not be '*' in production")
+    }
+    return nil
+}
+
+// Load(): env var asli selalu menang atas file .env
+v.SetConfigFile(".env")
+v.AutomaticEnv()
+setDefaults(v)</script>
+<script type="text/plain" id="c-bcrypt">// internal/modules/auth/service.go
+hash, err := bcrypt.GenerateFromPassword([]byte(password), s.bcryptCost)
+// hasil: $2a$12$Q9...  (salt sudah ada di dalam hash)
+
+// Login
+if bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(req.Password)) != nil {
+    return nil, errInvalidCredentials
+}
+
+// pesan yang SAMA untuk "email tidak ada" dan "password salah"
+var errInvalidCredentials = apperror.Unauthorized("Invalid email or password")</script>
+<script type="text/plain" id="c-jwt">// pkg/token/token.go
+func (m *Manager) Generate(userID uuid.UUID, role string) (string, error) {
+    now := time.Now()
+    claims := Claims{
+        Role: role,
+        RegisteredClaims: jwt.RegisteredClaims{
+            Subject:   userID.String(),
+            Issuer:    m.issuer,
+            IssuedAt:  jwt.NewNumericDate(now),
+            ExpiresAt: jwt.NewNumericDate(now.Add(m.ttl)), // 15 menit
+        },
+    }
+    return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(m.secret)
+}
+
+func (m *Manager) Parse(tokenString string) (*Claims, error) {
+    claims := &Claims{}
+    _, err := jwt.ParseWithClaims(tokenString, claims,
+        func(*jwt.Token) (any, error) { return m.secret, nil },
+        jwt.WithValidMethods([]string{"HS256"}), // tolak alg:none & alg confusion
+        jwt.WithIssuer(m.issuer),
+        jwt.WithExpirationRequired(),
+    )
+    if err != nil {
+        return nil, ErrInvalidToken
+    }
+    return claims, nil
+}</script>
+<script type="text/plain" id="c-refresh">// internal/modules/auth/service.go
+func (s *Service) Refresh(ctx context.Context, req RefreshRequest) (*TokenResponse, error) {
+    stored, err := s.tokens.FindByHash(ctx, hashToken(req.RefreshToken))
+    ...
+    // Revoke hanya berhasil kalau token MASIH aktif (compare-and-swap)
+    revoked, err := s.tokens.Revoke(ctx, stored.ID)
+    if !revoked {
+        // token ini sudah pernah dipakai → kemungkinan dicuri.
+        // Cabut SEMUA sesi user ini.
+        s.tokens.RevokeAllForUser(ctx, stored.UserID)
+        return nil, invalid
+    }
+    return s.issueTokens(ctx, u) // pasangan token baru
+}
+
+// repository.go
+res := db.Model(&RefreshToken{}).
+    Where("id = ? AND revoked_at IS NULL", id).
+    Update("revoked_at", time.Now().UTC())
+return res.RowsAffected == 1, res.Error
+
+// yang disimpan hanya hash-nya
+func hashToken(t string) string {
+    sum := sha256.Sum256([]byte(t))
+    return hex.EncodeToString(sum[:])
+}</script>
+<script type="text/plain" id="c-cacheaside">// internal/modules/product/service.go
+func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Response, error) {
+    key := detailKey(id) // "product:<uuid>"
+
+    // 1. coba Redis
+    var cached Response
+    found, err := s.cache.Get(ctx, key, &cached)
+    if err != nil {
+        s.log.Warn("product cache read failed", zap.Error(err)) // Redis mati? lanjut saja
+    }
+    if found {
+        return &cached, nil // HIT
+    }
+
+    // 2. MISS → baca PostgreSQL
+    p, err := s.repo.FindByID(ctx, id)
+    ...
+    // 3. simpan ke Redis dengan TTL untuk pembaca berikutnya
+    res := ToResponse(p)
+    if err := s.cache.Set(ctx, key, res, s.detailTTL); err != nil {
+        s.log.Warn("product cache write failed", zap.Error(err))
+    }
+    return &res, nil
+}
+
+// Setelah update/delete/stok berubah: hapus key-nya
+s.cache.Delete(ctx, detailKey(id))</script>
+<script type="text/plain" id="c-versioned">// internal/modules/product/service.go
+const listVersionKey = "products:list:version"
+
+func (s *Service) listKey(ctx context.Context, f ListFilter) (string, bool) {
+    var version int64
+    if _, err := s.cache.Get(ctx, listVersionKey, &version); err != nil {
+        return "", false // Redis bermasalah → jangan cache list kali ini
+    }
+    raw, _ := json.Marshal(f)
+    sum := sha1.Sum(raw)
+    return fmt.Sprintf("products:list:v%d:%s", version, hex.EncodeToString(sum[:])), true
+}
+
+// Setiap ada produk berubah:
+func (s *Service) invalidateLists(ctx context.Context) {
+    s.cache.Incr(ctx, listVersionKey) // v3 → v4: semua key v3 tidak terbaca lagi
+}</script>
+<script type="text/plain" id="c-whitelist">// internal/modules/product/service.go
+var allowedSorts = map[string]bool{"created_at": true, "price": true, "name": true}
+
+func normalizeFilter(f ListFilter) ListFilter {
+    f.Sort = strings.ToLower(f.Sort)
+    if !allowedSorts[f.Sort] {
+        f.Sort = "created_at" // input aneh → default
+    }
+    if f.Order != "asc" && f.Order != "desc" {
+        f.Order = "desc"
+    }
+    ...
+}
+
+// repository.go
+q = q.Where("name ILIKE ?", "%"+escapeLike(f.Search)+"%") // nilai → parameter binding
+
+func escapeLike(s string) string {
+    return strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`).Replace(s)
+}</script>
+<script type="text/plain" id="c-pointer">// internal/modules/product/model.go
+type SaveRequest struct {
+    Name  string `json:"name"  validate:"required,min=3,max=200"`
+    Price int64  `json:"price" validate:"required,gt=0"`
+    Stock *int   `json:"stock" validate:"required,gte=0"` // pointer!
+}
+
+// Kalau pakai `int` biasa:
+//   {"stock": 0}  → Stock = 0
+//   {}            → Stock = 0   ← tidak bisa dibedakan, "required" gagal untuk 0
+//
+// Dengan `*int`:
+//   {"stock": 0}  → Stock = &0  ✓ valid
+//   {}            → Stock = nil ✗ "is required"
+
+p.Stock = *req.Stock // dereference saat dipakai</script>
+<script type="text/plain" id="c-upsert">// internal/modules/cart/cart.go
+
+// Buat cart kalau belum ada. Aman kalau 2 request datang bersamaan.
+db.Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "user_id"}}, DoNothing: true}).
+    Create(&Cart{UserID: userID})
+
+// Tambah item: kalau produk sudah ada di cart, update quantity
+db.Clauses(clause.OnConflict{
+    Columns:   []clause.Column{{Name: "cart_id"}, {Name: "product_id"}},
+    DoUpdates: clause.Assignments(map[string]any{"quantity": quantity}),
+}).Create(&Item{CartID: cartID, ProductID: productID, Quantity: quantity})
+
+// SQL yang dihasilkan kira-kira:
+// INSERT INTO cart_items (...) VALUES (...)
+// ON CONFLICT (cart_id, product_id) DO UPDATE SET quantity = 5</script>
+<script type="text/plain" id="c-derived">// internal/modules/cart/cart.go
+// Total TIDAK disimpan di database. Dihitung setiap kali cart dibaca,
+// dari harga produk saat ini.
+func ToResponse(c *Cart) Response {
+    res := Response{ID: c.ID}
+    for _, it := range c.Items {
+        line := ItemResponse{
+            UnitPrice: it.Product.Price,
+            Quantity:  it.Quantity,
+            Subtotal:  it.Product.Price * int64(it.Quantity),
+            Available: it.Product.ID != uuid.Nil && it.Product.Stock >= it.Quantity,
+        }
+        res.Items = append(res.Items, line)
+        res.TotalItems += it.Quantity
+        res.TotalAmount += line.Subtotal
+    }
+    return res
+}</script>
+<script type="text/plain" id="c-atomic">// internal/modules/product/repository.go
+// Cek stok dan kurangi stok dalam SATU statement.
+func (r *GormRepository) DecreaseStock(ctx context.Context, id uuid.UUID, qty int) (*Product, error) {
+    var p Product
+    res := database.FromContext(ctx, r.db).Model(&p).
+        Clauses(clause.Returning{}).          // RETURNING * → dapat nama & harga terbaru
+        Where("id = ? AND stock >= ?", id, qty).
+        Updates(map[string]any{
+            "stock":      gorm.Expr("stock - ?", qty),
+            "updated_at": time.Now().UTC(),
+        })
+    if res.Error != nil {
+        return nil, res.Error
+    }
+    if res.RowsAffected == 0 {
+        return nil, ErrInsufficientStock // stok kurang → order di-rollback
+    }
+    return &p, nil
+}
+
+// SQL:
+// UPDATE products SET stock = stock - 1
+// WHERE id = $1 AND stock >= 1 AND deleted_at IS NULL
+// RETURNING *;</script>
+<script type="text/plain" id="c-wrong">// ❌ JANGAN: baca → cek di Go → tulis
+p, _ := repo.FindByID(ctx, id)  // goroutine A & B sama-sama baca stock = 1
+if p.Stock >= qty {             // A lolos, B juga lolos
+    p.Stock -= qty
+    repo.Update(ctx, p)         // dua-duanya menulis stock = 0 → 2 order, 1 barang
+}</script>
+<script type="text/plain" id="c-lock">// internal/modules/order/service.go
+err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
+    // SELECT ... FROM carts WHERE user_id = ? FOR UPDATE
+    c, err := s.carts.GetForCheckout(ctx, userID)
+    if len(c.Items) == 0 {
+        return apperror.BadRequest("Cart is empty")
+    }
+
+    // Kunci produk selalu dengan urutan yang SAMA → tidak ada deadlock
+    items := append([]cart.Item(nil), c.Items...)
+    sort.Slice(items, func(i, j int) bool {
+        return items[i].ProductID.String() < items[j].ProductID.String()
+    })
+
+    for _, it := range items {
+        p, err := s.stock.DecreaseStock(ctx, it.ProductID, it.Quantity)
+        ...
+        order.Items = append(order.Items, Item{
+            ProductName: p.Name,  // snapshot dari DB, bukan dari klien
+            UnitPrice:   p.Price,
+            Quantity:    it.Quantity,
+        })
+    }
+    s.repo.Create(ctx, order)
+    return s.carts.Clear(ctx, c.ID)
+})</script>
+<script type="text/plain" id="c-cas">// internal/modules/order/model.go — state machine sebagai map
+var adminTransitions = map[Status][]Status{
+    StatusPending:    {StatusCancelled},
+    StatusPaid:       {StatusProcessing},
+    StatusProcessing: {StatusShipped},
+    StatusShipped:    {StatusCompleted},
+}
+
+// repository.go — compare-and-swap di level SQL
+func (r *GormRepository) TransitionStatus(ctx context.Context, id uuid.UUID, from, to Status) (bool, error) {
+    res := database.FromContext(ctx, r.db).Model(&Order{}).
+        Where("id = ? AND status = ?", id, from). // hanya kalau status MASIH `from`
+        Update("status", to)
+    return res.RowsAffected == 1, res.Error
+}
+
+// service.go — Cancel
+ok, err := s.repo.TransitionStatus(ctx, o.ID, StatusPending, StatusCancelled)
+if !ok {
+    return apperror.Conflict("Only orders with status PENDING can be cancelled")
+}
+// baru kembalikan stok — dijamin cuma sekali</script>
+<script type="text/plain" id="c-idem">// internal/modules/payment/service.go
+func (s *Service) Create(ctx context.Context, caller Caller, key string, req CreateRequest) (*Payment, bool, error) {
+    if key == "" {
+        return nil, false, apperror.BadRequest("Idempotency-Key header is required")
+    }
+    // 1. jalur cepat: key ini pernah dipakai? kembalikan payment lama
+    if existing, err := s.replay(ctx, key, orderID); err != nil || existing != nil {
+        return existing, false, err
+    }
+    // 2. ada payment PENDING dengan key yang sama? (request kembar menang duluan)
+    if existing, err := s.activePayment(ctx, orderID, key); err != nil || existing != nil {
+        return existing, false, err
+    }
+    // 3. insert — unique index idempotency_key adalah penjaga terakhir
+    err = s.repo.Create(ctx, p)
+    if errors.Is(err, apperror.ErrDuplicate) {
+        return s.replay(ctx, key, orderID) // kalah balapan → kembalikan yang menang
+    }
+    return p, true, nil
+}
+
+// SimulateSuccess: hanya satu request yang berhasil mengubah PENDING → SUCCESS
+ok, err := s.repo.Transition(ctx, p.ID, StatusSuccess, &now) // WHERE status = 'PENDING'</script>
+<script type="text/plain" id="c-waitgroup">// tests/cart_order_test.go — 20 pembeli berebut 5 barang
+var created, conflict atomic.Int32 // counter aman dipakai banyak goroutine
+var wg sync.WaitGroup
+start := make(chan struct{})       // "pistol start"
+
+for _, tok := range tokens {
+    wg.Add(1)
+    go func(tok string) {
+        defer wg.Done()
+        <-start // semua goroutine menunggu di sini
+        switch call(t, http.MethodPost, "/orders", tok, nil).Status {
+        case http.StatusCreated:
+            created.Add(1)
+        case http.StatusConflict:
+            conflict.Add(1)
+        }
+    }(tok)
+}
+close(start) // DOR! semua goroutine dilepas bersamaan
+wg.Wait()    // tunggu semuanya selesai
+
+assert.EqualValues(t, 5, created.Load())
+assert.EqualValues(t, 15, conflict.Load())
+assert.Equal(t, 0, productStock(t, productID))</script>
+<script type="text/plain" id="c-wg-mini">// Versi contoh kamu, tapi tanpa time.Sleep
+func main() {
+    var wg sync.WaitGroup
+    wg.Add(2)
+
+    go func() { defer wg.Done(); getCurrency() }()
+    go func() { defer wg.Done(); getExchangeRate() }()
+
+    wg.Wait() // tunggu tepat sampai keduanya selesai, tidak lebih, tidak kurang
+}</script>
+<script type="text/plain" id="c-fakes">// internal/modules/auth/service_test.go
+type fakeTokens struct {
+    mu     sync.Mutex // map Go TIDAK aman diakses banyak goroutine
+    byHash map[string]*RefreshToken
+}
+
+func (f *fakeTokens) Revoke(_ context.Context, id uuid.UUID) (bool, error) {
+    f.mu.Lock()
+    defer f.mu.Unlock() // pasti dilepas, walau ada return di tengah
+    for _, t := range f.byHash {
+        if t.ID == id && t.RevokedAt == nil {
+            now := time.Now()
+            t.RevokedAt = &now
+            return true, nil
+        }
+    }
+    return false, nil
+}
+
+// Service asli dipakai dengan fake ini, tanpa database:
+svc := NewService(newFakeUsers(), newFakeTokens(), jwt, time.Hour, bcrypt.MinCost)</script>
+<script type="text/plain" id="c-buildtag">//go:build integration
+
+// tests/setup_test.go — file ini hanya ikut di-compile kalau
+// `-tags integration` diberikan.
+package tests
+
+func TestMain(m *testing.M) {
+    database.Migrate(cfg.DB.DSN()) // database sungguhan
+    ...
+    os.Exit(m.Run())
+}
+
+// go test ./...                                → unit test saja, cepat
+// go test -tags integration -race ./tests/...  → + PostgreSQL sungguhan</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+<script>
+const MODULES = [
+  {id:"fondasi", name:"Fondasi", desc:"main.go, config, database, error, middleware"},
+  {id:"auth", name:"Auth", desc:"register, login, JWT, refresh token"},
+  {id:"product", name:"Product & Cache", desc:"katalog, Redis, query aman"},
+  {id:"cart", name:"Cart", desc:"keranjang belanja"},
+  {id:"order", name:"Order", desc:"checkout transaksional, anti-oversell"},
+  {id:"payment", name:"Payment", desc:"idempotency"},
+  {id:"testing", name:"Testing", desc:"goroutine di test, fake, build tag"},
+];
+const TAGS = {go:["GO","t-go"], pattern:["PATTERN","t-pattern"], db:["DATABASE","t-db"], sec:["SECURITY","t-sec"], test:["TESTING","t-test"]};
+
+const C = [
+/* ---------------- FONDASI ---------------- */
+{id:"goroutine", mod:"fondasi", tag:"go", title:"Goroutine", short:"Menjalankan server di \"thread ringan\" supaya main() tetap bisa mendengarkan sinyal shutdown.",
+ file:"cmd/api/main.go", viz:"goroutine",
+ code:[["Contoh sederhana (seperti contohmu)","c-goroutine-mini"],["Di project ini","c-goroutine"]],
+ what:`<p>Goroutine adalah fungsi yang berjalan <b>bersamaan</b> dengan kode lain. Cukup tambah kata <code>go</code> di depan pemanggilan fungsi. Goroutine sangat murah (mulai dari sekitar 2 KB stack), jadi Go bisa menjalankan ratusan ribu goroutine sekaligus. Runtime Go yang membagi goroutine ke thread OS.</p>
+ <p>Di contoh sederhana, <code>getCurrency()</code> dan <code>getExchangeRate()</code> jalan bersamaan. <code>time.Sleep</code> dipakai supaya <code>main()</code> tidak selesai duluan, karena saat <code>main()</code> selesai, semua goroutine ikut mati.</p>`,
+ why:`<p><code>Fiber.Listen()</code> <b>memblok selamanya</b>: selama server hidup, fungsi itu tidak pernah return. Kalau dipanggil langsung di <code>main()</code>, kode di bawahnya (menunggu Ctrl+C / SIGTERM) tidak akan pernah jalan.</p>
+ <p>Jadi server dijalankan di goroutine sendiri, sementara goroutine utama menunggu dua kemungkinan lewat <code>select</code>: server mati sendiri, atau ada sinyal shutdown. Kalau sinyal datang, server dimatikan dengan sopan (<code>ShutdownWithTimeout</code>) sehingga checkout yang sedang berjalan sempat selesai.</p>
+ <div class="callout">Jujur soal project ini: di service (order, payment, dll.) <b>tidak ada</b> goroutine yang ditulis manual. Fiber sendiri yang menjalankan <b>setiap request di goroutine-nya masing-masing</b>. Itu sebabnya semua kode yang dipakai bersama antar request (validator, koneksi DB, Redis client) harus aman diakses banyak goroutine sekaligus.</div>`,
+ without:`<div class="callout bad">Tanpa goroutine: <code>Listen()</code> memblok, <code>signal.Notify</code> tidak pernah terpasang, dan saat <code>docker stop</code> proses langsung dibunuh paksa. Request checkout yang sedang di tengah jalan bisa terputus.</div>
+ <div class="callout">Catatan untuk contoh sederhana: <code>time.Sleep</code> itu menebak. Kalau fungsinya butuh lebih dari 1 detik, hasilnya hilang. Di kode sungguhan pakai <code>sync.WaitGroup</code> atau channel (lihat kartu "WaitGroup &amp; atomic").</div>`,
+ qa:[["Apa beda goroutine dengan thread OS?","Goroutine dikelola runtime Go, bukan OS. Stack awalnya kecil dan bisa tumbuh, jadi jauh lebih murah. Runtime memetakan banyak goroutine ke sedikit thread OS (model M:N)."],
+     ["Kenapa server dijalankan di goroutine?","Karena Listen() memblok. Goroutine utama perlu bebas untuk menunggu sinyal shutdown lewat select, lalu mematikan server dengan graceful shutdown."],
+     ["Apakah project ini memakai goroutine di service?","Tidak secara manual. Fiber sudah menjalankan tiap request di goroutine sendiri. Konsekuensinya, state yang dibagi antar request harus concurrency-safe, dan race condition di data (stok) diselesaikan di database."]]},
+
+{id:"channel", mod:"fondasi", tag:"go", title:"Channel & select", short:"Cara goroutine saling mengirim kabar. select menunggu mana yang datang duluan.",
+ file:"cmd/api/main.go", viz:"select",
+ code:[["Contoh sederhana","c-channel-mini"],["Di project ini","c-goroutine"]],
+ what:`<p><b>Channel</b> adalah pipa bertipe untuk mengirim data antar goroutine: <code>ch &lt;- v</code> mengirim, <code>v := &lt;-ch</code> menerima. Prinsip Go: <i>"Don't communicate by sharing memory; share memory by communicating."</i></p>
+ <p><b>select</b> menunggu beberapa channel sekaligus dan menjalankan cabang yang siap duluan, mirip <code>switch</code> tapi untuk channel.</p>`,
+ why:`<p>Di <code>main.go</code> ada dua kejadian yang mungkin terjadi duluan:</p>
+ <ul><li><code>serverErr</code>: server gagal sendiri, misalnya port 8080 sudah dipakai.</li><li><code>quit</code>: OS mengirim SIGINT/SIGTERM.</li></ul>
+ <p><code>select</code> menangani keduanya tanpa polling. Channel <code>serverErr</code> dibuat <b>buffered</b> (<code>make(chan error, 1)</code>) supaya goroutine server bisa mengirim error lalu selesai walaupun <code>main</code> sudah tidak membaca lagi. Tanpa buffer, goroutine itu bisa macet selamanya (goroutine leak).</p>`,
+ without:`<div class="callout bad">Alternatifnya variabel global + loop <code>for { if stopped {...}; time.Sleep(...) }</code>: boros CPU, lambat bereaksi, dan rawan data race.</div>`,
+ qa:[["Beda buffered dan unbuffered channel?","Unbuffered: pengirim menunggu sampai ada penerima. Buffered: pengirim bisa langsung lanjut selama buffer belum penuh."],
+     ["Kenapa serverErr diberi buffer 1?","Supaya goroutine server tidak macet saat mengirim error kalau main sudah keluar dari select lewat cabang quit. Itu mencegah goroutine leak."],
+     ["Apa yang terjadi kalau select punya beberapa cabang yang siap bersamaan?","Go memilih salah satu secara acak, supaya tidak ada cabang yang selalu kalah."]]},
+
+{id:"defer", mod:"fondasi", tag:"go", title:"defer & pola run()", short:"Membersihkan resource otomatis, dan kenapa main() hanya memanggil run().",
+ file:"cmd/api/main.go",
+ code:[["Di project ini","c-defer"]],
+ what:`<p><code>defer</code> menunda pemanggilan fungsi sampai fungsi yang membungkusnya selesai, entah lewat return normal, error, atau panic. Beberapa defer dijalankan terbalik (LIFO): yang terakhir ditulis, dieksekusi pertama.</p>`,
+ why:`<p>Koneksi DB dan Redis harus ditutup apa pun yang terjadi. Dengan <code>defer</code>, penutupnya ditulis tepat di sebelah pembukanya, jadi tidak mungkin lupa.</p>
+ <p>Tapi <code>os.Exit()</code> <b>tidak menjalankan defer</b>. Karena itu semua logika ada di <code>run()</code> yang mengembalikan error; <code>main()</code> hanya mencetak error lalu exit. Semua defer di <code>run()</code> sudah selesai sebelum <code>os.Exit</code> dipanggil.</p>`,
+ without:`<div class="callout bad">Kalau logika langsung di main() lalu memakai <code>log.Fatal</code> / <code>os.Exit</code> saat error, semua <code>defer Close()</code> dilewati: koneksi tidak ditutup rapi dan log yang masih di buffer bisa hilang.</div>`,
+ qa:[["Kapan defer dieksekusi?","Saat fungsi yang membungkusnya return, termasuk karena panic. Urutannya LIFO."],
+     ["Kenapa ada fungsi run() terpisah dari main()?","Karena os.Exit melewati defer. run() mengembalikan error sehingga semua cleanup berjalan dulu, baru main() memanggil os.Exit(1)."]]},
+
+{id:"singleton", mod:"fondasi", tag:"pattern", title:"Singleton (instance bersama)", short:"Satu validator untuk seluruh aplikasi, dibuat sekali saat program start.",
+ file:"internal/utils/validator.go",
+ code:[["Di project ini","c-singleton"],["Varian lazy dengan sync.Once","c-singleton-mini"]],
+ what:`<p>Singleton artinya hanya ada <b>satu instance</b> dari suatu objek untuk seluruh aplikasi. Di Go caranya biasanya sederhana: variabel tingkat package yang diinisialisasi sekali, seperti <code>var validate = newValidator()</code>. Go menjamin inisialisasi variabel package berjalan sekali, sebelum <code>main()</code>, dan aman dari race.</p>
+ <p>Kalau objeknya mahal dan baru boleh dibuat saat pertama kali dipakai (lazy), pakai <code>sync.Once</code>.</p>`,
+ why:`<ul><li><b>Mahal kalau dibuat berulang.</b> <code>validator.New()</code> membaca struct tag lewat reflection lalu menyimpan hasilnya di cache. Membuat validator baru tiap request berarti membuang cache itu terus-menerus.</li>
+ <li><b>Aman untuk konkurensi.</b> Dokumentasi validator menyatakan satu instance aman dipakai banyak goroutine. Ini penting karena tiap request Fiber berjalan di goroutine sendiri.</li>
+ <li><b>Konfigurasi sekali.</b> Aturan custom <code>password</code> dan nama field JSON didaftarkan satu kali.</li></ul>
+ <div class="callout">Objek lain seperti <code>*gorm.DB</code>, Redis client, dan logger juga hanya dibuat sekali, tapi <b>tidak</b> dijadikan variabel global. Mereka dibuat di <code>main</code> lalu disuntikkan lewat constructor (lihat kartu Dependency Injection), supaya mudah diganti saat test. Validator dibuat global karena tidak punya dependency eksternal dan tidak perlu diganti di test.</div>`,
+ without:`<div class="callout bad">Tanpa singleton: setiap request membuat validator baru → reflection diulang terus, alokasi memori naik, dan aturan custom harus didaftarkan ulang di banyak tempat.</div>
+ <div class="callout bad">Singleton yang salah: variabel global yang <b>diubah</b> oleh banyak goroutine tanpa mutex. Itu data race. Singleton aman kalau isinya read-only setelah inisialisasi, atau memang dirancang concurrency-safe.</div>`,
+ qa:[["Bagaimana membuat singleton di Go?","Untuk yang sederhana: variabel package yang diinisialisasi saat deklarasi. Untuk lazy init: sync.Once, yang menjamin fungsi inisialisasi berjalan tepat sekali walaupun dipanggil banyak goroutine."],
+     ["Kenapa DB tidak dijadikan singleton global juga?","Global state menyulitkan test dan menyembunyikan dependency. DB tetap satu instance, tapi dioper lewat constructor sehingga di test bisa diganti dengan database test atau fake."],
+     ["Apa risiko singleton?","Global mutable state: rawan data race dan susah di-test. Singleton aman kalau immutable setelah dibuat atau thread-safe secara internal."]]},
+
+{id:"di", mod:"fondasi", tag:"pattern", title:"Dependency Injection manual", short:"Semua objek dirangkai di satu tempat lewat constructor, tanpa framework.",
+ file:"internal/app/app.go",
+ code:[["Di project ini","c-di"]],
+ what:`<p>Dependency Injection (DI) artinya sebuah objek <b>menerima</b> dependency-nya dari luar, bukan membuatnya sendiri. Di Go cukup lewat parameter constructor: <code>NewService(repo, cache, log)</code>.</p>
+ <p>Tempat semua objek dirangkai disebut <b>composition root</b>; di project ini <code>internal/app/app.go</code>.</p>`,
+ why:`<ul><li><b>Mudah di-test.</b> Di unit test, <code>auth.NewService</code> diberi fake repository in-memory, bukan PostgreSQL.</li>
+ <li><b>Dependency terlihat jelas.</b> Cukup baca satu file untuk tahu siapa bergantung pada siapa.</li>
+ <li><b>Dicek compiler.</b> Kalau ada dependency yang lupa diisi atau salah tipe, program tidak bisa di-compile. Framework DI berbasis reflection baru ketahuan salahnya saat runtime.</li></ul>`,
+ without:`<div class="callout bad">Tanpa DI: service memanggil <code>database.GetDB()</code> global di dalamnya. Akibatnya service tidak bisa di-test tanpa database sungguhan, dan urutan inisialisasi jadi tersembunyi.</div>
+ <div class="callout">Alternatif: Google Wire (generate kode DI) atau Uber Fx (runtime DI). Berguna untuk project besar; untuk ukuran ini DI manual lebih mudah dibaca.</div>`,
+ qa:[["Kenapa tidak pakai framework DI?","Untuk tujuh modul, wiring manual cuma puluhan baris, mudah dibaca, dan dicek compiler. Framework menambah konsep baru dan kadang error baru muncul saat runtime."],
+     ["Apa itu composition root?","Satu tempat di aplikasi tempat semua dependency dibuat dan dirangkai. Kode lain cukup menerima dependency lewat constructor."]]},
+
+{id:"interface", mod:"fondasi", tag:"go", title:"Interface di sisi pemakai", short:"Service mendefinisikan interface kecil yang dia butuhkan. Repository cukup memenuhinya.",
+ file:"internal/modules/order/service.go",
+ code:[["Contoh sederhana","c-interface-mini"],["Di project ini","c-interface"]],
+ what:`<p>Di Go, sebuah tipe otomatis memenuhi interface kalau punya semua method-nya. Tidak ada kata <code>implements</code>. Karena itu interface bisa didefinisikan oleh <b>pemakainya</b>, bukan oleh pembuat implementasinya.</p>
+ <p>Idiom Go: <i>"Accept interfaces, return structs."</i></p>`,
+ why:`<ul><li><b>Interface kecil.</b> Order hanya butuh <code>DecreaseStock</code> dan <code>IncreaseStock</code>, bukan semua method repository produk. Fake untuk test jadi sangat sederhana.</li>
+ <li><b>Mencegah import cycle.</b> Contohnya <code>user.SessionRevoker</code>: modul user perlu mencabut refresh token, tapi package <code>auth</code> sudah meng-import <code>user</code>. Dengan interface di sisi user, user tidak perlu meng-import auth.</li>
+ <li><b>Satu objek, beberapa peran.</b> <code>product.GormRepository</code> sekaligus memenuhi <code>product.Repository</code>, <code>cart.ProductReader</code>, dan <code>order.StockManager</code>.</li></ul>`,
+ without:`<div class="callout bad">Interface besar di package repository ("RepositoryInterface" berisi 20 method): setiap fake harus mengimplementasi 20 method, dan modul saling meng-import sampai muncul import cycle.</div>`,
+ qa:[["Kenapa interface didefinisikan di service, bukan di repository?","Karena di Go interface dipenuhi secara implisit. Pemakai yang paling tahu method apa yang dia butuhkan, jadi interface-nya kecil dan dependency tetap satu arah."],
+     ["Bagaimana interface membantu mencegah import cycle?","Package user mendefinisikan SessionRevoker sendiri. auth.GormRepository memenuhinya tanpa user perlu meng-import auth."]]},
+
+{id:"ctxtx", mod:"fondasi", tag:"pattern", title:"Transaksi lewat context", short:"Service menentukan batas transaksi tanpa tahu GORM. Repository otomatis ikut transaksi.",
+ file:"internal/database/postgres.go", viz:"tx",
+ code:[["Di project ini","c-ctxtx"]],
+ what:`<p><code>context.Context</code> biasanya membawa deadline dan sinyal pembatalan, tapi juga bisa membawa nilai lewat <code>context.WithValue</code>. Di sini context membawa <b>transaksi database yang sedang aktif</b>.</p>
+ <p><code>TxManager.WithinTx</code> membuka transaksi, menaruhnya di context, lalu menjalankan fungsi. Setiap repository memanggil <code>FromContext</code>: kalau ada transaksi, query masuk ke transaksi itu.</p>`,
+ why:`<p>Checkout menyentuh tiga repository (cart, product, order) yang harus <b>berhasil semua atau gagal semua</b>. Aturan "harus satu transaksi" adalah aturan bisnis, jadi tempatnya di service. Tapi service tidak boleh bergantung ke GORM.</p>
+ <p>Dengan pola ini, service hanya tahu interface <code>Transactor</code>, dan repository tidak perlu menerima parameter <code>tx</code> tambahan di setiap method.</p>
+ <p>Key-nya bertipe privat (<code>type txKey struct{}</code>), sehingga package lain tidak mungkin tidak sengaja memakai key yang sama.</p>`,
+ without:`<div class="callout bad">Tanpa transaksi: stok produk A sudah berkurang, lalu produk B ternyata habis dan proses berhenti. Stok A hilang padahal order tidak pernah dibuat.</div>
+ <div class="callout bad">Bug yang sering terjadi: repository lupa memakai <code>FromContext</code> dan langsung memakai <code>r.db</code>. Query itu jalan di luar transaksi tanpa error apa pun.</div>`,
+ qa:[["Kenapa transaksi dikontrol di service, bukan di repository?","Karena batas transaksi ditentukan aturan bisnis: checkout harus atomik meliputi cart, stok, dan order. Repository hanya tahu satu tabel."],
+     ["Kenapa key context memakai struct kosong privat?","Supaya tidak bisa bentrok dengan key dari package lain. Tipe yang berbeda selalu menghasilkan key yang berbeda, walaupun isinya sama-sama kosong."]]},
+
+{id:"errors", mod:"fondasi", tag:"go", title:"Custom error, errors.Is & errors.As", short:"Error bertipe yang membawa status HTTP, tapi penyebab aslinya tetap bisa dilacak.",
+ file:"pkg/apperror/apperror.go",
+ code:[["Di project ini","c-errors"]],
+ what:`<p>Di Go, error adalah nilai biasa yang memenuhi interface <code>error</code> (punya method <code>Error() string</code>). Ada dua alat penting:</p>
+ <ul><li><code>errors.Is(err, target)</code>: apakah di rantai error ada nilai tertentu? Dipakai untuk <b>sentinel error</b> seperti <code>ErrNotFound</code>.</li>
+ <li><code>errors.As(err, &amp;target)</code>: apakah di rantai error ada tipe tertentu? Kalau ada, isi ke variabel target.</li></ul>
+ <p>Method <code>Unwrap()</code> memberi tahu Go cara "membuka" error untuk melihat penyebab di dalamnya.</p>`,
+ why:`<p>Tiap lapisan punya tanggung jawab sendiri:</p>
+ <ul><li>Repository mengembalikan <code>ErrNotFound</code>, tanpa tahu HTTP.</li>
+ <li>Service menerjemahkannya menjadi <code>AppError{Status: 404}</code> dengan pesan yang aman untuk klien.</li>
+ <li>Penyebab asli disimpan di field <code>Err</code>, hanya untuk log, tidak pernah dikirim ke klien.</li></ul>`,
+ without:`<div class="callout bad">Membandingkan string (<code>err.Error() == "record not found"</code>): rapuh, pesan berubah sedikit langsung rusak.</div>
+ <div class="callout bad">Mengirim <code>err.Error()</code> mentah ke klien: pesan SQL, nama tabel, bahkan isi query bisa bocor.</div>`,
+ qa:[["Beda errors.Is dan errors.As?","Is mengecek apakah rantai error mengandung nilai tertentu (sentinel). As mengecek apakah ada tipe tertentu dan mengambil nilainya."],
+     ["Kenapa AppError punya Unwrap()?","Supaya errors.Is dan errors.As tetap bisa menemukan penyebab asli di dalamnya, misalnya untuk logging atau pengecekan lanjutan."]]},
+
+{id:"errhandler", mod:"fondasi", tag:"pattern", title:"Centralized error handler", short:"Satu-satunya tempat error berubah menjadi respons JSON.",
+ file:"pkg/response/response.go",
+ code:[["Di project ini","c-errhandler"]],
+ what:`<p>Handler cukup <code>return err</code>. Fiber meneruskan semua error yang dikembalikan handler ke satu fungsi <code>ErrorHandler</code> yang didaftarkan di <code>fiber.Config</code>.</p>`,
+ why:`<ul><li><b>Format konsisten.</b> Semua error berbentuk <code>{success:false, message, error:{code, details}, request_id}</code>.</li>
+ <li><b>Aman.</b> Error yang tidak dikenali selalu menjadi 500 dengan pesan generik. Detailnya hanya masuk log.</li>
+ <li><b>Bisa dilacak.</b> Klien menerima <code>request_id</code>; tim support mencarinya di log untuk menemukan penyebab sebenarnya.</li></ul>`,
+ without:`<div class="callout bad">Setiap handler menulis <code>c.Status(500).JSON(...)</code> sendiri: format tidak seragam, ada yang lupa logging, ada yang tidak sengaja mengirim pesan error database ke klien.</div>`,
+ qa:[["Bagaimana memastikan error internal tidak bocor?","Hanya AppError yang pesannya dikirim ke klien. Selain itu dibalas 'Internal server error' dan detailnya di-log bersama request ID."],
+     ["Apa gunanya request ID?","Mengaitkan laporan dari klien dengan baris log tertentu di server, termasuk di sistem yang punya banyak instance."]]},
+
+{id:"middleware", mod:"fondasi", tag:"go", title:"Middleware & closure", short:"Fungsi yang mengembalikan fungsi, dirangkai menjadi pipeline untuk setiap request.",
+ file:"internal/middleware/auth.go",
+ code:[["Di project ini","c-middleware"]],
+ what:`<p><b>Closure</b> adalah fungsi yang "mengingat" variabel dari lingkup tempat ia dibuat. <code>Auth(tokens)</code> mengembalikan fungsi handler yang masih bisa memakai <code>tokens</code>.</p>
+ <p><b>Middleware</b> adalah handler yang menjalankan sesuatu lalu memanggil <code>c.Next()</code> untuk meneruskan ke handler berikutnya, atau berhenti dengan mengembalikan error.</p>
+ <p><code>roles ...string</code> adalah parameter <b>variadic</b>: boleh diisi satu, dua, atau lebih role.</p>`,
+ why:`<ul><li>Logika autentikasi ditulis sekali, dipakai di banyak route.</li>
+ <li>Dependency (token manager) disuntikkan sekali saat setup, bukan dicari tiap request.</li>
+ <li>Aturan akses terbaca langsung di <code>routes.go</code>: <code>authn, admin, h.Product.Create</code>.</li>
+ <li>Urutan penting: <code>Auth</code> dulu (401 kalau tidak ada identitas), baru <code>RequireRole</code> (403 kalau identitas ada tapi role kurang).</li></ul>`,
+ without:`<div class="callout bad">Tanpa middleware: setiap handler admin harus mengecek header, parse JWT, dan cek role sendiri. Satu handler lupa mengecek berarti satu endpoint admin terbuka untuk semua orang.</div>`,
+ qa:[["Apa itu closure?","Fungsi yang membawa variabel dari lingkup luarnya. Auth(tokens) mengembalikan handler yang tetap bisa memakai tokens setiap kali dipanggil."],
+     ["Kenapa 401 dan 403 dipisah middleware-nya?","Auth menjawab 'siapa kamu' (401 kalau tidak valid). RequireRole menjawab 'boleh tidak' (403). Dengan urutan ini, endpoint admin tanpa token memberi 401, bukan 403."]]},
+
+{id:"tags", mod:"fondasi", tag:"go", title:"Struct tag & DTO", short:"Metadata di struct untuk JSON, validasi, dan GORM. Entity DB tidak pernah dikirim langsung.",
+ file:"internal/modules/*/model.go",
+ code:[["Di project ini","c-tags"]],
+ what:`<p><b>Struct tag</b> adalah string metadata di belakang field, misalnya <code>&#96;json:"email" validate:"required,email"&#96;</code>. Library membacanya lewat <b>reflection</b> saat runtime: <code>encoding/json</code> membaca tag <code>json</code>, validator membaca tag <code>validate</code>, GORM membaca tag <code>gorm</code>.</p>
+ <p><b>DTO</b> (Data Transfer Object) adalah struct khusus untuk request/response, terpisah dari entity database.</p>`,
+ why:`<ul><li><b>Validasi deklaratif.</b> Aturan input terbaca langsung di struct, bukan tersebar di if-else.</li>
+ <li><b>Keamanan.</b> Entity <code>User</code> punya <code>PasswordHash</code> tapi tidak punya tag json. Respons selalu lewat <code>user.Response</code> yang tidak memiliki field itu, jadi hash password <b>tidak mungkin</b> ikut terkirim.</li>
+ <li><b>Mass assignment dicegah.</b> <code>RegisterRequest</code> tidak punya field <code>role</code>, jadi klien yang mengirim <code>"role":"admin"</code> diabaikan. Ada integration test untuk ini.</li></ul>`,
+ without:`<div class="callout bad">Mengembalikan entity DB langsung: menambah satu kolom sensitif di tabel otomatis membocorkannya ke API.</div>`,
+ qa:[["Kenapa memisahkan entity dan DTO?","Supaya bentuk API tidak terikat ke skema database dan data sensitif seperti password hash tidak mungkin ikut terkirim."],
+     ["Bagaimana struct tag dibaca?","Lewat package reflect saat runtime. Validator menyimpan hasil parsing tag di cache, itu sebabnya instance-nya dibuat sekali (singleton)."]]},
+
+{id:"embed", mod:"fondasi", tag:"go", title:"go:embed", short:"File SQL migration ikut masuk ke dalam binary.",
+ file:"migrations/embed.go",
+ code:[["Di project ini","c-embed"]],
+ what:`<p>Directive <code>//go:embed</code> (sejak Go 1.16) memasukkan file ke dalam binary saat compile. Hasilnya bisa dibaca sebagai <code>embed.FS</code>, filesystem read-only.</p>`,
+ why:`<p>Image Docker cukup berisi satu binary. Tidak perlu menyalin folder <code>migrations/</code> dan tidak mungkin versi binary tidak cocok dengan versi file migration. Swagger (<code>docs/openapi.yaml</code>) juga di-embed dengan cara yang sama.</p>`,
+ without:`<div class="callout bad">Tanpa embed: migration dibaca dari path di disk. Lupa menyalin folder ke image, atau working directory berbeda, langsung membuat aplikasi gagal start.</div>`,
+ qa:[["Apa kelebihan go:embed untuk deployment?","Satu binary berisi semua yang dibutuhkan. Deployment lebih sederhana dan tidak ada masalah path."]]},
+
+{id:"config", mod:"fondasi", tag:"pattern", title:"Fail-fast config", short:"Konfigurasi yang berbahaya ditolak saat start, bukan saat request pertama.",
+ file:"internal/config/config.go",
+ code:[["Di project ini","c-config"]],
+ what:`<p>Config dibaca dengan Viper dari environment variable (dan file <code>.env</code> untuk lokal), lalu langsung divalidasi. Kalau ada yang salah, aplikasi menolak jalan dengan pesan yang jelas.</p>`,
+ why:`<ul><li>JWT secret yang pendek atau kosong membuat token mudah dipalsukan. Lebih baik aplikasi tidak jalan sama sekali daripada jalan dengan tidak aman.</li>
+ <li>Env var asli selalu menang atas <code>.env</code>, jadi binary yang sama bisa dipakai di laptop, Docker, dan Kubernetes (12-factor app).</li></ul>`,
+ without:`<div class="callout bad">Tanpa validasi: aplikasi jalan dengan <code>JWT_SECRET</code> kosong dan semua token ditandatangani dengan string kosong. Masalahnya baru ketahuan setelah ada yang menyalahgunakannya.</div>`,
+ qa:[["Kenapa config divalidasi saat startup?","Fail fast: error konfigurasi ketahuan saat deploy, bukan di tengah traffic produksi."]]},
+
+/* ---------------- AUTH ---------------- */
+{id:"bcrypt", mod:"auth", tag:"sec", title:"bcrypt untuk password", short:"Hash yang sengaja lambat, dengan salt otomatis.",
+ file:"internal/modules/auth/service.go",
+ code:[["Di project ini","c-bcrypt"]],
+ what:`<p>bcrypt adalah fungsi hash password yang <b>sengaja lambat</b> dan bisa diatur lewat <i>cost</i> (di sini 12). Salt acak dibuat otomatis dan disimpan di dalam string hash, jadi dua user dengan password sama punya hash berbeda.</p>`,
+ why:`<ul><li>Kalau database bocor, penyerang harus menebak password satu per satu, dan setiap tebakan mahal.</li>
+ <li>Pesan login sama untuk "email tidak ada" dan "password salah", supaya penyerang tidak bisa mengecek email mana yang terdaftar.</li>
+ <li>bcrypt hanya memakai 72 byte pertama, jadi validasi menolak password lebih dari 72 karakter alih-alih memotongnya diam-diam.</li></ul>`,
+ without:`<div class="callout bad">Simpan plaintext: satu kebocoran = semua password user terbuka, dan banyak user memakai password yang sama di tempat lain.</div>
+ <div class="callout bad">SHA-256 untuk password: terlalu cepat, GPU bisa mencoba miliaran tebakan per detik.</div>`,
+ qa:[["Kenapa bcrypt, bukan SHA-256?","SHA-256 dirancang cepat, bcrypt dirancang lambat dan punya salt. Untuk password yang bisa ditebak, lambat itu yang kita mau."],
+     ["Apa itu cost di bcrypt?","Faktor kerja eksponensial: naik 1 berarti dua kali lebih lambat. Dipilih supaya login masih terasa cepat tapi brute force mahal."]]},
+
+{id:"jwt", mod:"auth", tag:"sec", title:"JWT access token", short:"Token bertanda tangan, diverifikasi tanpa query database.",
+ file:"pkg/token/token.go",
+ code:[["Di project ini","c-jwt"]],
+ what:`<p>JWT berisi klaim (user ID, role, waktu kedaluwarsa) yang ditandatangani dengan HMAC-SHA256. Server memverifikasi tanda tangan dan waktu kedaluwarsa tanpa perlu membuka database.</p>`,
+ why:`<ul><li><b>Stateless.</b> Middleware auth tidak query DB di setiap request.</li>
+ <li><b>Umur pendek (15 menit).</b> Kalau bocor, jendela penyalahgunaannya kecil.</li>
+ <li><b>Algoritma dikunci ke HS256</b> (<code>WithValidMethods</code>), sehingga token dengan header <code>alg: none</code> ditolak. Ada unit test khusus untuk serangan ini.</li>
+ <li>Issuer dan expiration wajib dicek.</li></ul>`,
+ without:`<div class="callout bad">Tanpa mengunci algoritma: beberapa library lama menerima <code>alg: none</code>, sehingga siapa saja bisa membuat token admin tanpa tanda tangan.</div>`,
+ qa:[["Kelemahan JWT?","Tidak bisa dicabut sebelum kedaluwarsa. Karena itu umurnya dibuat pendek, dan refresh token yang disimpan di DB dipakai untuk sesi panjang."],
+     ["Kenapa HS256, bukan RS256?","Hanya satu service yang menerbitkan dan memverifikasi. RS256 berguna kalau banyak service perlu memverifikasi token tanpa memegang secret."]]},
+
+{id:"refresh", mod:"auth", tag:"sec", title:"Refresh token rotation", short:"Setiap refresh, token lama dicabut. Token lama dipakai lagi = semua sesi dicabut.",
+ file:"internal/modules/auth/service.go", viz:"rotation",
+ code:[["Di project ini","c-refresh"]],
+ what:`<p>Refresh token adalah 32 byte acak (bukan JWT). Yang disimpan di DB hanya SHA-256-nya. Setiap <code>POST /auth/refresh</code>, token lama dicabut dan pasangan token baru diterbitkan.</p>`,
+ why:`<ul><li><b>Deteksi pencurian.</b> Kalau token dicuri dan dipakai dua pihak, salah satunya pasti memakai token yang sudah dicabut. Saat itu terjadi, semua sesi user dicabut.</li>
+ <li><b>Revoke memakai compare-and-swap</b> (<code>WHERE revoked_at IS NULL</code>). Kalau dua request refresh dengan token sama datang bersamaan, hanya satu yang <code>RowsAffected == 1</code>.</li>
+ <li><b>SHA-256 cukup</b> karena token berisi 256 bit acak yang tidak bisa ditebak, dan hash cepat bisa dicari dengan index.</li></ul>`,
+ without:`<div class="callout bad">Refresh token tanpa rotasi: token yang dicuri bisa dipakai diam-diam selama 7 hari penuh.</div>`,
+ qa:[["Apa itu refresh token rotation?","Setiap refresh menerbitkan token baru dan mencabut yang lama. Pemakaian ulang token lama menandakan pencurian, sehingga semua sesi dicabut."],
+     ["Kenapa refresh token di-hash?","Supaya kebocoran database tidak langsung memberi penyerang sesi yang bisa dipakai."]]},
+
+/* ---------------- PRODUCT ---------------- */
+{id:"cacheaside", mod:"product", tag:"pattern", title:"Cache-aside (Redis)", short:"Baca cache dulu; kalau tidak ada, baca DB lalu simpan ke cache.",
+ file:"internal/modules/product/service.go", viz:"cache",
+ code:[["Di project ini","c-cacheaside"]],
+ what:`<p>Pada cache-aside, aplikasi sendiri yang mengatur cache:</p>
+ <ol><li>Baca Redis. Ada (HIT)? Langsung kembalikan.</li><li>Tidak ada (MISS)? Baca PostgreSQL.</li><li>Simpan hasilnya di Redis dengan TTL.</li><li>Saat data berubah, <b>hapus</b> key-nya.</li></ol>`,
+ why:`<ul><li>Detail produk sangat sering dibaca dan jarang berubah, cocok untuk cache.</li>
+ <li><b>Redis bukan sumber kebenaran.</b> Semua error Redis hanya di-log, request tetap jalan ke PostgreSQL. Timeout Redis 500 ms supaya cache yang mati tidak membuat request ikut lambat.</li>
+ <li>Key <b>dihapus</b>, bukan diperbarui, saat ada perubahan. Ini menghindari dua penulisan yang balapan meninggalkan nilai lama di cache.</li>
+ <li>Cart dan checkout sengaja <b>tidak</b> memakai cache: keputusan stok butuh data segar.</li></ul>`,
+ without:`<div class="callout bad">Tanpa invalidasi: admin mengubah harga, tapi user masih melihat harga lama sampai TTL habis.</div>
+ <div class="callout bad">Cache dianggap wajib: Redis mati → seluruh API ikut mati.</div>`,
+ qa:[["Jelaskan cache-aside.","Aplikasi membaca cache dulu, kalau miss membaca DB lalu mengisi cache. Saat menulis, tulis DB lalu hapus key cache."],
+     ["Apa yang terjadi kalau Redis mati?","Request tetap sukses lewat PostgreSQL, hanya lebih lambat, dan /health melaporkan degraded. Ada unit test yang mematikan Redis di tengah test."],
+     ["Apa itu cache stampede?","Banyak request miss bersamaan saat key populer habis, sehingga semuanya menghantam DB. Solusinya singleflight atau TTL dengan jitter."]]},
+
+{id:"versioned", mod:"product", tag:"pattern", title:"Versioned cache key", short:"Satu INCR menginvalidasi ribuan key list sekaligus.",
+ file:"internal/modules/product/service.go",
+ code:[["Di project ini","c-versioned"]],
+ what:`<p>List produk punya banyak kombinasi query (search, kategori, sort, halaman), jadi key cache-nya juga banyak. Setiap key memuat nomor versi: <code>products:list:v3:&lt;hash&gt;</code>.</p>
+ <p>Saat ada produk berubah, cukup <code>INCR products:list:version</code>. Request berikutnya membangun key <code>v4</code>, sehingga semua key <code>v3</code> tidak pernah dibaca lagi dan habis sendiri lewat TTL.</p>`,
+ why:`<p>Alternatifnya mencari semua key dengan <code>KEYS products:list:*</code> lalu menghapusnya. <code>KEYS</code> memblok Redis dan berbahaya di produksi; <code>SCAN</code> lebih aman tapi tetap lambat dan rumit.</p>`,
+ without:`<div class="callout bad">Hanya menghapus key detail: list produk masih menampilkan harga lama selama 2 menit.</div>`,
+ qa:[["Bagaimana menginvalidasi banyak key list sekaligus?","Dengan versi di dalam key. Satu INCR membuat semua key lama tidak terpakai; mereka habis sendiri lewat TTL."]]},
+
+{id:"whitelist", mod:"product", tag:"sec", title:"Whitelist sort & escape LIKE", short:"Menutup satu-satunya celah SQL injection saat memakai ORM.",
+ file:"internal/modules/product/service.go",
+ code:[["Di project ini","c-whitelist"]],
+ what:`<p>GORM sudah memakai parameter binding untuk <b>nilai</b> (<code>Where("name ILIKE ?", x)</code>). Tapi <b>nama kolom</b> untuk <code>ORDER BY</code> tidak bisa di-bind sebagai parameter, jadi harus divalidasi sendiri dengan whitelist.</p>
+ <p>Untuk pencarian, karakter <code>%</code> dan <code>_</code> di-escape supaya dicocokkan sebagai teks biasa.</p>`,
+ why:`<ul><li><code>?sort=price; DROP TABLE products</code> otomatis jatuh ke default <code>created_at</code>.</li>
+ <li>Tanpa escape, mencari <code>%</code> mengembalikan semua produk.</li>
+ <li><code>limit</code> dibatasi maksimal 100 sehingga klien tidak bisa meminta satu juta baris.</li></ul>`,
+ without:`<div class="callout bad">Menyusun ORDER BY dari input mentah = SQL injection, walaupun bagian lain sudah memakai ORM.</div>`,
+ qa:[["Kalau sudah pakai ORM, apakah otomatis aman dari SQL injection?","Untuk nilai, ya. Tapi nama kolom, arah sort, dan raw SQL tetap harus divalidasi. Di sini dengan whitelist."]]},
+
+{id:"pointer", mod:"product", tag:"go", title:"Pointer untuk field opsional", short:"Membedakan stok 0 dengan field yang tidak dikirim.",
+ file:"internal/modules/product/model.go",
+ code:[["Di project ini","c-pointer"]],
+ what:`<p>Zero value <code>int</code> di Go adalah 0. Kalau field tidak dikirim, nilainya juga 0. Dengan <code>*int</code>, field yang tidak dikirim menjadi <code>nil</code>, sedangkan <code>0</code> menjadi pointer ke 0.</p>`,
+ why:`<p>Stok 0 adalah nilai yang sah (barang habis). Validator <code>required</code> menganggap zero value sebagai "kosong", jadi tanpa pointer, admin tidak bisa mengisi stok 0.</p>
+ <div class="callout">Masalah serupa ada di GORM: <code>Updates(struct)</code> melewatkan zero value. Karena itu repository selalu memakai <code>Select("...")</code> eksplisit atau <code>map</code>.</div>`,
+ without:`<div class="callout bad"><code>{"stock": 0}</code> ditolak dengan "stock is required", atau sebaliknya field yang lupa dikirim diam-diam menjadi 0.</div>`,
+ qa:[["Kenapa stock di DTO memakai *int?","Supaya validator bisa membedakan nilai 0 yang sah dari field yang tidak dikirim."]]},
+
+/* ---------------- CART ---------------- */
+{id:"upsert", mod:"cart", tag:"db", title:"Upsert (ON CONFLICT)", short:"Insert atau update dalam satu query, aman dari request bersamaan.",
+ file:"internal/modules/cart/cart.go",
+ code:[["Di project ini","c-upsert"]],
+ what:`<p><code>INSERT ... ON CONFLICT</code> di PostgreSQL: coba insert, kalau bentrok dengan unique constraint maka <code>DO NOTHING</code> atau <code>DO UPDATE</code>.</p>`,
+ why:`<ul><li>Cart dibuat saat pertama dipakai. Dua request bersamaan tidak membuat dua cart, karena ada unique <code>carts.user_id</code>.</li>
+ <li>Menambah produk yang sudah ada di cart memperbarui quantity di baris yang sama, karena ada unique <code>(cart_id, product_id)</code>.</li></ul>`,
+ without:`<div class="callout bad">Pola "SELECT dulu, kalau tidak ada INSERT": dua request bersamaan sama-sama tidak menemukan apa-apa lalu sama-sama insert → dua baris, atau error duplicate.</div>`,
+ qa:[["Kenapa tidak SELECT dulu lalu INSERT?","Ada jeda di antara keduanya yang bisa diselipi request lain. Upsert menyerahkan keputusan ke database dalam satu operasi atomik."]]},
+
+{id:"derived", mod:"cart", tag:"pattern", title:"Total dihitung, bukan disimpan", short:"Tidak ada data turunan yang bisa basi.",
+ file:"internal/modules/cart/cart.go",
+ code:[["Di project ini","c-derived"]],
+ what:`<p>Subtotal dan total cart dihitung setiap kali cart dibaca, dari harga produk saat ini. Tidak ada kolom <code>total</code> di tabel cart.</p>`,
+ why:`<ul><li>Harga produk berubah → cart otomatis menampilkan harga baru.</li>
+ <li>Requirement "recalculate total whenever cart items change" otomatis terpenuhi.</li>
+ <li>Field <code>available</code> memberi tahu klien kalau produk sudah dihapus atau stoknya kurang, sebelum checkout.</li>
+ <li><b>Kebalikannya di order:</b> harga <i>disalin</i> ke <code>order_items</code>, karena order adalah catatan historis yang tidak boleh berubah.</li></ul>`,
+ without:`<div class="callout bad">Menyimpan total di DB: setiap perubahan item, harga, atau penghapusan produk harus ikut memperbarui total. Cepat atau lambat ada jalur yang lupa, dan totalnya salah.</div>`,
+ qa:[["Kenapa cart tidak menyimpan harga, tapi order menyimpan?","Cart mencerminkan kondisi sekarang, jadi selalu pakai harga terkini. Order adalah fakta historis saat transaksi terjadi, jadi harganya dibekukan (snapshot)."]]},
+
+/* ---------------- ORDER ---------------- */
+{id:"atomic", mod:"order", tag:"db", title:"Conditional UPDATE anti-oversell", short:"Cek stok dan kurangi stok dalam satu statement. Ini inti project-nya.",
+ file:"internal/modules/product/repository.go", viz:"oversell",
+ code:[["Di project ini","c-atomic"],["Pola yang salah","c-wrong"]],
+ what:`<p>Pengecekan <code>stock &gt;= qty</code> dan pengurangan <code>stock - qty</code> dilakukan dalam <b>satu UPDATE</b>. PostgreSQL mengunci baris produk selama UPDATE; request kedua menunggu, lalu mengevaluasi ulang syarat <code>WHERE</code> terhadap stok terbaru.</p>
+ <p>Kalau <code>RowsAffected == 0</code>, stok tidak cukup dan seluruh checkout di-rollback.</p>`,
+ why:`<ul><li>Tidak bergantung pada kode Go untuk mengecek. Database yang menjamin, karena hanya database yang melihat semua transaksi.</li>
+ <li><code>RETURNING *</code> mengembalikan nama dan harga terbaru dari baris yang sama. Itu yang dipakai sebagai snapshot di <code>order_items</code>, jadi harga dari klien tidak pernah dipakai.</li>
+ <li>Lapisan terakhir: <code>CHECK (stock &gt;= 0)</code> di tabel. Kalau suatu hari ada kode yang salah, database tetap menolak stok negatif.</li></ul>
+ <div class="callout good">Diuji: 20 pembeli berebut 5 unit secara bersamaan → tepat 5 order, 15 mendapat 409, stok akhir 0. Dijalankan berulang dengan race detector.</div>`,
+ without:`<div class="callout bad">Pola baca → cek di Go → tulis: dua goroutine sama-sama membaca stok 1, sama-sama lolos, dan menjual 2 barang yang hanya ada 1. Transaksi saja <b>tidak</b> mencegah ini di isolation level READ COMMITTED.</div>`,
+ qa:[["Bagaimana mencegah overselling?","Dengan UPDATE bersyarat stock >= qty di dalam transaksi. Database mengunci baris dan mengevaluasi syarat terhadap stok terbaru. Kalau tidak ada baris terpengaruh, checkout di-rollback."],
+     ["Kenapa transaksi saja tidak cukup?","Transaksi menjamin atomisitas, bukan mencegah lost update. Dua transaksi tetap bisa sama-sama membaca stok 1 di READ COMMITTED. Yang mencegah adalah syarat di UPDATE atau lock eksplisit."],
+     ["Alternatifnya apa?","SELECT ... FOR UPDATE (lock pesimistis), optimistic locking dengan kolom version (perlu retry), atau isolation SERIALIZABLE (perlu retry, lebih mahal)."]]},
+
+{id:"lock", mod:"order", tag:"db", title:"Row lock & urutan lock", short:"FOR UPDATE di cart mencegah double checkout; urutan produk mencegah deadlock.",
+ file:"internal/modules/order/service.go", viz:"deadlock",
+ code:[["Di project ini","c-lock"]],
+ what:`<p><code>SELECT ... FOR UPDATE</code> mengunci baris sampai transaksi selesai. Transaksi lain yang ingin mengunci baris yang sama harus menunggu.</p>
+ <p><b>Deadlock</b> terjadi kalau transaksi A memegang lock X dan menunggu Y, sementara B memegang Y dan menunggu X.</p>`,
+ why:`<ul><li><b>Lock cart:</b> user klik checkout dua kali → request kedua menunggu, lalu menemukan cart sudah kosong dan gagal dengan "Cart is empty". Satu cart tidak bisa menjadi dua order. Ada test dengan 8 request bersamaan.</li>
+ <li><b>Sort produk:</b> semua checkout mengunci produk dalam urutan ID yang sama, sehingga pola A-tunggu-B / B-tunggu-A tidak mungkin terjadi.</li></ul>`,
+ without:`<div class="callout bad">Tanpa urutan: user 1 membeli [Kopi, Teh], user 2 membeli [Teh, Kopi] pada saat yang sama → deadlock, PostgreSQL membatalkan salah satu dengan error.</div>`,
+ qa:[["Bagaimana mencegah deadlock saat checkout banyak item?","Semua transaksi mengunci baris dalam urutan yang sama (diurutkan berdasarkan product ID)."],
+     ["Bagaimana mencegah double checkout?","Baris cart dikunci dengan FOR UPDATE di awal transaksi. Request kedua menunggu, lalu menemukan cart sudah dikosongkan."]]},
+
+{id:"cas", mod:"order", tag:"db", title:"Compare-and-swap & state machine", short:"Status hanya berubah kalau masih sesuai dugaan. Cancel ganda tidak mengembalikan stok dua kali.",
+ file:"internal/modules/order/repository.go",
+ code:[["Di project ini","c-cas"]],
+ what:`<p><b>State machine</b>: daftar transisi status yang sah, di sini sebagai <code>map[Status][]Status</code>.</p>
+ <p><b>Compare-and-swap (CAS)</b>: ubah nilai hanya jika nilainya masih sama dengan yang kita harapkan. Di SQL: <code>UPDATE ... SET status = 'CANCELLED' WHERE id = ? AND status = 'PENDING'</code>.</p>`,
+ why:`<ul><li>Status tidak bisa lompat (PENDING → SHIPPED ditolak) atau mundur.</li>
+ <li>PENDING → PAID sengaja tidak ada di daftar admin: hanya pembayaran sukses yang boleh melakukannya.</li>
+ <li>Delapan request cancel bersamaan: hanya satu yang <code>RowsAffected == 1</code>, jadi stok dikembalikan tepat sekali. Ada test untuk ini.</li>
+ <li>Tidak perlu lock eksplisit; satu UPDATE sudah atomik.</li></ul>`,
+ without:`<div class="callout bad">Baca status → cek di Go → update: dua cancel bersamaan sama-sama melihat PENDING dan sama-sama mengembalikan stok. Stok bertambah dari udara.</div>`,
+ qa:[["Apa itu compare-and-swap di database?","UPDATE dengan syarat nilai lama di WHERE. Kalau nilainya sudah diubah request lain, tidak ada baris yang terpengaruh dan kita tahu kita kalah."],
+     ["Kenapa state machine disimpan sebagai map?","Aturannya terbaca di satu tempat, mudah di-unit-test, dan menambah status baru cukup mengubah map."]]},
+
+/* ---------------- PAYMENT ---------------- */
+{id:"idem", mod:"payment", tag:"pattern", title:"Idempotency", short:"Request yang sama dikirim berkali-kali, efeknya tetap sekali.",
+ file:"internal/modules/payment/service.go", viz:"idem",
+ code:[["Di project ini","c-idem"]],
+ what:`<p>Operasi idempotent: menjalankannya 1 kali atau 10 kali hasilnya sama. Di jaringan, klien sering retry karena timeout padahal request pertama sebenarnya berhasil.</p>
+ <p>Dua lapis di project ini:</p>
+ <ul><li><b>Membuat payment:</b> header <code>Idempotency-Key</code> + unique index. Key yang sama → payment yang sama (200, bukan 201).</li>
+ <li><b>Memproses payment:</b> CAS <code>WHERE status = 'PENDING'</code>. <code>simulate-success</code> berkali-kali → order PAID tepat sekali.</li></ul>`,
+ why:`<p>Tanpa idempotency, retry otomatis atau user yang menekan tombol bayar dua kali bisa membuat dua tagihan.</p>
+ <div class="callout good">Cerita bug nyata: test 10 request bersamaan dengan key yang sama awalnya <b>gagal</b>. Request kedua lolos pengecekan key (payment belum ada), lalu menemukan payment PENDING milik request pertama dan membalas 409. Perbaikannya di <code>activePayment</code>: payment PENDING dengan key yang sama dianggap replay. Ini contoh bagus kenapa test konkurensi penting.</div>`,
+ without:`<div class="callout bad">Hanya mengecek di kode ("sudah ada payment dengan key ini?") tanpa unique index: ada jeda antara cek dan insert, sehingga dua request bisa sama-sama lolos.</div>`,
+ qa:[["Apa itu idempotency dan kenapa penting di payment?","Operasi yang diulang hasilnya sama dengan sekali jalan. Penting karena retry jaringan bisa membuat user tertagih dua kali."],
+     ["Kenapa pengecekan di kode saja tidak cukup?","Ada race antara cek dan insert. Unique constraint di database adalah sumber kebenaran; error duplikat ditangani sebagai replay."],
+     ["Bagaimana kalau payment sukses tapi update order gagal?","Keduanya dalam satu transaksi. Kalau order sudah tidak PENDING, transaksi di-rollback dan payment kembali PENDING."]]},
+
+/* ---------------- TESTING ---------------- */
+{id:"waitgroup", mod:"testing", tag:"test", title:"WaitGroup, atomic & start barrier", short:"Goroutine dipakai di test untuk mensimulasikan 20 pembeli bersamaan.",
+ file:"tests/cart_order_test.go", viz:"oversell",
+ code:[["Contohmu, tanpa time.Sleep","c-wg-mini"],["Di project ini","c-waitgroup"]],
+ what:`<ul><li><code>sync.WaitGroup</code>: menunggu sekumpulan goroutine selesai. <code>Add</code> sebelum mulai, <code>Done</code> saat selesai, <code>Wait</code> memblok sampai hitungannya nol.</li>
+ <li><code>atomic.Int32</code>: counter yang aman ditambah banyak goroutine tanpa mutex.</li>
+ <li><b>Start barrier</b>: semua goroutine menunggu <code>&lt;-start</code>; <code>close(start)</code> melepas semuanya sekaligus.</li></ul>`,
+ why:`<p>Inilah tempat goroutine paling banyak dipakai di project ini: <b>membuktikan</b> bahwa kode aman saat banyak request datang bersamaan.</p>
+ <ul><li>Tanpa barrier, goroutine pertama mungkin sudah selesai sebelum goroutine terakhir dibuat, sehingga tidak ada balapan sungguhan.</li>
+ <li><code>count++</code> biasa dari banyak goroutine adalah data race; <code>atomic</code> mencegahnya.</li>
+ <li>Test dijalankan dengan <code>go test -race</code>, yang mendeteksi akses memori yang tidak aman.</li></ul>`,
+ without:`<div class="callout bad"><code>time.Sleep</code> untuk menunggu goroutine: terlalu pendek → test gagal acak; terlalu panjang → test lambat. WaitGroup menunggu tepat sampai selesai.</div>`,
+ qa:[["Bagaimana kamu menguji race condition?","Banyak goroutine dilepas bersamaan dengan start barrier, lalu memeriksa invarian: jumlah order sukses sama dengan stok awal dan stok akhir 0. Dijalankan dengan -race dan diulang berkali-kali."],
+     ["Kenapa pakai atomic, bukan int biasa?","Menambah int biasa dari banyak goroutine adalah data race. atomic menjamin operasi baca-tambah-tulis tidak terpotong."]]},
+
+{id:"fakes", mod:"testing", tag:"test", title:"Fake + sync.Mutex", short:"Repository in-memory untuk unit test, aman dipakai goroutine.",
+ file:"internal/modules/auth/service_test.go",
+ code:[["Di project ini","c-fakes"]],
+ what:`<p>Fake adalah implementasi sederhana dari interface untuk test, di sini berbasis <code>map</code>. <code>sync.Mutex</code> menjamin hanya satu goroutine yang mengakses map pada satu waktu.</p>`,
+ why:`<ul><li>Unit test auth berjalan dalam milidetik tanpa PostgreSQL, berkat interface di sisi pemakai.</li>
+ <li>Map Go <b>tidak</b> aman untuk akses bersamaan; tanpa mutex, runtime bisa panic dengan "concurrent map writes".</li>
+ <li><code>defer f.mu.Unlock()</code> memastikan lock dilepas walaupun ada <code>return</code> di tengah fungsi.</li></ul>
+ <div class="callout">Hal yang bergantung pada perilaku database (lock, constraint, transaksi) <b>tidak</b> diuji dengan fake, melainkan di integration test dengan PostgreSQL sungguhan.</div>`,
+ without:`<div class="callout bad">Mock semua hal: test hanya membuktikan "fungsi X dipanggil", bukan bahwa stok benar-benar tidak minus.</div>`,
+ qa:[["Kapan pakai fake, kapan pakai database sungguhan?","Fake untuk logika bisnis murni (rotasi token, aturan login). Database sungguhan untuk jaminan yang bergantung pada perilaku DB, seperti anti-oversell."]]},
+
+{id:"buildtag", mod:"testing", tag:"test", title:"Build tag integration", short:"Memisahkan test cepat dari test yang butuh PostgreSQL.",
+ file:"tests/setup_test.go",
+ code:[["Di project ini","c-buildtag"]],
+ what:`<p>Baris <code>//go:build integration</code> di paling atas file membuat file itu hanya ikut di-compile kalau flag <code>-tags integration</code> diberikan.</p>`,
+ why:`<p><code>go test ./...</code> tetap cepat dan bisa dijalankan di mana saja tanpa layanan eksternal. Integration test dijalankan secara sadar (<code>make test-integration</code>) saat PostgreSQL tersedia.</p>`,
+ without:`<div class="callout bad">Integration test tercampur: <code>go test ./...</code> gagal di laptop yang tidak menjalankan PostgreSQL, dan developer jadi malas menjalankan test.</div>`,
+ qa:[["Bagaimana memisahkan unit test dan integration test di Go?","Dengan build tag. File integration diberi //go:build integration dan dijalankan dengan go test -tags integration."]]},
+];
+
+/* ====================================================== RENDER */
+const $ = s => document.querySelector(s);
+let activeMod = "all";
+
+function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+
+function renderChips(){
+  const chips = [{id:"all",name:"Semua"}, ...MODULES];
+  $("#chips").innerHTML = chips.map(m=>`<button class="chip ${m.id===activeMod?"on":""}" data-mod="${m.id}">${m.name}</button>`).join("");
+  $("#chips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{activeMod=b.dataset.mod;renderChips();renderCards();});
+}
+
+function matches(c,q){
+  if(activeMod!=="all" && c.mod!==activeMod) return false;
+  if(!q) return true;
+  const hay = (c.title+" "+c.short+" "+c.file+" "+c.what+" "+c.why).toLowerCase();
+  return q.split(/\s+/).every(w=>hay.includes(w));
+}
+
+function renderCards(){
+  const q = $("#q").value.trim().toLowerCase();
+  let html="", n=0, delay=0;
+  MODULES.forEach(m=>{
+    const list = C.filter(c=>c.mod===m.id && matches(c,q));
+    if(!list.length) return;
+    n += list.length;
+    html += `<section class="mod"><div class="mod-head"><h2>${m.name}</h2><p>${m.desc}</p></div><div class="grid">`;
+    list.forEach(c=>{
+      const [tl,tc]=TAGS[c.tag];
+      html += `<article class="card" tabindex="0" data-id="${c.id}" style="animation-delay:${(delay++)*35}ms">
+        <span class="tag ${tc}">${tl}</span><h3>${c.title}</h3><p>${c.short}</p><div class="file">${c.file}</div></article>`;
+    });
+    html += `</div></section>`;
+  });
+  $("#sections").innerHTML = html;
+  $("#empty").style.display = n? "none":"block";
+  $("#count").textContent = `${n} konsep`;
+  document.querySelectorAll(".card").forEach(el=>{
+    el.onclick=()=>openModal(el.dataset.id);
+    el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openModal(el.dataset.id);}};
+  });
+}
+
+function codeBlock(label,id){
+  const src = document.getElementById(id).textContent.replace(/^\n/,"");
+  return `<div class="codehead"><span>${label}</span><button class="copy" data-src="${id}">Salin</button></div>
+  <pre><code class="language-go">${esc(src)}</code></pre>`;
+}
+
+function vizHTML(kind){
+  if(kind==="goroutine") return `<div class="viz"><div class="viz-title">Tanpa vs dengan goroutine <button class="play" data-viz="goroutine">Putar</button></div>
+    <div class="lane"><span class="lbl">berurutan: A</span><div class="track"><div class="bar" id="g1"></div></div></div>
+    <div class="lane"><span class="lbl">berurutan: B</span><div class="track"><div class="bar b2" id="g2"></div></div></div>
+    <div class="lane"><span class="lbl">go A</span><div class="track"><div class="bar" id="g3"></div></div></div>
+    <div class="lane"><span class="lbl">go B</span><div class="track"><div class="bar b2" id="g4"></div></div></div>
+    <div class="log" id="glog">Berurutan: B menunggu A selesai. Dengan goroutine: A dan B jalan bersamaan.</div></div>`;
+  if(kind==="select") return `<div class="viz"><div class="viz-title">select menunggu yang datang duluan <button class="play" data-viz="select">Putar</button></div>
+    <div class="flow"><span class="node" id="s1">go Listen()</span><span class="arrow">→</span><span class="node" id="s2">serverErr</span></div>
+    <div class="flow"><span class="node" id="s3">OS: SIGTERM</span><span class="arrow">→</span><span class="node" id="s4">quit</span><span class="arrow">→</span><span class="node" id="s5">select</span><span class="arrow">→</span><span class="node" id="s6">Shutdown(15s)</span></div>
+    <div class="log" id="slog"></div></div>`;
+  if(kind==="tx") return `<div class="viz"><div class="viz-title">Satu transaksi checkout <button class="play" data-viz="tx">Putar (gagal di item 2)</button></div>
+    <div class="flow"><span class="node" id="t1">BEGIN</span><span class="arrow">→</span><span class="node" id="t2">stok Kopi -2</span><span class="arrow">→</span><span class="node" id="t3">stok Susu -2</span><span class="arrow">→</span><span class="node" id="t4">insert order</span><span class="arrow">→</span><span class="node" id="t5">COMMIT</span></div>
+    <div class="log" id="tlog"></div></div>`;
+  if(kind==="cache") return `<div class="viz"><div class="viz-title">GET /products/:id <button class="play" data-viz="cache">Request</button></div>
+    <div class="flow"><span class="node" id="k1">handler</span><span class="arrow">→</span><span class="node" id="k2">Redis</span><span class="arrow">→</span><span class="node" id="k3">PostgreSQL</span><span class="arrow">→</span><span class="node" id="k4">SET key TTL 10m</span></div>
+    <div class="log" id="klog">Request pertama MISS, berikutnya HIT. Klik beberapa kali.</div></div>`;
+  if(kind==="oversell") return `<div class="viz"><div class="viz-title">20 pembeli, 5 unit, bersamaan <button class="play" data-viz="oversell">Mulai flash sale</button></div>
+    <div class="stockbox">stok: <span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span></div>
+    <div class="buyers">${Array.from({length:20},(_,i)=>`<div class="buyer">${i+1}</div>`).join("")}</div>
+    <div class="log" id="olog">UPDATE ... WHERE stock &gt;= 1 — hanya 5 yang mendapat baris.</div></div>`;
+  if(kind==="deadlock") return `<div class="viz"><div class="viz-title">Urutan lock <button class="play" data-viz="deadlock">Bandingkan</button></div>
+    <div class="flow"><span class="node">tanpa sort</span><span class="node" id="d1">U1: Kopi → Teh</span><span class="node" id="d2">U2: Teh → Kopi</span><span class="node" id="d3">?</span></div>
+    <div class="flow"><span class="node">dengan sort</span><span class="node" id="d4">U1: Kopi → Teh</span><span class="node" id="d5">U2: Kopi → Teh</span><span class="node" id="d6">?</span></div>
+    <div class="log" id="dlog"></div></div>`;
+  if(kind==="rotation") return `<div class="viz"><div class="viz-title">Rotasi refresh token <button class="play" data-viz="rotation">Putar</button></div>
+    <div class="flow"><span class="node" id="r1">RT#1 aktif</span><span class="arrow">→</span><span class="node" id="r2">refresh → RT#2</span><span class="arrow">→</span><span class="node" id="r3">penyerang pakai RT#1</span><span class="arrow">→</span><span class="node" id="r4">semua sesi dicabut</span></div>
+    <div class="log" id="rlog"></div></div>`;
+  if(kind==="idem") return `<div class="viz"><div class="viz-title">10 request, Idempotency-Key sama <button class="play" data-viz="idem">Kirim</button></div>
+    <div class="buyers" id="ib">${Array.from({length:10},(_,i)=>`<div class="buyer">#${i+1}</div>`).join("")}</div>
+    <div class="log" id="ilog"></div></div>`;
+  return "";
+}
+
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const animating = new Set();
+async function runViz(kind){
+  if(animating.has(kind)) return; animating.add(kind);
+  try{
+  if(kind==="goroutine"){
+    const set=(id,l,w,d)=>{const e=document.getElementById(id);e.style.transition="none";e.style.left=l+"%";e.style.width="0";e.offsetWidth;e.style.transition=`width ${d}ms linear`;e.style.width=w+"%";};
+    set("g1",0,45,900); set("g3",0,45,900); set("g4",0,45,900);
+    document.getElementById("g2").style.width="0";
+    await sleep(900); set("g2",45,45,900);
+    document.getElementById("glog").textContent="Dengan goroutine selesai di 1 detik. Berurutan butuh 2 detik.";
+    await sleep(900);
+  }
+  if(kind==="select"){
+    const ids=["s1","s2","s3","s4","s5","s6"];ids.forEach(i=>document.getElementById(i).className="node");
+    const L=document.getElementById("slog");
+    document.getElementById("s1").classList.add("hot");L.textContent="Server jalan di goroutine sendiri, main() bebas menunggu…";await sleep(900);
+    document.getElementById("s3").classList.add("miss");L.textContent="docker stop mengirim SIGTERM";await sleep(700);
+    document.getElementById("s4").classList.add("hot");await sleep(500);
+    document.getElementById("s5").classList.add("hot");L.textContent="select memilih cabang quit karena datang duluan";await sleep(700);
+    document.getElementById("s6").classList.add("hot");L.textContent="Request yang sedang berjalan diberi waktu selesai, lalu proses keluar dengan rapi.";
+  }
+  if(kind==="tx"){
+    const ids=["t1","t2","t3","t4","t5"];ids.forEach(i=>{const e=document.getElementById(i);e.className="node";e.textContent=e.textContent.replace(" ✗","").replace("ROLLBACK","COMMIT");});
+    const L=document.getElementById("tlog");L.textContent="";
+    for(const i of ["t1","t2"]){document.getElementById(i).classList.add("hot");await sleep(600);}
+    const s=document.getElementById("t3");s.classList.add("miss");s.textContent+=" ✗";L.textContent="Stok susu tinggal 1 → RowsAffected = 0 → fungsi return error";await sleep(1000);
+    const c=document.getElementById("t5");c.textContent="ROLLBACK";c.classList.add("miss");
+    document.getElementById("t2").className="node";
+    L.textContent="ROLLBACK: pengurangan stok Kopi ikut dibatalkan. Tidak ada stok yang hilang, cart tidak berubah.";
+  }
+  if(kind==="cache"){
+    window._cacheHit = window._cacheHit || false;
+    ["k1","k2","k3","k4"].forEach(i=>document.getElementById(i).className="node");
+    const L=document.getElementById("klog");
+    document.getElementById("k1").classList.add("hot");await sleep(350);
+    if(window._cacheHit){document.getElementById("k2").classList.add("hot");L.textContent="HIT: dijawab Redis, PostgreSQL tidak disentuh (±1 ms).";}
+    else{document.getElementById("k2").classList.add("miss");L.textContent="MISS: key belum ada di Redis…";await sleep(600);
+      document.getElementById("k3").classList.add("hot");L.textContent="Baca PostgreSQL…";await sleep(600);
+      document.getElementById("k4").classList.add("hot");L.textContent="Simpan ke Redis. Request berikutnya akan HIT.";window._cacheHit=true;}
+  }
+  if(kind==="oversell"){
+    const units=[...document.querySelectorAll(".modal .unit")], buyers=[...document.querySelectorAll(".modal .buyer")];
+    units.forEach(u=>u.classList.remove("gone"));buyers.forEach(b=>b.className="buyer");
+    const order=buyers.map((_,i)=>i).sort(()=>Math.random()-.5);let stock=5;
+    const L=document.getElementById("olog");
+    for(const i of order){await sleep(110);
+      if(stock>0){stock--;units[4-stock].classList.add("gone");buyers[i].classList.add("ok");}
+      else buyers[i].classList.add("no");
+      L.textContent=`stok tersisa: ${stock}`;}
+    L.textContent="Selesai: 5 order (201), 15 ditolak (409 CONFLICT), stok 0 — tidak pernah minus.";
+  }
+  if(kind==="deadlock"){
+    ["d1","d2","d3","d4","d5","d6"].forEach(i=>{const e=document.getElementById(i);e.className="node";});
+    document.getElementById("d3").textContent="?";document.getElementById("d6").textContent="?";
+    const L=document.getElementById("dlog");
+    document.getElementById("d1").classList.add("hot");document.getElementById("d2").classList.add("hot");
+    L.textContent="U1 mengunci Kopi, U2 mengunci Teh, lalu masing-masing menunggu yang lain…";await sleep(1100);
+    const d3=document.getElementById("d3");d3.textContent="DEADLOCK";d3.classList.add("miss");await sleep(700);
+    document.getElementById("d4").classList.add("hot");await sleep(400);
+    document.getElementById("d5").classList.add("miss");
+    L.textContent="Dengan sort: U2 juga mulai dari Kopi, jadi cukup menunggu U1 selesai.";await sleep(900);
+    document.getElementById("d5").className="node hot";const d6=document.getElementById("d6");d6.textContent="aman";d6.classList.add("hot");
+  }
+  if(kind==="rotation"){
+    ["r1","r2","r3","r4"].forEach(i=>document.getElementById(i).className="node");const L=document.getElementById("rlog");
+    document.getElementById("r1").classList.add("hot");L.textContent="User login, dapat RT#1. Penyerang diam-diam mencurinya.";await sleep(1000);
+    document.getElementById("r1").className="node";document.getElementById("r2").classList.add("hot");L.textContent="User refresh: RT#1 dicabut (revoked_at diisi), terbit RT#2.";await sleep(1100);
+    document.getElementById("r3").classList.add("miss");L.textContent="Penyerang memakai RT#1 → Revoke() RowsAffected = 0 → token sudah pernah dipakai!";await sleep(1100);
+    document.getElementById("r4").classList.add("miss");L.textContent="RevokeAllForUser: RT#2 juga dicabut. Penyerang dan user sama-sama harus login ulang.";
+  }
+  if(kind==="idem"){
+    const b=[...document.querySelectorAll("#ib .buyer")];b.forEach(x=>{x.className="buyer";x.textContent=x.textContent.split(" ")[0];});
+    const L=document.getElementById("ilog");const winner=Math.floor(Math.random()*10);
+    const order=b.map((_,i)=>i).sort(()=>Math.random()-.5);
+    for(const i of order){await sleep(110);b[i].classList.add("ok");b[i].textContent+= i===winner?" 201":" 200";}
+    L.textContent=`Satu request membuat payment (201), sembilan lainnya menerima payment yang SAMA (200). Di database: 1 baris.`;
+  }
+  } catch (e) { /* popup closed mid-animation */ } finally { animating.delete(kind); }
+}
+
+let currentIndex = -1, navList = [];
+function visible(){ const q=$("#q").value.trim().toLowerCase(); return C.filter(c=>matches(c,q)); }
+
+function openModal(id){
+  let list = visible(); currentIndex = list.findIndex(c=>c.id===id);
+  if(currentIndex<0){ list = C; currentIndex = C.findIndex(c=>c.id===id); }
+  modalMode="concept"; navList=list;
+  const c = list[currentIndex] || C.find(x=>x.id===id); const [tl,tc]=TAGS[c.tag];
+  const mod = MODULES.find(m=>m.id===c.mod).name;
+  const prev = list[currentIndex-1], next = list[currentIndex+1];
+  $("#modal").innerHTML = `
+  <div class="m-top"><div><span class="tag ${tc}">${tl} · ${mod}</span><h2 id="m-title">${c.title}</h2><div class="file">${c.file}</div></div>
+    <button class="x" aria-label="Tutup">✕</button></div>
+  <div class="m-body">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-p="code">Kode</button><button class="tab" data-p="what">Apa ini?</button>
+      <button class="tab" data-p="why">Kenapa dipakai?</button><button class="tab" data-p="without">Kalau tidak?</button>
+      <button class="tab" data-p="qa">Interview</button>
+    </div>
+    <div class="pane on" data-p="code">${c.viz?vizHTML(c.viz):""}${c.code.map(([l,i])=>codeBlock(l,i)).join("")}</div>
+    <div class="pane" data-p="what"><h4>Apa ini?</h4>${c.what}</div>
+    <div class="pane" data-p="why"><h4>Kenapa dipakai di sini?</h4>${c.why}</div>
+    <div class="pane" data-p="without"><h4>Kalau tidak dipakai?</h4>${c.without}</div>
+    <div class="pane" data-p="qa"><h4>Latihan interview</h4>${c.qa.map(([q,a])=>`<div class="qa"><b>${q}</b><span>${a}</span></div>`).join("")}</div>
+    <div class="navrow">
+      <button class="nav" ${prev?`data-go="${prev.id}"`:"disabled style='opacity:.35'"}>← ${prev?prev.title:""}</button>
+      <button class="nav" ${next?`data-go="${next.id}"`:"disabled style='opacity:.35'"}>${next?next.title:""} →</button>
+    </div>
+  </div>`;
+  const m=$("#modal");
+  m.querySelector(".x").onclick=closeModal;
+  m.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+    m.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+    m.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.dataset.p===t.dataset.p));
+  });
+  m.querySelectorAll(".nav[data-go]").forEach(b=>b.onclick=()=>openModal(b.dataset.go));
+  m.querySelectorAll(".play").forEach(b=>b.onclick=()=>runViz(b.dataset.viz));
+  m.querySelectorAll(".copy").forEach(b=>b.onclick=async()=>{
+    try{await navigator.clipboard.writeText(document.getElementById(b.dataset.src).textContent.trim());b.textContent="Tersalin ✓";}
+    catch{b.textContent="Gagal menyalin";}
+    setTimeout(()=>b.textContent="Salin",1500);
+  });
+  if(window.Prism) Prism.highlightAllUnder(m);
+  m.scrollTop=0;
+  $("#overlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  window._cacheHit=false;
+  if(c.viz) setTimeout(()=>runViz(c.viz),450);
+  try{ history.replaceState(null,"","#"+c.id); }catch{}
+  m.querySelector(".x").focus();
+}
+function closeModal(){
+  $("#overlay").classList.remove("open");document.body.style.overflow="";
+  try{ history.replaceState(null,"","#"+(curView==="alur"?curFlow.id:curView)); }catch{}
+}
+$("#overlay").onclick=e=>{if(e.target.id==="overlay")closeModal();};
+document.addEventListener("keydown",e=>{
+  if(!$("#overlay").classList.contains("open")) return;
+  if(e.key==="Escape") closeModal();
+  if(modalMode!=="concept") return;
+  const list=navList;
+  if(e.key==="ArrowRight" && list[currentIndex+1]) openModal(list[currentIndex+1].id);
+  if(e.key==="ArrowLeft" && list[currentIndex-1]) openModal(list[currentIndex-1].id);
+});
+$("#q").oninput=renderCards;
+
+/* ====================================================== FLOWS */
+const LANES = ["User","Middleware","Handler","Service","Repository","PostgreSQL","Redis"];
+const LANE_HINT = {
+  User:"Klien: aplikasi web, Flutter, Postman, atau curl",
+  Middleware:"internal/middleware + middleware bawaan Fiber",
+  Handler:"internal/modules/*/handler.go",
+  Service:"internal/modules/*/service.go — aturan bisnis",
+  Repository:"internal/modules/*/repository.go — satu-satunya yang kenal GORM",
+  PostgreSQL:"sumber kebenaran data",
+  Redis:"cache dan rate limiter (boleh mati)"
+};
+const L = a => a.join("\n");
+
+/* kind: req | ret | db | err | self */
+const FLOWS = [
+{id:"lifecycle", name:"Request lifecycle", desc:"Yang terjadi pada SETIAP request, dari masuk sampai respons keluar.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"HTTP request masuk",d:"Fiber menerima request. Middleware requestid memberi ID unik (header X-Request-ID) supaya request ini bisa dilacak di log.",file:"internal/app/app.go",fn:"app.New → f.Use(requestid.New())"},
+  {f:"Middleware",t:"Middleware",k:"self",l:"logger, recover, CORS",d:"RequestLogger mencatat method, path, status, dan lama proses. recover menangkap panic supaya server tidak mati. CORS mengecek origin yang diizinkan.",file:"internal/middleware/http.go",fn:"RequestLogger",concept:"middleware"},
+  {f:"Middleware",t:"Redis",k:"db",l:"INCR ratelimit:<ip>",d:"Rate limiter menghitung request per IP per menit di Redis. Lebih dari batas → 429. Kalau Redis mati, request tetap diloloskan (fail-open).",file:"internal/middleware/http.go",fn:"RateLimit",code:L(['count, err := store.IncrWithTTL(ctx, "ratelimit:"+c.IP(), window)','if err != nil {','    return c.Next() // Redis mati → loloskan','}','if int(count) > max {','    return apperror.TooManyRequests("Too many requests, please try again later")','}'])},
+  {f:"Middleware",t:"Middleware",k:"self",l:"Auth: verifikasi JWT",d:"Khusus route yang butuh login. Token di header Authorization dicek tanda tangan, issuer, dan kedaluwarsanya. Gagal → 401. User ID dan role disimpan di c.Locals.",file:"internal/middleware/auth.go",fn:"Auth",concept:"jwt"},
+  {f:"Middleware",t:"Middleware",k:"self",l:"RequireRole(admin)",d:"Khusus route admin. Token valid tapi role bukan admin → 403.",file:"internal/middleware/auth.go",fn:"RequireRole",concept:"middleware"},
+  {f:"Middleware",t:"Handler",k:"req",l:"c.Next()",d:"Semua middleware lolos, request diteruskan ke handler sesuai route di routes.go.",file:"internal/routes/routes.go",fn:"Register"},
+  {f:"Handler",t:"Handler",k:"self",l:"parse body + validasi",d:"Body JSON dibaca ke struct DTO lalu divalidasi lewat struct tag. Salah format → 400, gagal validasi → 422 dengan daftar field.",file:"internal/utils/validator.go",fn:"ParseBody",concept:"tags"},
+  {f:"Handler",t:"Service",k:"req",l:"panggil service",d:"Handler tidak berisi aturan bisnis. Ia hanya meneruskan input ke service bersama context request.",file:"internal/modules/*/handler.go",concept:"di"},
+  {f:"Service",t:"Repository",k:"req",l:"lewat interface kecil",d:"Service menjalankan aturan bisnis dan memanggil repository lewat interface yang ia definisikan sendiri.",file:"internal/modules/*/service.go",concept:"interface"},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"query SQL (GORM)",d:"Repository menyusun query lewat GORM dengan parameter binding. Kalau ada transaksi di context, query masuk ke transaksi itu.",file:"internal/database/postgres.go",fn:"FromContext",concept:"ctxtx"},
+  {f:"PostgreSQL",t:"Repository",k:"ret",l:"rows / error",d:"Database mengembalikan data atau error (misalnya unique constraint dilanggar)."},
+  {f:"Repository",t:"Service",k:"ret",l:"entity atau ErrNotFound",d:"Error GORM diterjemahkan ke sentinel error milik aplikasi (ErrNotFound, ErrDuplicate), supaya service tidak bergantung ke GORM.",concept:"errors"},
+  {f:"Service",t:"Handler",k:"ret",l:"data atau AppError",d:"Service mengubah sentinel error menjadi AppError yang membawa status HTTP dan pesan aman, misalnya 404 'Product not found'.",concept:"errors"},
+  {f:"Handler",t:"User",k:"ret",l:"JSON {success, data, meta}",d:"Sukses: response.OK/Created membungkus data dalam format standar. Error: dikembalikan ke ErrorHandler pusat yang menulis format error standar beserta request_id.",file:"pkg/response/response.go",concept:"errhandler"}
+ ]},
+
+{id:"register", name:"Register", desc:"POST /auth/register — membuat akun customer.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"POST /auth/register",d:"Body: name, email, password. Route publik: tidak perlu token, tapi tetap kena rate limit."},
+  {f:"Middleware",t:"Handler",k:"req",l:"auth.Handler.Register",d:"Tidak ada middleware Auth di route ini.",file:"internal/modules/auth/handler.go",fn:"Register"},
+  {f:"Handler",t:"Handler",k:"self",l:"validasi DTO",d:"Email harus valid, password 8–72 karakter dengan huruf besar, kecil, dan angka (aturan custom 'password'). Field 'role' tidak ada di DTO, jadi tidak bisa dikirim.",file:"internal/modules/auth/model.go",fn:"RegisterRequest",concept:"tags"},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Register",d:"Role selalu diisi 'customer' oleh server.",file:"internal/modules/auth/service.go",fn:"Register → createUser"},
+  {f:"Service",t:"Service",k:"self",l:"bcrypt hash password",d:"Password di-hash dengan bcrypt cost 12. Email di-normalisasi (lowercase, trim).",concept:"bcrypt",code:L(['hash, err := bcrypt.GenerateFromPassword([]byte(password), s.bcryptCost)','u := &user.User{Name: name, Email: normalizeEmail(email), PasswordHash: string(hash), Role: role}'])},
+  {f:"Service",t:"Repository",k:"req",l:"users.Create",d:"Langsung INSERT tanpa SELECT dulu.",file:"internal/modules/user/repository.go",fn:"Create"},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"INSERT INTO users",d:"Unique index uq_users_email yang menjaga email tidak dobel, termasuk saat dua orang mendaftar dengan email sama di detik yang sama."},
+  {f:"PostgreSQL",t:"Repository",k:"err",l:"duplicate key → 409",d:"Kalau email sudah ada, GORM mengembalikan ErrDuplicatedKey → repository mengubahnya jadi apperror.ErrDuplicate → service membalas 409 'Email is already registered'."},
+  {f:"Service",t:"Handler",k:"ret",l:"user baru",d:""},
+  {f:"Handler",t:"User",k:"ret",l:"201 Created (tanpa password)",d:"Respons memakai user.Response yang tidak punya field password hash sama sekali.",concept:"tags"}
+ ]},
+
+{id:"login", name:"Login", desc:"POST /auth/login — menukar email + password dengan access token dan refresh token.",
+ steps:[
+  {f:"User",t:"Handler",k:"req",l:"POST /auth/login",d:"Body: email, password. (Middleware umum diringkas.)"},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Login",file:"internal/modules/auth/service.go",fn:"Login",d:""},
+  {f:"Service",t:"Repository",k:"req",l:"FindByEmail",d:""},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"SELECT … WHERE email = ?",d:"Soft-deleted user otomatis tidak ikut (GORM menambah deleted_at IS NULL)."},
+  {f:"Service",t:"Service",k:"self",l:"bcrypt.CompareHashAndPassword",d:"Email tidak ada ATAU password salah → pesan yang sama: 401 'Invalid email or password'. Penyerang tidak bisa mengecek email mana yang terdaftar.",concept:"bcrypt"},
+  {f:"Service",t:"Service",k:"self",l:"buat JWT (15 menit)",d:"Access token berisi user ID dan role, ditandatangani HS256.",concept:"jwt"},
+  {f:"Service",t:"Service",k:"self",l:"buat refresh token acak",d:"32 byte dari crypto/rand. Ke klien dikirim token aslinya, ke database hanya SHA-256-nya.",concept:"refresh",code:L(['raw := make([]byte, 32)','rand.Read(raw)','refresh := base64.RawURLEncoding.EncodeToString(raw)','s.tokens.Create(ctx, &RefreshToken{UserID: u.ID, TokenHash: hashToken(refresh), ExpiresAt: ...})'])},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"INSERT refresh_tokens (hash)",d:""},
+  {f:"Handler",t:"User",k:"ret",l:"200 {user, tokens}",d:"Klien menyimpan keduanya. Access token dikirim di setiap request: Authorization: Bearer <token>."}
+ ]},
+
+{id:"refresh", name:"Refresh token", desc:"POST /auth/refresh — access token habis, minta pasangan token baru.",
+ steps:[
+  {f:"User",t:"Handler",k:"req",l:"POST /auth/refresh",d:"Body: refresh_token."},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Refresh",file:"internal/modules/auth/service.go",fn:"Refresh"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"cari by SHA-256(token)",d:"Tidak ketemu atau sudah kedaluwarsa → 401."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"UPDATE … WHERE revoked_at IS NULL",d:"Compare-and-swap: hanya berhasil kalau token masih aktif.",concept:"refresh"},
+  {f:"PostgreSQL",t:"Service",k:"err",l:"0 rows → token dipakai ulang!",d:"Token ini sudah pernah dipakai. Artinya ada dua pihak memegang token yang sama (dicuri). Semua sesi user dicabut dan dibalas 401.",code:'s.tokens.RevokeAllForUser(ctx, stored.UserID)'},
+  {f:"Service",t:"Service",k:"self",l:"issueTokens (pasangan baru)",d:"Kalau revoke berhasil, terbit access token dan refresh token baru."},
+  {f:"Handler",t:"User",k:"ret",l:"200 {access, refresh baru}",d:"Refresh token lama tidak bisa dipakai lagi."}
+ ]},
+
+{id:"admin-product", name:"Admin buat produk", desc:"POST /products — hanya admin.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"POST /products + Bearer",d:"Admin login dulu, lalu mengirim token admin."},
+  {f:"Middleware",t:"Middleware",k:"self",l:"Auth → RequireRole(admin)",d:"Tanpa token → 401. Token customer → 403.",concept:"middleware"},
+  {f:"Middleware",t:"Handler",k:"req",l:"product.Handler.Create",d:"Validasi: name 3–200, price > 0, stock ≥ 0 (pointer, jadi 0 sah), category_id UUID.",concept:"pointer"},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Create",file:"internal/modules/product/service.go",fn:"Create"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"kategori ada?",d:"category.Service.Exists. Kategori tidak ada → 400."},
+  {f:"Service",t:"Service",k:"self",l:"slug + 6 hex acak",d:"'Kopi Arabika' → 'kopi-arabika-a1b2c3'. Suffix acak membuat slug unik tanpa perlu retry."},
+  {f:"Service",t:"Repository",k:"req",l:"repo.Create",d:""},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"INSERT INTO products",d:"CHECK price >= 0 dan stock >= 0 di level tabel."},
+  {f:"Service",t:"Redis",k:"db",l:"INCR products:list:version",d:"Semua cache list produk otomatis basi, jadi produk baru langsung muncul di GET /products.",concept:"versioned"},
+  {f:"Handler",t:"User",k:"ret",l:"201 Created",d:""}
+ ]},
+
+{id:"browse", name:"Lihat produk", desc:"GET /products/:id — publik, memakai cache Redis.",
+ steps:[
+  {f:"User",t:"Handler",k:"req",l:"GET /products/:id",d:"Tidak perlu login. ID harus UUID, kalau bukan → 400."},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Get",file:"internal/modules/product/service.go",fn:"Get",concept:"cacheaside"},
+  {f:"Service",t:"Redis",k:"db",l:"GET product:<id>",d:"Coba cache dulu."},
+  {f:"Redis",t:"Service",k:"ret",l:"HIT → langsung balas",d:"Kalau ada di cache, PostgreSQL tidak disentuh sama sekali."},
+  {f:"Service",t:"Repository",k:"req",l:"MISS → FindByID",d:"Kalau tidak ada di cache, atau Redis error/mati: baca database. Error Redis hanya di-log."},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"SELECT … WHERE id = ?",d:"Tidak ada → 404 'Product not found'."},
+  {f:"Service",t:"Redis",k:"db",l:"SET product:<id> TTL 10m",d:"Disimpan untuk pembaca berikutnya. Gagal menyimpan pun tidak menggagalkan request."},
+  {f:"Handler",t:"User",k:"ret",l:"200 produk",d:""}
+ ]},
+
+{id:"cart", name:"Tambah ke cart", desc:"POST /cart/items — customer memasukkan produk ke keranjang.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"POST /cart/items + Bearer",d:"Body: product_id, quantity (1–1000)."},
+  {f:"Middleware",t:"Handler",k:"req",l:"cart.Handler.AddItem",d:"User ID diambil dari token, bukan dari body."},
+  {f:"Handler",t:"Service",k:"req",l:"Service.AddItem",file:"internal/modules/cart/service.go",fn:"AddItem"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"baca produk (tanpa cache)",d:"Sengaja langsung dari database: keputusan stok butuh data segar. Tidak ada → 404. Stok 0 → 409."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"cart: INSERT … ON CONFLICT DO NOTHING",d:"Cart dibuat saat pertama dipakai. Aman kalau dua request datang bersamaan.",concept:"upsert"},
+  {f:"Service",t:"Service",k:"self",l:"qty lama + qty baru ≤ stok?",d:"Produk yang sudah ada di cart: quantity dijumlahkan. Melebihi stok → 409 'Only N unit(s) available'. Ini hanya kenyamanan untuk user; penjaga oversell yang sebenarnya ada di checkout."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"UPSERT cart_items",d:"ON CONFLICT (cart_id, product_id) DO UPDATE SET quantity.",concept:"upsert"},
+  {f:"Service",t:"Service",k:"self",l:"hitung subtotal & total",d:"Total tidak disimpan, dihitung dari harga produk saat ini.",concept:"derived"},
+  {f:"Handler",t:"User",k:"ret",l:"200 cart + total",d:""}
+ ]},
+
+{id:"checkout", name:"Checkout", desc:"POST /orders — inti project: satu transaksi, anti-oversell.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"POST /orders + Bearer",d:"Tanpa body. Harga dan item tidak pernah diambil dari klien."},
+  {f:"Middleware",t:"Handler",k:"req",l:"order.Handler.Create",d:""},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Create",file:"internal/modules/order/service.go",fn:"Create"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"BEGIN",d:"TxManager.WithinTx membuka transaksi dan menitipkannya di context.",concept:"ctxtx"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"SELECT cart FOR UPDATE",d:"Baris cart dikunci. Klik checkout dua kali → request kedua menunggu, lalu menemukan cart sudah kosong (400).",concept:"lock"},
+  {f:"Service",t:"Service",k:"self",l:"urutkan item by product_id",d:"Semua checkout mengunci produk dengan urutan yang sama, jadi tidak bisa deadlock.",concept:"lock"},
+  {f:"Service",t:"Repository",k:"req",l:"DecreaseStock (per item)",file:"internal/modules/product/repository.go",fn:"DecreaseStock",concept:"atomic"},
+  {f:"Repository",t:"PostgreSQL",k:"db",l:"UPDATE … WHERE stock >= qty RETURNING *",d:"Cek dan kurangi stok dalam satu statement. RETURNING memberi nama dan harga terbaru dari baris yang sama.",concept:"atomic"},
+  {f:"PostgreSQL",t:"Service",k:"err",l:"0 rows → ROLLBACK, 409",d:"Satu saja item kurang stok, seluruh transaksi dibatalkan: stok item lain kembali, cart tidak berubah.",concept:"atomic"},
+  {f:"Service",t:"Service",k:"self",l:"snapshot nama & harga",d:"order_items menyimpan product_name dan unit_price saat ini. Harga produk berubah besok, order lama tetap benar."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"INSERT order + items, kosongkan cart",d:"Nomor order: ORD-YYYYMMDD-XXXXXXXX. Status awal PENDING."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"COMMIT",d:"Semua perubahan disimpan sekaligus."},
+  {f:"Service",t:"Redis",k:"db",l:"hapus cache produk",d:"Setelah commit (bukan sebelum), supaya stok yang tampil di GET /products ikut berubah.",concept:"cacheaside"},
+  {f:"Handler",t:"User",k:"ret",l:"201 order PENDING",d:""}
+ ]},
+
+{id:"payment", name:"Pembayaran", desc:"POST /payments lalu simulate-success — idempotent.",
+ steps:[
+  {f:"User",t:"Handler",k:"req",l:"POST /payments + Idempotency-Key",d:"Body: order_id. Header Idempotency-Key wajib (teks acak unik per percobaan bayar)."},
+  {f:"Handler",t:"Service",k:"req",l:"payment.Service.Create",file:"internal/modules/payment/service.go",fn:"Create"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"order milik user ini?",d:"Order orang lain → 404 (bukan 403), supaya tidak ketahuan order itu ada."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"key pernah dipakai?",d:"Ya → kembalikan payment yang sama dengan status 200. Retry jaringan tidak membuat tagihan kedua.",concept:"idem"},
+  {f:"Service",t:"Repository",k:"req",l:"INSERT payment (PENDING)",d:"Amount diambil dari total order, bukan dari request. Unique index idempotency_key dan 'satu PENDING per order' menjaga di level database.",concept:"idem"},
+  {f:"Repository",t:"User",k:"ret",l:"201 payment PENDING",d:"Berisi reference PAY-… dan expires_at (30 menit)."},
+  {f:"User",t:"Handler",k:"req",l:"POST /payments/:id/simulate-success",d:"Menggantikan webhook dari payment gateway sungguhan."},
+  {f:"Handler",t:"Service",k:"req",l:"SimulateSuccess",d:"Sudah SUCCESS → balas hasil yang sama (idempotent). FAILED/EXPIRED → 409. Lewat expires_at → ditandai EXPIRED."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"BEGIN; payment PENDING→SUCCESS",d:"Compare-and-swap: hanya satu request yang berhasil mengubahnya.",concept:"cas"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"order PENDING→PAID; COMMIT",d:"Satu transaksi dengan langkah sebelumnya."},
+  {f:"PostgreSQL",t:"Service",k:"err",l:"order sudah CANCELLED → ROLLBACK",d:"Payment ikut kembali ke PENDING. Tidak mungkin payment SUCCESS tapi order tidak PAID."},
+  {f:"Handler",t:"User",k:"ret",l:"200 payment SUCCESS",d:""}
+ ]},
+
+{id:"cancel", name:"Batalkan order", desc:"POST /orders/:id/cancel — hanya order PENDING; stok dikembalikan.",
+ steps:[
+  {f:"User",t:"Handler",k:"req",l:"POST /orders/:id/cancel",d:"Pemilik order atau admin."},
+  {f:"Handler",t:"Service",k:"req",l:"Service.Cancel",file:"internal/modules/order/service.go",fn:"Cancel"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"order milik user ini?",d:"Bukan → 404."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"BEGIN; status PENDING→CANCELLED",d:"Compare-and-swap. Order sudah PAID atau sudah dibatalkan → 0 rows → 409.",concept:"cas"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"stock = stock + qty (per item)",d:"Hanya dijalankan kalau langkah sebelumnya berhasil, jadi stok kembali tepat sekali walaupun cancel diklik berkali-kali."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"COMMIT",d:""},
+  {f:"Service",t:"Redis",k:"db",l:"hapus cache produk",d:""},
+  {f:"Handler",t:"User",k:"ret",l:"200 order CANCELLED",d:""}
+ ]},
+
+{id:"fulfil", name:"Admin proses & kirim", desc:"PATCH /orders/:id/status — PAID → PROCESSING → SHIPPED → COMPLETED.",
+ steps:[
+  {f:"User",t:"Middleware",k:"req",l:"PATCH /orders/:id/status",d:"Body: status. Hanya admin."},
+  {f:"Middleware",t:"Handler",k:"req",l:"RequireRole(admin) lolos",d:"Customer → 403."},
+  {f:"Handler",t:"Handler",k:"self",l:"validasi oneof",d:"Hanya PROCESSING, SHIPPED, COMPLETED, CANCELLED. PAID tidak bisa diset manual → 422."},
+  {f:"Handler",t:"Service",k:"req",l:"Service.UpdateStatus",file:"internal/modules/order/service.go",fn:"UpdateStatus"},
+  {f:"Service",t:"Service",k:"self",l:"CanTransition(from, to)?",d:"Cek state machine. Lompat (PAID→COMPLETED) atau mundur → 409.",concept:"cas"},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"UPDATE … WHERE status = from",d:"Compare-and-swap, supaya dua admin yang mengubah bersamaan tidak saling menimpa."},
+  {f:"Handler",t:"User",k:"ret",l:"200 status baru",d:""}
+ ]},
+];
+
+const JOURNEY = [
+  {who:"Admin", what:"Siapkan katalog", flow:"admin-product"},
+  {who:"User", what:"Daftar", flow:"register"},
+  {who:"User", what:"Login", flow:"login"},
+  {who:"User", what:"Lihat produk", flow:"browse"},
+  {who:"User", what:"Masukkan cart", flow:"cart"},
+  {who:"User", what:"Checkout", flow:"checkout"},
+  {who:"User", what:"Bayar", flow:"payment"},
+  {who:"Admin", what:"Proses & kirim", flow:"fulfil"},
+  {who:"Selesai", what:"COMPLETED", flow:"fulfil"},
+];
+
+let curFlow = FLOWS[0], playing = false, playToken = 0;
+const KCOL = {req:"#00add8", ret:"#8b98a9", db:"#f2b84b", err:"#f0605d", self:"#a78bfa"};
+
+function renderJourney(){
+  $("#journey").innerHTML = JOURNEY.map((j,i)=>`
+    <button class="jstep" data-flow="${j.flow}" style="animation-delay:${i*60}ms">
+      <span class="jwho ${j.who==="Admin"?"admin":j.who==="Selesai"?"done":""}">${j.who}</span>
+      <span class="jwhat">${j.what}</span></button>${i<JOURNEY.length-1?'<span class="jarrow">→</span>':""}`).join("");
+  $("#journey").querySelectorAll(".jstep").forEach(b=>b.onclick=()=>{selectFlow(b.dataset.flow);document.querySelector(".seqcard").scrollIntoView({behavior:"smooth",block:"start"});});
+}
+function renderFlowChips(){
+  $("#flowchips").innerHTML = FLOWS.map(f=>`<button class="chip ${f.id===curFlow.id?"on":""}" data-flow="${f.id}">${f.name}</button>`).join("");
+  $("#flowchips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>selectFlow(b.dataset.flow));
+}
+function selectFlow(id){
+  curFlow = FLOWS.find(f=>f.id===id) || FLOWS[0];
+  playToken++; playing=false; $("#flow-play").textContent="Putar alur";
+  renderFlowChips(); drawSeq();
+  document.querySelectorAll(".jstep").forEach(b=>b.classList.toggle("on", b.dataset.flow===curFlow.id));
+  try{ history.replaceState(null,"","#"+curFlow.id); }catch{}
+}
+
+function drawSeq(){
+  const f = curFlow;
+  const used = LANES.filter(l=>f.steps.some(s=>s.f===l||s.t===l));
+  const colW = 158, left = 20, top = 64, rowH = 50;
+  const W = Math.max(680, left*2 + used.length*colW);
+  const H = top + f.steps.length*rowH + 30;
+  const x = l => left + used.indexOf(l)*colW + colW/2;
+  $("#flow-title").textContent = f.name;
+  $("#flow-desc").textContent = f.desc;
+  $("#flow-caption").innerHTML = 'Tekan "Putar alur" atau klik salah satu panah.';
+  const svg = $("#seq");
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("width",W); svg.setAttribute("height",H);
+  let s = `<defs>${Object.entries(KCOL).map(([k,c])=>`<marker id="ah-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="${c}"/></marker>`).join("")}</defs>`;
+  used.forEach(l=>{
+    s += `<line class="life" x1="${x(l)}" y1="${top-14}" x2="${x(l)}" y2="${H-10}"/>`;
+    s += `<g class="lanehd" data-lane="${l}"><title>${LANE_HINT[l]}</title><rect x="${x(l)-66}" y="8" width="132" height="36" rx="9"/><text x="${x(l)}" y="31" text-anchor="middle">${l}</text></g>`;
+  });
+  f.steps.forEach((st,i)=>{
+    const y = top + i*rowH + 22, c = KCOL[st.k];
+    const label = `${i+1}. ${esc(st.l)}`;
+    s += `<g class="step" data-i="${i}" tabindex="0">`;
+    s += `<rect class="hit" x="0" y="${y-30}" width="${W}" height="${rowH}"/>`;
+    if(st.f===st.t){
+      const x0 = x(st.f);
+      s += `<path d="M${x0} ${y-6} h34 v16 h-30" fill="none" stroke="${c}" stroke-width="1.6" marker-end="url(#ah-${st.k})"/>`;
+      s += `<text class="lbl" x="${x0+42}" y="${y+6}">${label}</text>`;
+    } else {
+      const x1=x(st.f), x2=x(st.t), dir = x2>x1?1:-1;
+      const dash = st.k==="ret"||st.k==="err" ? 'stroke-dasharray="6 5"' : "";
+      s += `<line x1="${x1+dir*4}" y1="${y}" x2="${x2-dir*6}" y2="${y}" stroke="${c}" stroke-width="1.7" ${dash} marker-end="url(#ah-${st.k})"/>`;
+      s += `<text class="lbl" x="${(x1+x2)/2}" y="${y-9}" text-anchor="middle">${label}</text>`;
+    }
+    s += `</g>`;
+  });
+  s += `<circle id="packet" r="6" cx="0" cy="0" style="opacity:0"/>`;
+  svg.innerHTML = s;
+  svg.querySelectorAll(".step").forEach(g=>{
+    g.onclick=()=>openStep(+g.dataset.i);
+    g.onkeydown=e=>{if(e.key==="Enter"){openStep(+g.dataset.i);}};
+    g.onmouseenter=()=>showCaption(+g.dataset.i);
+  });
+  svg._x = x; svg._top=top; svg._rowH=rowH;
+}
+
+function showCaption(i){
+  const st = curFlow.steps[i];
+  $("#flow-caption").innerHTML = `<b>${i+1}. ${esc(st.l)}</b> <span class="cap-who">${st.f} → ${st.t}</span><br>${st.d||""}${st.file?` <span class="cap-file">${st.file}${st.fn?" · "+st.fn:""}</span>`:""}`;
+}
+function highlight(i){
+  const svg=$("#seq");
+  svg.querySelectorAll(".step").forEach(g=>g.classList.toggle("active", +g.dataset.i===i));
+  svg.querySelectorAll(".step").forEach(g=>g.classList.toggle("done", +g.dataset.i<i));
+  const st=curFlow.steps[i]||{};
+  svg.querySelectorAll(".lanehd").forEach(g=>g.classList.toggle("on", g.dataset.lane===st.f||g.dataset.lane===st.t));
+}
+
+async function playFlow(){
+  if(playing){ playToken++; playing=false; $("#flow-play").textContent="Putar alur"; return; }
+  playing=true; const my=++playToken; $("#flow-play").textContent="Jeda";
+  const svg=$("#seq"), p=$("#packet");
+  for(let i=0;i<curFlow.steps.length;i++){
+    if(my!==playToken) return;
+    const st=curFlow.steps[i], y=svg._top+i*svg._rowH+22, x1=svg._x(st.f), x2=svg._x(st.t);
+    highlight(i); showCaption(i);
+    p.style.transition="none"; p.style.fill=KCOL[st.k]; p.style.opacity=1;
+    p.style.transform=`translate(${x1}px,${y}px)`; p.getBoundingClientRect();
+    p.style.transition="transform .75s cubic-bezier(.5,0,.3,1)";
+    p.style.transform= st.f===st.t ? `translate(${x1+34}px,${y+5}px)` : `translate(${x2}px,${y}px)`;
+    await sleep(1500);
+  }
+  if(my===playToken){ playing=false; $("#flow-play").textContent="Putar ulang"; p.style.opacity=0; }
+}
+function resetFlow(){ playToken++; playing=false; $("#flow-play").textContent="Putar alur"; drawSeq(); }
+
+function openStep(i){
+  const f=curFlow, st=f.steps[i]; highlight(i); showCaption(i);
+  const concept = st.concept && C.find(c=>c.id===st.concept);
+  $("#modal").innerHTML = `
+  <div class="m-top"><div><span class="tag t-go">LANGKAH ${i+1} / ${f.steps.length} · ${f.name}</span>
+    <h2 id="m-title">${esc(st.l)}</h2>
+    <div class="flowwho"><span class="who">${st.f}</span><span class="arrow">→</span><span class="who">${st.t}</span><span class="kind" style="color:${KCOL[st.k]}">${{req:"request",ret:"respons",db:"database / Redis",err:"jalur gagal",self:"proses internal"}[st.k]}</span></div></div>
+    <button class="x" aria-label="Tutup">✕</button></div>
+  <div class="m-body"><div class="pane on">
+    <h4>Apa yang terjadi</h4><p>${st.d||"Hasil diteruskan ke lapisan berikutnya."}</p>
+    ${st.file?`<h4>Di mana kodenya</h4><p><code>${st.file}</code>${st.fn?` → <code>${st.fn}</code>`:""}</p>`:""}
+    ${st.code?`<div class="codehead"><span>Potongan kode</span></div><pre><code class="language-go">${esc(st.code)}</code></pre>`:""}
+    ${concept?`<h4>Konsep terkait</h4><button class="nav" id="goconcept">Buka penjelasan: ${concept.title} →</button>`:""}
+    <div class="navrow">
+      <button class="nav" ${i>0?`data-step="${i-1}"`:"disabled style='opacity:.35'"}>← Langkah sebelumnya</button>
+      <button class="nav" ${i<f.steps.length-1?`data-step="${i+1}"`:"disabled style='opacity:.35'"}>Langkah berikutnya →</button>
+    </div></div></div>`;
+  const m=$("#modal");
+  m.querySelector(".x").onclick=closeModal;
+  m.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>openStep(+b.dataset.step));
+  if(concept) m.querySelector("#goconcept").onclick=()=>openModal(concept.id);
+  if(window.Prism) Prism.highlightAllUnder(m);
+  m.scrollTop=0; $("#overlay").classList.add("open"); document.body.style.overflow="hidden";
+  modalMode="step"; m.querySelector(".x").focus();
+}
+
+/* ---- Kenapa view ---- */
+const WHYMODS = [
+  {t:"Auth",flow:"login",tag:"sec",d:"Supaya server tahu siapa yang memanggil dan apa haknya. Tanpa ini, siapa saja bisa mengubah harga atau melihat order orang lain."},
+  {t:"Users",flow:"lifecycle",tag:"pattern",d:"User mengelola profil dan password sendiri; admin bisa melihat daftar user untuk keperluan support."},
+  {t:"Categories",flow:"admin-product",tag:"pattern",d:"Mengelompokkan produk supaya bisa difilter (?category_id=). Kategori yang masih punya produk tidak bisa dihapus."},
+  {t:"Products",flow:"browse",tag:"db",d:"Katalog: sumber harga dan stok yang sah. Dibaca sangat sering, jadi di-cache di Redis."},
+  {t:"Cart",flow:"cart",tag:"pattern",d:"Tempat user mengumpulkan barang sebelum membeli. Disimpan di server supaya sama di HP dan laptop."},
+  {t:"Orders",flow:"checkout",tag:"db",d:"Mengubah cart menjadi pesanan secara aman: stok dikunci, harga dibekukan, semua dalam satu transaksi."},
+  {t:"Payments",flow:"payment",tag:"pattern",d:"Mensimulasikan payment gateway. Fokusnya idempotency: tidak ada pembayaran yang terproses dua kali."},
+];
+const WHYTECH = [
+  {t:"Go",tag:"go",d:"Compile jadi satu binary, cepat, konkurensi bawaan (goroutine), dan populer untuk backend di perusahaan Indonesia."},
+  {t:"Fiber v2",tag:"go",d:"Framework HTTP yang ringan dengan API mirip Express. Catatan: v2 kini berstatus deprecated, penggantinya Fiber v3."},
+  {t:"PostgreSQL",tag:"db",d:"Transaksi ACID, row lock, partial index, CHECK constraint — semua dipakai untuk mencegah oversell dan data dobel."},
+  {t:"Redis",tag:"db",d:"Penyimpanan in-memory yang sangat cepat untuk cache produk dan counter rate limit. Bukan sumber kebenaran."},
+  {t:"GORM",tag:"db",d:"ORM paling populer di Go: CRUD lebih singkat, query tetap memakai parameter binding sehingga aman dari SQL injection."},
+  {t:"JWT + bcrypt",tag:"sec",d:"JWT untuk autentikasi stateless; bcrypt untuk menyimpan password dengan aman."},
+  {t:"Docker Compose",tag:"pattern",d:"Menjalankan API + PostgreSQL + Redis dengan satu perintah dan versi yang sama di mana pun."},
+  {t:"REST + JSON",tag:"pattern",d:"Standar yang dipahami semua klien (web, mobile) dan mudah didokumentasikan dengan OpenAPI/Swagger."},
+];
+const DOCKFLOW = [
+  ["Baca docker-compose.yml","Compose membaca tiga service: api, postgres, redis, beserta port, env, dan volume."],
+  ["Build image api","Dockerfile stage 1 (golang:1.24-alpine): download dependency, lalu go build menjadi satu binary statis."],
+  ["Copy ke image kecil","Stage 2 (alpine): hanya binary yang disalin. Compiler Go dan source code tidak ikut."],
+  ["Start postgres & redis","Container database dan cache dinyalakan. Data PostgreSQL disimpan di volume postgres_data supaya tidak hilang saat container dimatikan."],
+  ["Tunggu health check","depends_on: condition service_healthy. API baru dinyalakan setelah pg_isready dan redis-cli ping berhasil."],
+  ["Start api","Binary jalan: baca env, jalankan migration SQL yang ter-embed, buat akun admin, lalu listen di :8080."],
+  ["Siap dipakai","localhost:8080 diteruskan ke container. Docker juga mengecek /health secara berkala (HEALTHCHECK)."],
+];
+function renderWhy(){
+  $("#whymods").innerHTML = WHYMODS.map((m,i)=>{const [tl,tc]=TAGS[m.tag];return `<article class="card" tabindex="0" data-flow="${m.flow}" style="animation-delay:${i*40}ms"><span class="tag ${tc}">${tl}</span><h3>${m.t}</h3><p>${m.d}</p><div class="file">lihat alur →</div></article>`}).join("");
+  $("#whymods").querySelectorAll(".card").forEach(c=>c.onclick=()=>{setView("alur");selectFlow(c.dataset.flow);});
+  $("#whytech").innerHTML = WHYTECH.map((m,i)=>{const [tl,tc]=TAGS[m.tag];return `<article class="card static" style="animation-delay:${i*40}ms"><span class="tag ${tc}">${tl}</span><h3>${m.t}</h3><p>${m.d}</p></article>`}).join("");
+  $("#dockflow").innerHTML = DOCKFLOW.map((d,i)=>`<button class="dstep" data-i="${i}"><span class="dn">${i+1}</span>${d[0]}</button>${i<DOCKFLOW.length-1?'<span class="jarrow">→</span>':""}`).join("");
+  $("#dockflow").querySelectorAll(".dstep").forEach(b=>b.onclick=()=>{
+    $("#dockflow").querySelectorAll(".dstep").forEach(x=>x.classList.toggle("on",x===b));
+    const d=DOCKFLOW[+b.dataset.i]; $("#dock-caption").innerHTML=`<b>${d[0]}</b><br>${d[1]}`;
+  });
+}
+
+/* ---- views ---- */
+const VIEWS=["konsep","alur","jalankan","kenapa"];
+let curView="konsep", modalMode="concept";
+function setView(v, keepHash){
+  curView = VIEWS.includes(v)?v:"konsep";
+  document.querySelectorAll(".vbtn").forEach(b=>b.classList.toggle("on",b.dataset.view===curView));
+  document.querySelectorAll(".view").forEach(el=>el.classList.toggle("on",el.id==="v-"+curView));
+  if(!keepHash){ try{ history.replaceState(null,"","#"+(curView==="alur"?curFlow.id:curView)); }catch{} }
+  window.scrollTo({top:0});
+}
+document.querySelectorAll(".vbtn").forEach(b=>b.onclick=()=>setView(b.dataset.view));
+document.querySelectorAll(".rtab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".rtab").forEach(x=>x.classList.toggle("on",x===t));
+  document.querySelectorAll(".runpane").forEach(p=>p.classList.toggle("on",p.dataset.run===t.dataset.run));
+});
+$("#flow-play").onclick=playFlow; $("#flow-reset").onclick=resetFlow;
+
+renderChips(); renderCards(); renderJourney(); renderFlowChips(); drawSeq(); renderWhy();
+(function(){
+  const h=location.hash.slice(1);
+  if(VIEWS.includes(h)) setView(h,true);
+  else if(FLOWS.find(f=>f.id===h)){ setView("alur",true); selectFlow(h); }
+  else if(C.find(c=>c.id===h)){ openModal(h); }
+})();
+</script>
+</body>
+</html>
