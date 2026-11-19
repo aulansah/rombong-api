@@ -1,4 +1,4 @@
-// Load and concurrency tests against a running go-ecommerce-api.
+// Load and concurrency tests against a running rombong-api.
 // Standard library only. Writes results as JSON for the report.
 package main
 

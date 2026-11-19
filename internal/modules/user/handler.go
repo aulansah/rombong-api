@@ -3,9 +3,9 @@ package user
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/aulansah/go-ecommerce-api/internal/middleware"
-	"github.com/aulansah/go-ecommerce-api/internal/utils"
-	"github.com/aulansah/go-ecommerce-api/pkg/response"
+	"github.com/aulansah/rombong-api/internal/middleware"
+	"github.com/aulansah/rombong-api/internal/utils"
+	"github.com/aulansah/rombong-api/pkg/response"
 )
 
 // Handler translates HTTP requests into service calls. It contains no

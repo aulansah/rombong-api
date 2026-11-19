@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 
-	"github.com/aulansah/go-ecommerce-api/internal/config"
+	"github.com/aulansah/rombong-api/internal/config"
 )
 
 // Connect opens the GORM connection and configures the connection pool.

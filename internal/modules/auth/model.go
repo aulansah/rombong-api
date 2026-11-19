@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aulansah/go-ecommerce-api/internal/modules/user"
+	"github.com/aulansah/rombong-api/internal/modules/user"
 )
 
 // RefreshToken is the refresh_tokens table. Only the SHA-256 hash of the

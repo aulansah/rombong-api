@@ -1,4 +1,4 @@
-// Command api starts the e-commerce REST API.
+// Command api starts the Rombong e-commerce REST API.
 package main
 
 import (
@@ -12,11 +12,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/aulansah/go-ecommerce-api/internal/app"
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/internal/config"
-	"github.com/aulansah/go-ecommerce-api/internal/database"
-	"github.com/aulansah/go-ecommerce-api/pkg/logger"
+	"github.com/aulansah/rombong-api/internal/app"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/internal/config"
+	"github.com/aulansah/rombong-api/internal/database"
+	"github.com/aulansah/rombong-api/pkg/logger"
 )
 
 func main() {

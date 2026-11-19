@@ -1,6 +1,6 @@
-# Go E-Commerce API
+# Rombong API
 
-A production-oriented e-commerce REST API written in Go. It covers the full
+Rombong ("gerobak" pedagang, sekarang digital) is a production-oriented e-commerce REST API written in Go. It covers the full
 purchase path — catalog, cart, transactional checkout, simulated payment —
 with the concerns that matter in a real backend: no overselling under
 concurrency, idempotent payments, token rotation, cache invalidation and
@@ -248,7 +248,7 @@ make run
 
 ```bash
 make build                           # static binary in bin/api
-docker build -t go-ecommerce-api .   # minimal image, runs as non-root
+docker build -t rombong-api .   # minimal image, runs as non-root
 ```
 
 In production set `APP_ENV=production` (JSON logs), a strong `JWT_SECRET`,
