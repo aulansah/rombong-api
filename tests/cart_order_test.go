@@ -14,8 +14,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/aulansah/go-ecommerce-api/internal/database"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/product"
+	"github.com/aulansah/rombong-api/internal/database"
+	"github.com/aulansah/rombong-api/internal/modules/product"
 )
 
 func TestCartRules(t *testing.T) {

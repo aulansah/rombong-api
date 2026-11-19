@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/aulansah/go-ecommerce-api/internal/modules/order"
-	"github.com/aulansah/go-ecommerce-api/internal/utils"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/internal/modules/order"
+	"github.com/aulansah/rombong-api/internal/utils"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // Repository is what the service needs from the persistence layer.

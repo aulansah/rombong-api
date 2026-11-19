@@ -5,14 +5,14 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/aulansah/go-ecommerce-api/internal/middleware"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/auth"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/cart"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/category"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/order"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/payment"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/product"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/user"
+	"github.com/aulansah/rombong-api/internal/middleware"
+	"github.com/aulansah/rombong-api/internal/modules/auth"
+	"github.com/aulansah/rombong-api/internal/modules/cart"
+	"github.com/aulansah/rombong-api/internal/modules/category"
+	"github.com/aulansah/rombong-api/internal/modules/order"
+	"github.com/aulansah/rombong-api/internal/modules/payment"
+	"github.com/aulansah/rombong-api/internal/modules/product"
+	"github.com/aulansah/rombong-api/internal/modules/user"
 )
 
 // Handlers groups every module handler.

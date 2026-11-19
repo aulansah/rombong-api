@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/aulansah/go-ecommerce-api/internal/database"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/internal/database"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // GormRepository stores refresh tokens in PostgreSQL.

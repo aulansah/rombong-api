@@ -28,10 +28,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"github.com/aulansah/go-ecommerce-api/internal/app"
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/internal/config"
-	"github.com/aulansah/go-ecommerce-api/internal/database"
+	"github.com/aulansah/rombong-api/internal/app"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/internal/config"
+	"github.com/aulansah/rombong-api/internal/database"
 )
 
 const (
@@ -54,7 +54,7 @@ func env(key, fallback string) string {
 
 func TestMain(m *testing.M) {
 	cfg := &config.Config{
-		App: config.AppConfig{Name: "go-ecommerce-api-test", Env: "test", BcryptCost: bcrypt.MinCost},
+		App: config.AppConfig{Name: "rombong-api-test", Env: "test", BcryptCost: bcrypt.MinCost},
 		DB: config.DBConfig{
 			Host:         env("TEST_DB_HOST", "localhost"),
 			Port:         env("TEST_DB_PORT", "5432"),

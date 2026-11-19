@@ -4,9 +4,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
-	"github.com/aulansah/go-ecommerce-api/internal/utils"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
-	"github.com/aulansah/go-ecommerce-api/pkg/response"
+	"github.com/aulansah/rombong-api/internal/utils"
+	"github.com/aulansah/rombong-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/response"
 )
 
 type Handler struct {

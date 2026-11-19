@@ -147,7 +147,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 <body>
 <div class="hero"><div class="wrap">
   <h1>Membaca project E-Commerce tanpa harus bisa ngoding</h1>
-  <p>Panduan ini menjelaskan isi dua project (<b>go-ecommerce-api</b> dan <b>ecommerce_app</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar waktu kamu menekan satu tombol di aplikasi.</p>
+  <p>Panduan ini menjelaskan isi dua project (<b>rombong-api</b> dan <b>rombong</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar waktu kamu menekan satu tombol di aplikasi.</p>
   <div class="toc">
     <a href="#besar">1. Gambaran besar</a><a href="#peta">2. Peta folder</a><a href="#urutan">3. Urutan ngoding</a>
     <a href="#perjalanan">4. Ikuti satu klik</a><a href="#root">5. File-file aneh</a><a href="#docker">6. Docker &amp; Makefile</a>
@@ -164,8 +164,8 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
   <div class="card" id="restoDetail"></div>
   <h3>Ada dua project yang terpisah</h3>
   <div class="grid g2">
-    <div class="card"><span class="tag t-fe">ecommerce_app</span><h4>Aplikasi HP (Flutter, bahasa Dart)</h4><p>Yang dilihat dan disentuh pelanggan: layar katalog, keranjang, tombol bayar. Aplikasi ini <b>tidak menyimpan data toko</b>; semua ditanyakan ke backend lewat internet.</p></div>
-    <div class="card"><span class="tag t-be">go-ecommerce-api</span><h4>Backend / server (bahasa Go)</h4><p>Otak dan gudangnya. Memeriksa login, menghitung total, mengurangi stok, mencatat pembayaran. Juga melayani panel admin. Bisa dipakai juga oleh website atau aplikasi lain nanti.</p></div>
+    <div class="card"><span class="tag t-fe">rombong</span><h4>Aplikasi HP (Flutter, bahasa Dart)</h4><p>Yang dilihat dan disentuh pelanggan: layar katalog, keranjang, tombol bayar. Aplikasi ini <b>tidak menyimpan data toko</b>; semua ditanyakan ke backend lewat internet.</p></div>
+    <div class="card"><span class="tag t-be">rombong-api</span><h4>Backend / server (bahasa Go)</h4><p>Otak dan gudangnya. Memeriksa login, menghitung total, mengurangi stok, mencatat pembayaran. Juga melayani panel admin. Bisa dipakai juga oleh website atau aplikasi lain nanti.</p></div>
   </div>
   <div class="callout">Keduanya berbicara lewat <b>API</b>: aplikasi mengirim permintaan seperti <code>GET /api/v1/products</code> ("tolong daftar produk"), lalu backend menjawab dengan data berformat <b>JSON</b> (teks terstruktur yang mudah dibaca mesin).</div>
 </section>
@@ -174,7 +174,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 <section id="peta">
   <h2><span class="n">2</span>Peta folder: klik untuk tahu isinya</h2>
   <p class="lead">Ini isi asli kedua project. Klik folder untuk membuka, klik apa saja untuk melihat penjelasannya di sebelah kanan.</p>
-  <div class="tabs"><button class="on" data-tree="be">🖥️ Backend (go-ecommerce-api)</button><button data-tree="fe">📱 Aplikasi (ecommerce_app)</button></div>
+  <div class="tabs"><button class="on" data-tree="be">🖥️ Backend (rombong-api)</button><button data-tree="fe">📱 Aplikasi (rombong)</button></div>
   <div class="legend"><span><i style="background:#0B7A94"></i>kode program</span><span><i style="background:#B45309"></i>database</span><span><i style="background:#1E7B34"></i>pengujian</span><span><i style="background:#8A5A00"></i>pengaturan / alat bantu</span><span><i style="background:#7C3AED"></i>dokumentasi</span></div>
   <div class="explorer">
     <div class="tree" id="tree"></div>
@@ -237,9 +237,9 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
   <h2><span class="n">7</span>Cara menjalankan, versi singkat</h2>
   <div class="grid g2">
     <div class="card"><span class="tag t-be">Backend</span><h4>Pakai Docker (paling gampang)</h4>
-      <ol class="steps-list"><li>Instal <b>Docker Desktop</b>, lalu buka aplikasinya</li><li>Buka terminal di folder <code>go-ecommerce-api</code></li><li><code>cp .env.example .env</code> (bikin file setelan)</li><li><code>docker compose up --build</code></li><li>Buka <code>http://localhost:8080/docs</code>: daftar semua endpoint, bisa dicoba langsung</li></ol></div>
+      <ol class="steps-list"><li>Instal <b>Docker Desktop</b>, lalu buka aplikasinya</li><li>Buka terminal di folder <code>rombong-api</code></li><li><code>cp .env.example .env</code> (bikin file setelan)</li><li><code>docker compose up --build</code></li><li>Buka <code>http://localhost:8080/docs</code>: daftar semua endpoint, bisa dicoba langsung</li></ol></div>
     <div class="card"><span class="tag t-fe">Aplikasi</span><h4>Flutter di emulator</h4>
-      <ol class="steps-list"><li>Instal <b>Flutter 3.35+</b> dan Android Studio (untuk emulator)</li><li>Buka terminal di folder <code>ecommerce_app</code></li><li>Sekali saja: <code>flutter create --org com.aulansah --project-name ecommerce_app .</code> (membuat folder android/ios)</li><li><code>flutter pub get</code> (unduh library)</li><li>Pastikan backend sudah jalan, lalu <code>flutter run</code></li></ol></div>
+      <ol class="steps-list"><li>Instal <b>Flutter 3.35+</b> dan Android Studio (untuk emulator)</li><li>Buka terminal di folder <code>rombong</code></li><li>Sekali saja: <code>flutter create --org com.aulansah --project-name rombong .</code> (membuat folder android/ios)</li><li><code>flutter pub get</code> (unduh library)</li><li>Pastikan backend sudah jalan, lalu <code>flutter run</code></li></ol></div>
   </div>
   <div class="callout">Login admin bawaan: <code>admin@example.com</code> / <code>Admin12345</code> (diatur di <code>.env</code>). Pelanggan bisa daftar sendiri dari aplikasi.</div>
 </section>
@@ -262,9 +262,9 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 
 /* ---------------- 1. restaurant ---------------- */
 const resto=[
- {e:"📱",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>ecommerce_app</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
+ {e:"📱",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>rombong</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
  {e:"🧑‍🍳",t:"Pelayan",s:"API / endpoint",d:"<b>API</b> adalah aturan cara memesan. Setiap 'kalimat pesanan' disebut <b>endpoint</b>, misalnya <code>POST /api/v1/orders</code> = \"buatkan pesanan dari keranjang saya\". Ada 34 endpoint di project ini."},
- {e:"🔥",t:"Dapur",s:"Backend Go",d:"<b>go-ecommerce-api</b>. Di sinilah aturan bisnis dijalankan: cek stok, hitung total, kurangi stok, catat pesanan. Dapur dibagi ke beberapa stasiun (<b>modul</b>): auth, produk, keranjang, pesanan, pembayaran."},
+ {e:"🔥",t:"Dapur",s:"Backend Go",d:"<b>rombong-api</b>. Di sinilah aturan bisnis dijalankan: cek stok, hitung total, kurangi stok, catat pesanan. Dapur dibagi ke beberapa stasiun (<b>modul</b>): auth, produk, keranjang, pesanan, pembayaran."},
  {e:"🗄️",t:"Gudang",s:"Database PostgreSQL",d:"Tempat menyimpan semua data secara permanen: user, produk, pesanan, pembayaran. Berbentuk tabel seperti Excel, tapi bisa diakses ribuan orang bersamaan tanpa kacau."},
  {e:"🍱",t:"Etalase saji cepat",s:"Cache Redis",d:"Produk yang sering dilihat disimpan sementara di <b>Redis</b> supaya tidak perlu bolak-balik ke gudang. Hasil uji: detail produk jadi ±19× lebih cepat. Kalau etalase rusak, dapur tetap ambil dari gudang (lebih lambat, tapi tetap jalan)."},
 ];
@@ -335,7 +335,7 @@ const FE=[
  {n:"docs",k:"doc",d:{w:"<code>flutter-explainer.html</code>: panduan visual konsep dan alur aplikasi.",a:"",t:""}},
  {n:".github/workflows/flutter-ci.yml",k:"tool",f:1,d:{w:"GitHub Actions: setiap push, otomatis menjalankan <code>flutter analyze</code> (cek kesalahan) dan <code>flutter test</code>.",a:"Inspektur otomatis.",t:"Jarang."}},
  {n:"pubspec.yaml",k:"tool",f:1,ref:"pubspec.yaml"},{n:"analysis_options.yaml",k:"tool",f:1,ref:"analysis_options.yaml"},{n:".gitignore",k:"tool",f:1,ref:".gitignore"},{n:"README.md",k:"doc",f:1,ref:"README.md"},
- {n:"android/ ios/ (belum ada)",k:"tool",f:1,d:{w:"Folder khusus platform. Sengaja belum ada di repo; dibuat otomatis dengan <code>flutter create --org com.aulansah --project-name ecommerce_app .</code> saat pertama kali menjalankan di laptop.",a:"Cetakan sampul untuk tiap jenis HP.",t:"Sekali saat setup."}},
+ {n:"android/ ios/ (belum ada)",k:"tool",f:1,d:{w:"Folder khusus platform. Sengaja belum ada di repo; dibuat otomatis dengan <code>flutter create --org com.aulansah --project-name rombong .</code> saat pertama kali menjalankan di laptop.",a:"Cetakan sampul untuk tiap jenis HP.",t:"Sekali saat setup."}},
 ];
 const ROOT={
  "Dockerfile":{e:"📜",s:"Resep membuat kotak program",w:"Langkah-langkah membuat <b>image</b> Docker untuk backend: siapkan Go, unduh library, compile kode jadi satu file program, lalu pindahkan ke kotak Linux yang kecil. Hasilnya bisa dijalankan di komputer mana pun yang punya Docker.",a:"Resep masakan yang hasilnya selalu sama di dapur mana pun.",x:"FROM golang:1.24-alpine AS builder   # tahap 1: dapur besar\nCOPY . .\nRUN go build -o /out/api ./cmd/api  # masak jadi satu file\n\nFROM alpine:3.20                     # tahap 2: kotak kecil\nCOPY --from=builder /out/api /app/api\nUSER app                             # bukan admin, lebih aman\nEXPOSE 8080\nENTRYPOINT [\"/app/api\"]"},
@@ -343,10 +343,10 @@ const ROOT={
  "Makefile":{e:"🎮",s:"Jalan pintas perintah",w:"Kumpulan nama pendek untuk perintah panjang. Ketik <code>make help</code> untuk melihat semuanya.",a:"Tombol remote: satu tombol untuk serangkaian aksi.",x:"make up                # nyalakan semua dengan Docker\nmake test              # unit test\nmake test-integration  # test dengan database\nmake run               # jalankan tanpa Docker"},
  ".env.example":{e:"🔐",s:"Contoh setelan",w:"Contoh semua setelan: alamat database, password, kunci rahasia JWT, batas request, akun admin awal. Disalin menjadi <code>.env</code> lalu diisi. File <code>.env</code> asli <b>tidak boleh</b> masuk Git karena berisi rahasia.",a:"Formulir kosong; yang terisi disimpan sendiri di brankas.",x:"DB_HOST=localhost\nDB_PASSWORD=postgres\nJWT_SECRET=ganti-dengan-teks-acak-minimal-32-karakter\nADMIN_EMAIL=admin@example.com"},
  ".gitignore":{e:"🙈",s:"Yang tidak ikut ke GitHub",w:"Daftar file yang diabaikan Git: <code>.env</code> (rahasia), hasil build, cache. Supaya repo bersih dan aman.",a:"Barang pribadi yang tidak ikut difoto untuk katalog.",x:".env\nbin/\ncoverage.out"},
- "go.mod":{e:"🛒",s:"Daftar belanja library Go",w:"Nama project dan daftar library yang dipakai beserta versinya: Fiber (web server), GORM (database), go-redis, JWT, Viper (setelan), Zap (log), validator, testify (test).",a:"Daftar bahan baku dan merek pemasoknya.",x:"module github.com/aulansah/go-ecommerce-api\n\nrequire (\n  github.com/gofiber/fiber/v2 v2.52\n  gorm.io/gorm v1.25\n  github.com/redis/go-redis/v9 v9.22\n)"},
+ "go.mod":{e:"🛒",s:"Daftar belanja library Go",w:"Nama project dan daftar library yang dipakai beserta versinya: Fiber (web server), GORM (database), go-redis, JWT, Viper (setelan), Zap (log), validator, testify (test).",a:"Daftar bahan baku dan merek pemasoknya.",x:"module github.com/aulansah/rombong-api\n\nrequire (\n  github.com/gofiber/fiber/v2 v2.52\n  gorm.io/gorm v1.25\n  github.com/redis/go-redis/v9 v9.22\n)"},
  "pubspec.yaml":{e:"🛒",s:"Daftar belanja library Flutter",w:"Nama aplikasi, versi Flutter minimal (3.35), dan library: flutter_riverpod (state), dio (HTTP), go_router (navigasi), flutter_secure_storage (brankas token), equatable; untuk test: mocktail.",a:"Daftar bahan untuk buku menu.",x:"environment:\n  sdk: \">=3.9.0 <4.0.0\"\n  flutter: \">=3.35.0\"\ndependencies:\n  flutter_riverpod: ^3.0.0\n  dio: ^5.8.0\n  go_router: \">=14.8.0 <19.0.0\""},
  "analysis_options.yaml":{e:"🧹",s:"Aturan kerapian kode",w:"Aturan yang dicek <code>flutter analyze</code>, misalnya wajib <code>const</code> bila bisa, tidak boleh ada import yang tidak dipakai.",a:"Standar kebersihan dapur.",x:"include: package:flutter_lints/flutter.yaml"},
- "README.md":{e:"📘",s:"Halaman depan project",w:"Hal pertama yang dibaca orang di GitHub: apa project ini, fiturnya, cara menjalankan, arsitektur, cara test, dan progres.",a:"Brosur restoran.",x:"# go-ecommerce-api\nProduction-style e-commerce REST API in Go…\n\n## Quick start\ndocker compose up --build"},
+ "README.md":{e:"📘",s:"Halaman depan project",w:"Hal pertama yang dibaca orang di GitHub: apa project ini, fiturnya, cara menjalankan, arsitektur, cara test, dan progres.",a:"Brosur restoran.",x:"# rombong-api\nProduction-style e-commerce REST API in Go…\n\n## Quick start\ndocker compose up --build"},
 };
 const kindColor={code:"#0B7A94",db:"#B45309",test:"#1E7B34",tool:"#8A5A00",doc:"#7C3AED"};
 const kindName={code:"Kode program",db:"Database",test:"Pengujian",tool:"Pengaturan / alat bantu",doc:"Dokumentasi"};

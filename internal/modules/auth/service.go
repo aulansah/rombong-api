@@ -13,10 +13,10 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/aulansah/go-ecommerce-api/internal/middleware"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/user"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
-	"github.com/aulansah/go-ecommerce-api/pkg/token"
+	"github.com/aulansah/rombong-api/internal/middleware"
+	"github.com/aulansah/rombong-api/internal/modules/user"
+	"github.com/aulansah/rombong-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/token"
 )
 
 // UserStore is the part of the user repository auth needs.

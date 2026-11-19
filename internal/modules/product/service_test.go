@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // fakeRepo is an in-memory Repository that counts database reads, so tests
