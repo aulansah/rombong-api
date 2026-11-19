@@ -70,22 +70,22 @@ details[open] summary{margin-bottom:6px}
 <body>
 <div class="hero"><div class="w">
  <h1>Cara menjalankan aplikasi Rombong di Windows</h1>
- <p>Dari folder <code style="background:rgba(255,255,255,.18);color:#fff">rombong-api</code> dan <code style="background:rgba(255,255,255,.18);color:#fff">rombong-app</code> di laptopmu sampai aplikasi bisa dipakai belanja di emulator. Ikuti berurutan: backend dulu, isi produk contoh, baru aplikasi.</p>
+ <p>Dari folder <code style="background:rgba(255,255,255,.18);color:#fff">rombong-api</code> dan <code style="background:rgba(255,255,255,.18);color:#fff">rombong-app</code> di laptop sampai aplikasi bisa dipakai belanja di emulator. Ikuti berurutan: backend dulu, isi produk contoh, baru aplikasi.</p>
  <div class="routes">
-  <a href="#backend"><b>① Nyalakan backend</b><span>Docker (paling mudah) atau Go langsung</span></a>
-  <a href="#seed"><b>② Isi produk contoh</b><span>Satu skrip PowerShell</span></a>
-  <a href="#app"><b>③ Jalankan aplikasi</b><span>Emulator Android, Chrome, atau HP</span></a>
+  <a href="#backend"><b>1. Jalankan backend</b><span>Docker (paling mudah) atau Go langsung</span></a>
+  <a href="#seed"><b>2. Isi produk contoh</b><span>Satu skrip PowerShell</span></a>
+  <a href="#app"><b>3. Jalankan aplikasi</b><span>Emulator Android, Chrome, atau HP</span></a>
  </div>
 </div></div>
 
 <main>
 <section>
- <h2><span class="n">0</span>Gambaran: apa yang akan menyala</h2>
+ <h2><span class="n">0</span>Komponen yang dijalankan</h2>
  <div class="diagram">
-  <div class="dn fe"><b>📱 Aplikasi Flutter</b>emulator / Chrome / HP</div><span class="arrow">→ HTTP →</span>
-  <div class="dn"><b>🖥️ Backend Go</b>localhost:8080</div><span class="arrow">→</span>
-  <div class="dn db"><b>🗄️ PostgreSQL</b>port 5432</div>
-  <div class="dn db"><b>⚡ Redis</b>port 6379</div>
+  <div class="dn fe"><b>Aplikasi Flutter</b>emulator / Chrome / HP</div><span class="arrow">→ HTTP →</span>
+  <div class="dn"><b>Backend Go</b>localhost:8080</div><span class="arrow">→</span>
+  <div class="dn db"><b>PostgreSQL</b>port 5432</div>
+  <div class="dn db"><b>Redis</b>port 6379</div>
  </div>
  <p>Backend harus menyala dulu, karena aplikasi tidak menyimpan data sendiri; semuanya diminta ke backend. Biarkan jendela terminal backend tetap terbuka selama memakai aplikasi.</p>
  <h3>Alat yang dibutuhkan (sekali saja)</h3>
@@ -97,13 +97,13 @@ details[open] summary{margin-bottom:6px}
   <tr><td><b>Android Studio</b></td><td>Emulator Android + Android SDK</td><td><code>flutter doctor</code></td></tr>
   <tr><td>Go 1.24+ <span class="pill">opsional</span></td><td>Hanya untuk jalur "tanpa Docker" dan menjalankan test</td><td><code>go version</code></td></tr>
  </table>
- <div class="note i">💡 <b>Cara membuka terminal di folder tertentu:</b> buka folder di File Explorer → klik kanan di ruang kosong → <i>Open in Terminal</i>. Atau buka foldernya di VS Code lalu tekan <code>Ctrl+`</code>.</div>
+ <div class="note i"><b>Cara membuka terminal di folder tertentu:</b> buka folder di File Explorer → klik kanan di ruang kosong → <i>Open in Terminal</i>. Atau buka foldernya di VS Code lalu tekan <code>Ctrl+`</code>.</div>
 </section>
 
 <section id="backend" style="--c:var(--pri)">
- <h2><span class="n">①</span>Nyalakan backend</h2>
+ <h2><span class="n">1</span>Jalankan backend</h2>
  <p class="lead">Pilih salah satu jalur.</p>
- <div class="tabs" data-group="be"><button class="on" data-t="docker">🐳 Pakai Docker (disarankan)</button><button data-t="go">🐹 Tanpa Docker untuk API</button></div>
+ <div class="tabs" data-group="be"><button class="on" data-t="docker">Pakai Docker (disarankan)</button><button data-t="go">Tanpa Docker untuk API</button></div>
 
  <div class="tp on" data-p="be-docker">
  <ol class="steps">
@@ -114,7 +114,7 @@ details[open] summary{margin-bottom:6px}
    <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>docker compose up --build</pre></div>
    Pertama kali butuh beberapa menit (mengunduh image Go, PostgreSQL, Redis, lalu build). Berikutnya hanya beberapa detik. File <code>.env</code> tidak diperlukan di jalur ini; setelan sudah ada di <code>docker-compose.yml</code>.</li>
   <li><b>Pastikan sehat</b> Buka di browser: <a href="http://localhost:8080/health" target="_blank">http://localhost:8080/health</a>
-   <div class="note ok">✅ Berhasil jika muncul <code>{"database":"up","redis":"up","status":"ok"}</code></div></li>
+   <div class="note ok">Berhasil jika muncul <code>{"database":"up","redis":"up","status":"ok"}</code></div></li>
   <li><b>Coba API lewat Swagger</b> Buka <a href="http://localhost:8080/docs" target="_blank">http://localhost:8080/docs</a>: semua 34 endpoint bisa dicoba dari browser. Untuk endpoint yang butuh login: jalankan <code>POST /auth/login</code> dengan akun admin, salin <code>access_token</code>, klik tombol <b>Authorize</b>, tempel token.</li>
  </ol>
  <h3>Mematikan & mereset</h3>
@@ -126,7 +126,7 @@ docker compose logs -f api <span class="c"># lihat log backend</span></pre></div
  </div>
 
  <div class="tp" data-p="be-go">
- <p>Database dan Redis tetap lewat Docker (Redis tidak tersedia resmi untuk Windows), tapi program Go dijalankan langsung. Cocok saat kamu sedang mengubah kode backend.</p>
+ <p>Database dan Redis tetap lewat Docker (Redis tidak tersedia resmi untuk Windows), tapi program Go dijalankan langsung. Cocok saat Anda sedang mengubah kode backend.</p>
  <ol class="steps">
   <li><b>Nyalakan hanya database & Redis</b>
    <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-api</span><button>Salin</button></div><pre>docker compose up -d postgres redis</pre></div></li>
@@ -138,17 +138,17 @@ docker compose logs -f api <span class="c"># lihat log backend</span></pre></div
    Saat pertama, Go mengunduh library (butuh internet). Tabel database dibuat otomatis (migration) sebelum server mulai menerima request.</li>
   <li><b>Cek</b> <a href="http://localhost:8080/health" target="_blank">localhost:8080/health</a> dan <a href="http://localhost:8080/docs" target="_blank">localhost:8080/docs</a> seperti jalur Docker.</li>
  </ol>
- <div class="note w">⚠️ Jangan jalankan jalur Docker penuh dan jalur ini bersamaan: keduanya memakai port 8080. Kalau sebelumnya pernah <code>docker compose up</code>, matikan container <code>api</code> dulu: <code>docker compose stop api</code>.</div>
+ <div class="note w">Jangan jalankan jalur Docker penuh dan jalur ini bersamaan: keduanya memakai port 8080. Kalau sebelumnya pernah <code>docker compose up</code>, matikan container <code>api</code> dulu: <code>docker compose stop api</code>.</div>
  </div>
 
- <div class="note i">🔑 <b>Akun admin bawaan:</b> <code>admin@example.com</code> / <code>Admin12345</code> (dibuat otomatis saat backend menyala). Akun pelanggan didaftarkan dari aplikasi.</div>
+ <div class="note i"><b>Akun admin bawaan:</b> <code>admin@example.com</code> / <code>Admin12345</code> (dibuat otomatis saat backend menyala). Akun pelanggan didaftarkan dari aplikasi.</div>
 </section>
 
 <section id="seed" style="--c:#B45309">
- <h2><span class="n">②</span>Isi produk contoh</h2>
+ <h2><span class="n">2</span>Isi produk contoh</h2>
  <p class="lead">Database baru masih kosong, jadi katalog di aplikasi akan kosong. Skrip ini login sebagai admin lalu membuat 3 kategori dan 7 produk lewat API (sama seperti yang dipakai di showcase).</p>
  <ol class="steps">
-  <li><b>Pastikan backend sudah menyala</b> (langkah ①).</li>
+  <li><b>Pastikan backend sudah menyala</b> (langkah 1).</li>
   <li><b>Buka PowerShell baru</b>, tempel seluruh skrip di bawah, tekan Enter. Jalankan <b>sekali saja</b>; kalau dijalankan lagi, kategori yang sama ditolak (409) karena namanya harus unik.
    <div class="cmd"><div class="ch"><span>PowerShell · seed-produk.ps1</span><button>Salin</button></div><pre>$base = "http://localhost:8080/api/v1"
 $login = Invoke-RestMethod -Method Post -Uri "$base/auth/login" -ContentType "application/json" `
@@ -183,7 +183,7 @@ foreach ($p in $produk) {
 </section>
 
 <section id="app" style="--c:var(--fe)">
- <h2><span class="n">③</span>Jalankan aplikasi Flutter</h2>
+ <h2><span class="n">3</span>Jalankan aplikasi Flutter</h2>
  <h3>Persiapan sekali saja</h3>
  <ol class="steps">
   <li><b>Buka terminal di folder aplikasi</b>
@@ -198,16 +198,16 @@ flutter pub get</pre></div></li>
     android:name="${applicationName}"
     android:icon="@mipmap/ic_launcher"
     <b style="color:#86EFAC">android:usesCleartextTraffic="true"</b>&gt;</pre></div>
-   <div class="note w">⚠️ Tanpa ini, login gagal dengan pesan "Tidak bisa terhubung ke server" walau backend menyala. Di production, backend harus memakai HTTPS dan atribut ini dihapus.</div></li>
+   <div class="note w">Tanpa ini, login gagal dengan pesan "Tidak bisa terhubung ke server" walau backend menyala. Di production, backend harus memakai HTTPS dan atribut ini dihapus.</div></li>
   <li><b>(Opsional) simpan perubahan ke Git</b> <code>git add . ; git commit -m "chore: add android and web platform folders"</code></li>
  </ol>
 
  <h3>Pilih tempat menjalankan</h3>
- <div class="tabs" data-group="run"><button class="on" data-t="emu">🤖 Emulator Android</button><button data-t="web">🌐 Chrome</button><button data-t="hp">📱 HP fisik</button></div>
+ <div class="tabs" data-group="run"><button class="on" data-t="emu">Emulator Android</button><button data-t="web">Chrome</button><button data-t="hp">HP fisik</button></div>
 
  <div class="tp on" data-p="run-emu">
  <ol class="steps">
-  <li><b>Nyalakan emulator</b> Android Studio → <i>Device Manager</i> → tombol ▶ pada salah satu perangkat (buat dulu jika belum ada, misalnya Pixel dengan Android 14). Atau lewat terminal:
+  <li><b>Nyalakan emulator</b> Android Studio → <i>Device Manager</i> → tombol pada salah satu perangkat (buat dulu jika belum ada, misalnya Pixel dengan Android 14). Atau lewat terminal:
    <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>flutter emulators                 <span class="c"># lihat daftar emulator</span>
 flutter emulators --launch &lt;id&gt;   <span class="c"># ganti &lt;id&gt; dengan salah satu dari daftar</span></pre></div></li>
   <li><b>Jalankan aplikasi</b>
@@ -220,7 +220,7 @@ flutter emulators --launch &lt;id&gt;   <span class="c"># ganti &lt;id&gt; denga
  <ol class="steps">
   <li><b>Jalankan di Chrome dengan port 3000</b>
    <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-app</span><button>Salin</button></div><pre>flutter run -d chrome --web-port 3000</pre></div>
-   <div class="note w">⚠️ Port 3000 penting: backend hanya mengizinkan browser dari <code>http://localhost:3000</code> (setelan CORS). Dengan port acak, request diblokir browser.</div></li>
+   <div class="note w">Port 3000 penting: backend hanya mengizinkan browser dari <code>http://localhost:3000</code> (setelan CORS). Dengan port acak, request diblokir browser.</div></li>
  </ol>
  <div class="note i">Di versi web, token disimpan di penyimpanan browser (flutter_secure_storage versi web), tidak sekuat Keystore Android. Untuk demo cepat ini cukup.</div>
  </div>
@@ -239,7 +239,7 @@ flutter emulators --launch &lt;id&gt;   <span class="c"># ganti &lt;id&gt; denga
 </section>
 
 <section style="--c:var(--ok)">
- <h2><span class="n">④</span>Coba alur lengkapnya</h2>
+ <h2><span class="n">4</span>Uji alur lengkap</h2>
  <p class="lead">Klik untuk mencentang. Semua fitur ini sudah ada di aplikasi.</p>
  <ul class="check" id="check">
   <li>Daftar akun pelanggan baru dari layar <b>Daftar</b>, lalu login</li>
@@ -256,7 +256,7 @@ flutter emulators --launch &lt;id&gt;   <span class="c"># ganti &lt;id&gt; denga
 </section>
 
 <section style="--c:#5B6670">
- <h2><span class="n">⑤</span>Menjalankan test</h2>
+ <h2><span class="n">5</span>Menjalankan test</h2>
  <div class="grid">
   <div class="card"><h4>Backend (butuh Go)</h4>
    <div class="cmd"><div class="ch"><span>folder rombong-api</span><button>Salin</button></div><pre>go test ./...                              <span class="c"># unit test</span>
@@ -271,13 +271,13 @@ flutter test      <span class="c"># 91 test</span></pre></div>
 </section>
 
 <section id="masalah" style="--c:var(--err)">
- <h2><span class="n">!</span>Kalau ada masalah</h2>
+ <h2><span class="n">6</span>Pemecahan masalah</h2>
  <details><summary>"Tidak bisa terhubung ke server" di aplikasi</summary>
   <ul><li>Backend menyala? Cek <a href="http://localhost:8080/health">localhost:8080/health</a> di browser laptop.</li><li>Android: sudah menambahkan <code>usesCleartextTraffic="true"</code>? Setelah mengubah manifest, hentikan aplikasi (<code>q</code>) lalu <code>flutter run</code> lagi; hot reload tidak cukup.</li><li>HP fisik: pakai IP laptop + firewall dibuka, bukan <code>localhost</code>.</li><li>Chrome: pakai <code>--web-port 3000</code>.</li></ul></details>
  <details><summary>Docker: "error during connect" / "cannot find the file specified"</summary>Docker Desktop belum jalan. Buka aplikasinya dan tunggu sampai <i>Engine running</i>.</details>
  <details><summary>"port is already allocated" (8080, 5432, atau 6379)</summary>Port dipakai program lain. Untuk 5432 biasanya PostgreSQL yang terinstal di Windows: hentikan service-nya (Services → postgresql → Stop), atau ubah baris <code>"5432:5432"</code> di <code>docker-compose.yml</code> menjadi <code>"5433:5432"</code>. Cek pemakai port: <code>netstat -ano | findstr :8080</code>.</details>
  <details><summary>Login admin gagal (401)</summary>Akun admin dibuat dari setelan saat backend pertama menyala. Kalau pernah diubah, reset data dengan <code>docker compose down -v</code> lalu <code>docker compose up</code>.</details>
- <details><summary>Katalog kosong</summary>Belum menjalankan skrip langkah ②, atau data baru saja direset dengan <code>down -v</code>.</details>
+ <details><summary>Katalog kosong</summary>Belum menjalankan skrip langkah 2, atau data baru saja direset dengan <code>down -v</code>.</details>
  <details><summary>Skrip PowerShell: "running scripts is disabled"</summary>Jangan simpan sebagai file; tempel langsung ke jendela PowerShell. Kalau ingin sebagai file: <code>powershell -ExecutionPolicy Bypass -File seed-produk.ps1</code>.</details>
  <details><summary>Flutter: "requires SDK version >=3.9.0" atau error Riverpod</summary>Versi Flutter terlalu lama. Jalankan <code>flutter upgrade</code> (butuh 3.35+), lalu <code>flutter pub get</code>.</details>
  <details><summary>Flutter: "No connected devices" / emulator tidak muncul</summary>Jalankan <code>flutter doctor</code> dan ikuti sarannya (biasanya <code>flutter doctor --android-licenses</code>). Pastikan emulator sudah menyala sebelum <code>flutter run</code>.</details>
