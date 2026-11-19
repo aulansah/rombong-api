@@ -10,7 +10,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/jackc/pgx/v5/stdlib" // registers the "pgx" database/sql driver
 
-	"github.com/aulansah/go-ecommerce-api/migrations"
+	"github.com/aulansah/rombong-api/migrations"
 )
 
 // Migrate applies every pending SQL migration embedded in the binary.

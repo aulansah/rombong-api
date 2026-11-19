@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/pkg/response"
-	"github.com/aulansah/go-ecommerce-api/pkg/token"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/pkg/response"
+	"github.com/aulansah/rombong-api/pkg/token"
 )
 
 func newApp() *fiber.App {

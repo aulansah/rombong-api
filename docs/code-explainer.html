@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>go-ecommerce-api — Penjelasan Kode</title>
+<title>rombong-api — Penjelasan Kode</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -188,9 +188,9 @@ h3.sub{font:600 18px "Space Grotesk",sans-serif;margin:24px 0 10px}
 <body>
 <div class="wrap">
   <header class="hero">
-    <div class="eyebrow">go-ecommerce-api / docs</div>
+    <div class="eyebrow">rombong-api / docs</div>
     <h1>Kenapa kodenya <span>ditulis begini?</span></h1>
-    <p class="lead">Panduan visual project go-ecommerce-api: konsep Go yang dipakai beserta kode aslinya, alur sistem dalam bentuk sequence diagram yang bisa diklik per langkah, cara menjalankan dengan atau tanpa Docker, dan alasan di balik setiap keputusan.</p>
+    <p class="lead">Panduan visual project rombong-api: konsep Go yang dipakai beserta kode aslinya, alur sistem dalam bentuk sequence diagram yang bisa diklik per langkah, cara menjalankan dengan atau tanpa Docker, dan alasan di balik setiap keputusan.</p>
     <div class="legend">
       <span class="tag t-go">GO</span><span class="tag t-pattern">PATTERN</span><span class="tag t-db">DATABASE</span><span class="tag t-sec">SECURITY</span><span class="tag t-test">TESTING</span>
     </div>
@@ -257,7 +257,7 @@ h3.sub{font:600 18px "Space Grotesk",sans-serif;margin:24px 0 10px}
       <div class="need">Yang perlu ter-install: <b>Docker Desktop</b> saja. Go, PostgreSQL, dan Redis tidak perlu di-install.</div>
       <ol class="steps">
         <li><h4>Buka terminal di folder project</h4>
-<pre><code>cd "I:\Fullstack Web Developer and Flutter Developer\ECommerce API"</code></pre></li>
+<pre><code>cd "I:\Fullstack Web Developer and Flutter Developer\rombong-api"</code></pre></li>
         <li><h4>Build dan jalankan semuanya</h4>
 <pre><code>docker compose up --build -d</code></pre>
 <p>Docker membuat tiga container: <code>api</code>, <code>postgres</code>, <code>redis</code>. API baru start setelah PostgreSQL dan Redis lolos health check. Migration database jalan otomatis, dan akun admin dibuat: <code>admin@example.com</code> / <code>Admin12345</code>.</p></li>

@@ -13,7 +13,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/aulansah/go-ecommerce-api/internal/config"
+	"github.com/aulansah/rombong-api/internal/config"
 )
 
 // Cache is the contract the rest of the application depends on.

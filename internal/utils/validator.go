@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // validate is safe for concurrent use and caches struct metadata, so a

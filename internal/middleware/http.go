@@ -8,9 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
-	"github.com/aulansah/go-ecommerce-api/pkg/response"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/response"
 )
 
 // RequestLogger writes one structured log line per request, including the

@@ -159,7 +159,7 @@ func Load() (*Config, error) {
 }
 
 func setDefaults(v *viper.Viper) {
-	v.SetDefault("APP_NAME", "go-ecommerce-api")
+	v.SetDefault("APP_NAME", "rombong-api")
 	v.SetDefault("APP_ENV", "development")
 	v.SetDefault("APP_PORT", "8080")
 	v.SetDefault("LOG_LEVEL", "info")

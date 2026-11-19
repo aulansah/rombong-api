@@ -10,9 +10,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
-	"github.com/aulansah/go-ecommerce-api/internal/database"
-	"github.com/aulansah/go-ecommerce-api/internal/modules/product"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/internal/database"
+	"github.com/aulansah/rombong-api/internal/modules/product"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // Cart is the carts table: exactly one cart per user.

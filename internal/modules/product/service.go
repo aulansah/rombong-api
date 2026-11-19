@@ -13,9 +13,9 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
-	"github.com/aulansah/go-ecommerce-api/internal/cache"
-	"github.com/aulansah/go-ecommerce-api/internal/utils"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/internal/cache"
+	"github.com/aulansah/rombong-api/internal/utils"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 )
 
 // Repository is what the service needs from the persistence layer.

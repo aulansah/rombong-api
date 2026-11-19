@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
-	"github.com/aulansah/go-ecommerce-api/pkg/token"
+	"github.com/aulansah/rombong-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/token"
 )
 
 const (

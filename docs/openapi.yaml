@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Go E-Commerce API
+  title: Go Rombong API
   version: 1.0.0
   description: |
     Production-oriented e-commerce REST API built with Go, Fiber, GORM,

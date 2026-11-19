@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/aulansah/go-ecommerce-api/internal/modules/user"
-	"github.com/aulansah/go-ecommerce-api/pkg/apperror"
-	"github.com/aulansah/go-ecommerce-api/pkg/token"
+	"github.com/aulansah/rombong-api/internal/modules/user"
+	"github.com/aulansah/rombong-api/pkg/apperror"
+	"github.com/aulansah/rombong-api/pkg/token"
 )
 
 // ---------------------------------------------------------------------------

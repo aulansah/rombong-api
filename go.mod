@@ -1,4 +1,4 @@
-module github.com/aulansah/go-ecommerce-api
+module github.com/aulansah/rombong-api
 
 go 1.24.7
 
