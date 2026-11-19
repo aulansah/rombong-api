@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cara Menjalankan Aplikasi Rombong (Windows)</title>
+<style>
+:root{--pri:#0B7A94;--pri-d:#04404F;--pri-s:#D9F2F8;--fe:#7C3AED;--fe-s:#EDE7FB;--ok:#1E7B34;--ok-s:#E3F4E6;--warn:#8A5A00;--warn-s:#FFF4D6;--err:#B3261E;--err-s:#FCE8E6;--ink:#14202A;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;font-size:15.5px}
+.hero{background:linear-gradient(135deg,#04404F,#0B7A94 60%,#7C3AED);color:#fff;padding:46px 22px 40px}
+.w{max-width:1000px;margin:0 auto}
+.hero h1{margin:0 0 8px;font-size:32px;line-height:1.2}
+.hero p{margin:0;opacity:.92;max-width:760px}
+.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.routes a{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:14px;color:#fff;text-decoration:none}
+.routes a:hover{background:rgba(255,255,255,.2)}
+.routes b{display:block;font-size:16px}.routes span{font-size:13px;opacity:.9}
+main{padding:8px 16px 80px}
+section{max-width:1000px;margin:24px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 28px}
+h2{margin:0 0 6px;font-size:23px;display:flex;align-items:center;gap:12px}
+h2 .n{background:var(--c,var(--pri));color:#fff;min-width:34px;height:34px;padding:0 8px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.lead{color:var(--muted);margin:0 0 16px}
+h3{font-size:17px;margin:22px 0 6px;color:var(--pri-d)}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:0}
+ol.steps>li{counter-increment:s;position:relative;padding:0 0 18px 46px;border-left:2px solid var(--pri-s);margin-left:15px}
+ol.steps>li:last-child{border-left-color:transparent}
+ol.steps>li::before{content:counter(s);position:absolute;left:-16px;top:-2px;width:30px;height:30px;border-radius:50%;background:var(--c,var(--pri));color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+ol.steps>li>b:first-child{display:block;font-size:16px;margin-bottom:2px}
+.cmd{margin:8px 0;border-radius:10px;overflow:hidden;border:1px solid #1E2C33}
+.cmd .ch{display:flex;justify-content:space-between;align-items:center;background:#18262D;color:#B8C7CE;font-size:12px;padding:5px 12px}
+.cmd button{border:1px solid #3A4B53;background:#22343C;color:#D7E3E8;border-radius:6px;padding:2px 10px;font:inherit;font-size:12px;cursor:pointer}
+.cmd button.ok{background:var(--ok);border-color:var(--ok)}
+.cmd pre{margin:0;background:#0F1B21;color:#D7E3E8;padding:12px 14px;overflow:auto;font-size:13px;line-height:1.55}
+.cmd pre .c{color:#7A8F99;font-style:italic}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.86em;background:#EAF0F3;padding:1px 5px;border-radius:4px}
+.note{border-radius:10px;padding:10px 14px;margin:10px 0;font-size:14.5px}
+.note.i{background:var(--pri-s);border-left:4px solid var(--pri)}
+.note.w{background:var(--warn-s);border-left:4px solid #E7C66A}
+.note.e{background:var(--err-s);border-left:4px solid var(--err)}
+.note.ok{background:var(--ok-s);border-left:4px solid var(--ok)}
+.tabs{display:flex;gap:8px;margin:6px 0 14px;flex-wrap:wrap}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.tabs button.on{background:var(--c,var(--pri));color:#fff;border-color:transparent}
+.tp{display:none}.tp.on{display:block}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0}
+th{text-align:left;background:#F2F6F8;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid #EEF2F4;vertical-align:top}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#FBFCFD}
+.card h4{margin:0 0 4px}
+.check{list-style:none;padding:0;margin:8px 0}
+.check li{padding:7px 0 7px 32px;position:relative;border-bottom:1px dashed var(--line);cursor:pointer}
+.check li::before{content:"";position:absolute;left:4px;top:9px;width:18px;height:18px;border:2px solid #C9D2D8;border-radius:5px}
+.check li.done{color:var(--muted);text-decoration:line-through}
+.check li.done::before{background:var(--ok);border-color:var(--ok)}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:#FBFCFD}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:6px}
+.diagram{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.dn{border:2px solid var(--pri);background:var(--pri-s);border-radius:12px;padding:10px 14px;text-align:center;font-size:13px;min-width:130px}
+.dn.fe{border-color:var(--fe);background:var(--fe-s)}.dn.db{border-color:#B45309;background:#FEF0DC}
+.dn b{display:block;font-size:14px}
+.arrow{color:var(--muted);font-size:20px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--pri-s);color:var(--pri-d)}
+@media (max-width:760px){.routes,.grid{grid-template-columns:1fr}section{padding:20px 16px}.hero h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="hero"><div class="w">
+ <h1>Cara menjalankan aplikasi Rombong di Windows</h1>
+ <p>Dari folder <code style="background:rgba(255,255,255,.18);color:#fff">rombong-api</code> dan <code style="background:rgba(255,255,255,.18);color:#fff">rombong-app</code> di laptopmu sampai aplikasi bisa dipakai belanja di emulator. Ikuti berurutan: backend dulu, isi produk contoh, baru aplikasi.</p>
+ <div class="routes">
+  <a href="#backend"><b>① Nyalakan backend</b><span>Docker (paling mudah) atau Go langsung</span></a>
+  <a href="#seed"><b>② Isi produk contoh</b><span>Satu skrip PowerShell</span></a>
+  <a href="#app"><b>③ Jalankan aplikasi</b><span>Emulator Android, Chrome, atau HP</span></a>
+ </div>
+</div></div>
+
+<main>
+<section>
+ <h2><span class="n">0</span>Gambaran: apa yang akan menyala</h2>
+ <div class="diagram">
+  <div class="dn fe"><b>📱 Aplikasi Flutter</b>emulator / Chrome / HP</div><span class="arrow">→ HTTP →</span>
+  <div class="dn"><b>🖥️ Backend Go</b>localhost:8080</div><span class="arrow">→</span>
+  <div class="dn db"><b>🗄️ PostgreSQL</b>port 5432</div>
+  <div class="dn db"><b>⚡ Redis</b>port 6379</div>
+ </div>
+ <p>Backend harus menyala dulu, karena aplikasi tidak menyimpan data sendiri; semuanya diminta ke backend. Biarkan jendela terminal backend tetap terbuka selama memakai aplikasi.</p>
+ <h3>Alat yang dibutuhkan (sekali saja)</h3>
+ <table>
+  <tr><th>Alat</th><th>Untuk</th><th>Cek di PowerShell</th></tr>
+  <tr><td><b>Docker Desktop</b></td><td>Menjalankan backend, PostgreSQL, Redis</td><td><code>docker --version</code></td></tr>
+  <tr><td><b>Git</b></td><td>Repo dan push</td><td><code>git --version</code></td></tr>
+  <tr><td><b>Flutter SDK 3.35+</b></td><td>Aplikasi mobile</td><td><code>flutter --version</code></td></tr>
+  <tr><td><b>Android Studio</b></td><td>Emulator Android + Android SDK</td><td><code>flutter doctor</code></td></tr>
+  <tr><td>Go 1.24+ <span class="pill">opsional</span></td><td>Hanya untuk jalur "tanpa Docker" dan menjalankan test</td><td><code>go version</code></td></tr>
+ </table>
+ <div class="note i">💡 <b>Cara membuka terminal di folder tertentu:</b> buka folder di File Explorer → klik kanan di ruang kosong → <i>Open in Terminal</i>. Atau buka foldernya di VS Code lalu tekan <code>Ctrl+`</code>.</div>
+</section>
+
+<section id="backend" style="--c:var(--pri)">
+ <h2><span class="n">①</span>Nyalakan backend</h2>
+ <p class="lead">Pilih salah satu jalur.</p>
+ <div class="tabs" data-group="be"><button class="on" data-t="docker">🐳 Pakai Docker (disarankan)</button><button data-t="go">🐹 Tanpa Docker untuk API</button></div>
+
+ <div class="tp on" data-p="be-docker">
+ <ol class="steps">
+  <li><b>Buka Docker Desktop</b>Tunggu sampai di pojok kiri bawah tertulis <i>Engine running</i>.</li>
+  <li><b>Buka terminal di folder backend</b>
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>cd "I:\Fullstack Web Developer and Flutter Developer\rombong-api"</pre></div></li>
+  <li><b>Nyalakan semuanya</b>
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>docker compose up --build</pre></div>
+   Pertama kali butuh beberapa menit (mengunduh image Go, PostgreSQL, Redis, lalu build). Berikutnya hanya beberapa detik. File <code>.env</code> tidak diperlukan di jalur ini; setelan sudah ada di <code>docker-compose.yml</code>.</li>
+  <li><b>Pastikan sehat</b> Buka di browser: <a href="http://localhost:8080/health" target="_blank">http://localhost:8080/health</a>
+   <div class="note ok">✅ Berhasil jika muncul <code>{"database":"up","redis":"up","status":"ok"}</code></div></li>
+  <li><b>Coba API lewat Swagger</b> Buka <a href="http://localhost:8080/docs" target="_blank">http://localhost:8080/docs</a>: semua 34 endpoint bisa dicoba dari browser. Untuk endpoint yang butuh login: jalankan <code>POST /auth/login</code> dengan akun admin, salin <code>access_token</code>, klik tombol <b>Authorize</b>, tempel token.</li>
+ </ol>
+ <h3>Mematikan & mereset</h3>
+ <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre><span class="c"># di terminal yang sedang berjalan: tekan Ctrl+C, lalu</span>
+docker compose down        <span class="c"># matikan, data tetap tersimpan</span>
+docker compose down -v     <span class="c"># matikan DAN hapus semua data (mulai dari nol)</span>
+docker compose up -d       <span class="c"># nyalakan di background (terminal bisa ditutup)</span>
+docker compose logs -f api <span class="c"># lihat log backend</span></pre></div>
+ </div>
+
+ <div class="tp" data-p="be-go">
+ <p>Database dan Redis tetap lewat Docker (Redis tidak tersedia resmi untuk Windows), tapi program Go dijalankan langsung. Cocok saat kamu sedang mengubah kode backend.</p>
+ <ol class="steps">
+  <li><b>Nyalakan hanya database & Redis</b>
+   <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-api</span><button>Salin</button></div><pre>docker compose up -d postgres redis</pre></div></li>
+  <li><b>Buat file setelan</b> (sekali saja)
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>copy .env.example .env</pre></div>
+   Isinya sudah cocok untuk lokal (<code>DB_HOST=localhost</code>, akun admin <code>admin@example.com</code> / <code>Admin12345</code>).</li>
+  <li><b>Jalankan backend</b>
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>go run ./cmd/api</pre></div>
+   Saat pertama, Go mengunduh library (butuh internet). Tabel database dibuat otomatis (migration) sebelum server mulai menerima request.</li>
+  <li><b>Cek</b> <a href="http://localhost:8080/health" target="_blank">localhost:8080/health</a> dan <a href="http://localhost:8080/docs" target="_blank">localhost:8080/docs</a> seperti jalur Docker.</li>
+ </ol>
+ <div class="note w">⚠️ Jangan jalankan jalur Docker penuh dan jalur ini bersamaan: keduanya memakai port 8080. Kalau sebelumnya pernah <code>docker compose up</code>, matikan container <code>api</code> dulu: <code>docker compose stop api</code>.</div>
+ </div>
+
+ <div class="note i">🔑 <b>Akun admin bawaan:</b> <code>admin@example.com</code> / <code>Admin12345</code> (dibuat otomatis saat backend menyala). Akun pelanggan didaftarkan dari aplikasi.</div>
+</section>
+
+<section id="seed" style="--c:#B45309">
+ <h2><span class="n">②</span>Isi produk contoh</h2>
+ <p class="lead">Database baru masih kosong, jadi katalog di aplikasi akan kosong. Skrip ini login sebagai admin lalu membuat 3 kategori dan 7 produk lewat API (sama seperti yang dipakai di showcase).</p>
+ <ol class="steps">
+  <li><b>Pastikan backend sudah menyala</b> (langkah ①).</li>
+  <li><b>Buka PowerShell baru</b>, tempel seluruh skrip di bawah, tekan Enter. Jalankan <b>sekali saja</b>; kalau dijalankan lagi, kategori yang sama ditolak (409) karena namanya harus unik.
+   <div class="cmd"><div class="ch"><span>PowerShell · seed-produk.ps1</span><button>Salin</button></div><pre>$base = "http://localhost:8080/api/v1"
+$login = Invoke-RestMethod -Method Post -Uri "$base/auth/login" -ContentType "application/json" `
+  -Body (@{ email = "admin@example.com"; password = "Admin12345" } | ConvertTo-Json)
+$h = @{ Authorization = "Bearer " + $login.data.tokens.access_token }
+
+function New-Category($name) {
+  $r = Invoke-RestMethod -Method Post -Uri "$base/categories" -Headers $h -ContentType "application/json" `
+    -Body (@{ name = $name } | ConvertTo-Json)
+  return $r.data.id
+}
+$minuman = New-Category "Minuman"
+$snack   = New-Category "Makanan Ringan"
+$dapur   = New-Category "Perlengkapan Dapur"
+
+$produk = @(
+  @{ name = "Kopi Arabika Gayo 250g";     price = 85000;  stock = 24; category_id = $minuman; description = "Biji kopi single origin dari Gayo, sangrai medium." },
+  @{ name = "Teh Hijau Melati 100g";      price = 32000;  stock = 40; category_id = $minuman; description = "Teh hijau dengan bunga melati asli." },
+  @{ name = "Cokelat Bubuk Premium 200g"; price = 54000;  stock = 15; category_id = $minuman; description = "Kakao murni tanpa gula tambahan." },
+  @{ name = "Keripik Singkong Balado";    price = 18000;  stock = 60; category_id = $snack;   description = "Keripik singkong renyah bumbu balado." },
+  @{ name = "Kacang Mete Panggang 250g";  price = 76000;  stock = 12; category_id = $snack;   description = "Mete dipanggang tanpa minyak." },
+  @{ name = "French Press 600ml";         price = 149000; stock = 8;  category_id = $dapur;   description = "Kaca borosilikat, saringan stainless." },
+  @{ name = "Edisi Terbatas: Kopi Luwak"; price = 450000; stock = 1;  category_id = $minuman; description = "Stok 1, untuk mencoba rebutan stok." }
+)
+foreach ($p in $produk) {
+  $r = Invoke-RestMethod -Method Post -Uri "$base/products" -Headers $h -ContentType "application/json" -Body ($p | ConvertTo-Json)
+  Write-Host "OK  $($r.data.name)  stok $($r.data.stock)"
+}</pre></div></li>
+  <li><b>Cek</b> <a href="http://localhost:8080/api/v1/products" target="_blank">localhost:8080/api/v1/products</a> menampilkan 7 produk.</li>
+ </ol>
+ <div class="note i">Alternatif tanpa skrip: setelah aplikasi jalan, login sebagai admin → ikon admin di katalog → tab Kategori dan Produk → tombol <b>+</b>.</div>
+</section>
+
+<section id="app" style="--c:var(--fe)">
+ <h2><span class="n">③</span>Jalankan aplikasi Flutter</h2>
+ <h3>Persiapan sekali saja</h3>
+ <ol class="steps">
+  <li><b>Buka terminal di folder aplikasi</b>
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>cd "I:\Fullstack Web Developer and Flutter Developer\rombong-app"</pre></div></li>
+  <li><b>Buat folder platform (android, web)</b> Repo sengaja tidak menyimpannya; perintah ini membuatnya tanpa menimpa kode yang sudah ada.
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>flutter create --org com.aulansah --project-name rombong --platforms=android,web .
+flutter pub get</pre></div></li>
+  <li><b>Izinkan HTTP ke backend lokal (wajib untuk Android)</b> Android 9 ke atas memblokir HTTP tanpa S. Backend lokal memakai <code>http://</code>, jadi buka file
+   <code>android\app\src\main\AndroidManifest.xml</code> dan tambahkan atribut ini ke tag <code>&lt;application</code>:
+   <div class="cmd"><div class="ch"><span>android/app/src/main/AndroidManifest.xml</span><button>Salin</button></div><pre>&lt;application
+    android:label="rombong-app"
+    android:name="${applicationName}"
+    android:icon="@mipmap/ic_launcher"
+    <b style="color:#86EFAC">android:usesCleartextTraffic="true"</b>&gt;</pre></div>
+   <div class="note w">⚠️ Tanpa ini, login gagal dengan pesan "Tidak bisa terhubung ke server" walau backend menyala. Di production, backend harus memakai HTTPS dan atribut ini dihapus.</div></li>
+  <li><b>(Opsional) simpan perubahan ke Git</b> <code>git add . ; git commit -m "chore: add android and web platform folders"</code></li>
+ </ol>
+
+ <h3>Pilih tempat menjalankan</h3>
+ <div class="tabs" data-group="run"><button class="on" data-t="emu">🤖 Emulator Android</button><button data-t="web">🌐 Chrome</button><button data-t="hp">📱 HP fisik</button></div>
+
+ <div class="tp on" data-p="run-emu">
+ <ol class="steps">
+  <li><b>Nyalakan emulator</b> Android Studio → <i>Device Manager</i> → tombol ▶ pada salah satu perangkat (buat dulu jika belum ada, misalnya Pixel dengan Android 14). Atau lewat terminal:
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>flutter emulators                 <span class="c"># lihat daftar emulator</span>
+flutter emulators --launch &lt;id&gt;   <span class="c"># ganti &lt;id&gt; dengan salah satu dari daftar</span></pre></div></li>
+  <li><b>Jalankan aplikasi</b>
+   <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-app</span><button>Salin</button></div><pre>flutter run</pre></div>
+   Tidak perlu mengatur alamat: di emulator Android, aplikasi otomatis memakai <code>http://10.0.2.2:8080</code> (alamat khusus emulator untuk laptop).</li>
+  <li><b>Saat aplikasi berjalan</b> tekan <code>r</code> di terminal untuk <i>hot reload</i> setelah mengubah kode, <code>R</code> untuk restart, <code>q</code> untuk keluar.</li>
+ </ol>
+ </div>
+ <div class="tp" data-p="run-web">
+ <ol class="steps">
+  <li><b>Jalankan di Chrome dengan port 3000</b>
+   <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-app</span><button>Salin</button></div><pre>flutter run -d chrome --web-port 3000</pre></div>
+   <div class="note w">⚠️ Port 3000 penting: backend hanya mengizinkan browser dari <code>http://localhost:3000</code> (setelan CORS). Dengan port acak, request diblokir browser.</div></li>
+ </ol>
+ <div class="note i">Di versi web, token disimpan di penyimpanan browser (flutter_secure_storage versi web), tidak sekuat Keystore Android. Untuk demo cepat ini cukup.</div>
+ </div>
+ <div class="tp" data-p="run-hp">
+ <ol class="steps">
+  <li><b>HP dan laptop di Wi-Fi yang sama.</b> Aktifkan <i>Developer options</i> → <i>USB debugging</i> di HP, sambungkan kabel, izinkan saat diminta. Cek dengan <code>flutter devices</code>.</li>
+  <li><b>Cari IP laptop</b>
+   <div class="cmd"><div class="ch"><span>PowerShell</span><button>Salin</button></div><pre>ipconfig   <span class="c"># cari "IPv4 Address" pada adaptor Wi-Fi, misalnya 192.168.1.10</span></pre></div></li>
+  <li><b>Buka port 8080 di firewall</b> (PowerShell <i>Run as administrator</i>, sekali saja)
+   <div class="cmd"><div class="ch"><span>PowerShell (Administrator)</span><button>Salin</button></div><pre>New-NetFirewallRule -DisplayName "rombong-api 8080" -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow -Profile Private</pre></div></li>
+  <li><b>Jalankan dengan alamat laptop</b> (ganti IP-nya)
+   <div class="cmd"><div class="ch"><span>PowerShell · folder rombong-app</span><button>Salin</button></div><pre>flutter run --dart-define=API_BASE_URL=http://192.168.1.10:8080/api/v1</pre></div>
+   Cek dulu dari browser HP: <code>http://192.168.1.10:8080/health</code> harus menampilkan status ok.</li>
+ </ol>
+ </div>
+</section>
+
+<section style="--c:var(--ok)">
+ <h2><span class="n">④</span>Coba alur lengkapnya</h2>
+ <p class="lead">Klik untuk mencentang. Semua fitur ini sudah ada di aplikasi.</p>
+ <ul class="check" id="check">
+  <li>Daftar akun pelanggan baru dari layar <b>Daftar</b>, lalu login</li>
+  <li>Katalog: ketik <i>kopi</i> di kolom cari, pilih chip <i>Makanan Ringan</i>, tarik ke bawah untuk refresh</li>
+  <li>Buka detail <b>Kopi Arabika Gayo</b>, atur jumlah 2, <i>Tambah ke keranjang</i></li>
+  <li>Keranjang: tekan + beberapa kali dengan cepat (angka langsung berubah), geser item ke kiri untuk menghapus</li>
+  <li>Checkout → <i>Buat pesanan</i>; badge keranjang kembali 0 dan detail pesanan terbuka</li>
+  <li>Detail pesanan → <i>Bayar</i> → <i>Bayar sekarang</i>; status menjadi <b>Dibayar</b></li>
+  <li>Logout (ikon keluar), login sebagai admin <code>admin@example.com</code></li>
+  <li>Admin: ikon admin → tab Pesanan → buka pesanan → <i>Ubah status ke Diproses</i></li>
+  <li>Admin: tab Produk → ⋮ → <i>Ubah stok</i> Kopi Luwak; lihat perubahannya di katalog pelanggan</li>
+  <li>Rebutan stok: dua akun memasukkan <i>Kopi Luwak</i> (stok 1) ke keranjang, checkout bergantian; yang kedua ditolak</li>
+ </ul>
+</section>
+
+<section style="--c:#5B6670">
+ <h2><span class="n">⑤</span>Menjalankan test</h2>
+ <div class="grid">
+  <div class="card"><h4>Backend (butuh Go)</h4>
+   <div class="cmd"><div class="ch"><span>folder rombong-api</span><button>Salin</button></div><pre>go test ./...                              <span class="c"># unit test</span>
+docker compose up -d postgres redis
+go test -tags integration ./tests/...      <span class="c"># integration test</span></pre></div>
+   <small>Integration test memakai database <code>ecommerce_test</code> yang dibuat otomatis saat volume PostgreSQL pertama kali dibuat. Kalau tidak ada, jalankan <code>docker compose down -v</code> lalu <code>up</code> lagi. Tanda <code>-race</code> di Makefile butuh compiler C (gcc), jadi di Windows lebih mudah tanpa <code>-race</code>.</small></div>
+  <div class="card"><h4>Aplikasi Flutter</h4>
+   <div class="cmd"><div class="ch"><span>folder rombong-app</span><button>Salin</button></div><pre>flutter analyze   <span class="c"># cek kesalahan kode</span>
+flutter test      <span class="c"># 91 test</span></pre></div>
+   <small>Ini pertama kalinya kode Flutter dicompile. Kalau ada error, salin seluruh output ke Claude.</small></div>
+ </div>
+</section>
+
+<section id="masalah" style="--c:var(--err)">
+ <h2><span class="n">!</span>Kalau ada masalah</h2>
+ <details><summary>"Tidak bisa terhubung ke server" di aplikasi</summary>
+  <ul><li>Backend menyala? Cek <a href="http://localhost:8080/health">localhost:8080/health</a> di browser laptop.</li><li>Android: sudah menambahkan <code>usesCleartextTraffic="true"</code>? Setelah mengubah manifest, hentikan aplikasi (<code>q</code>) lalu <code>flutter run</code> lagi; hot reload tidak cukup.</li><li>HP fisik: pakai IP laptop + firewall dibuka, bukan <code>localhost</code>.</li><li>Chrome: pakai <code>--web-port 3000</code>.</li></ul></details>
+ <details><summary>Docker: "error during connect" / "cannot find the file specified"</summary>Docker Desktop belum jalan. Buka aplikasinya dan tunggu sampai <i>Engine running</i>.</details>
+ <details><summary>"port is already allocated" (8080, 5432, atau 6379)</summary>Port dipakai program lain. Untuk 5432 biasanya PostgreSQL yang terinstal di Windows: hentikan service-nya (Services → postgresql → Stop), atau ubah baris <code>"5432:5432"</code> di <code>docker-compose.yml</code> menjadi <code>"5433:5432"</code>. Cek pemakai port: <code>netstat -ano | findstr :8080</code>.</details>
+ <details><summary>Login admin gagal (401)</summary>Akun admin dibuat dari setelan saat backend pertama menyala. Kalau pernah diubah, reset data dengan <code>docker compose down -v</code> lalu <code>docker compose up</code>.</details>
+ <details><summary>Katalog kosong</summary>Belum menjalankan skrip langkah ②, atau data baru saja direset dengan <code>down -v</code>.</details>
+ <details><summary>Skrip PowerShell: "running scripts is disabled"</summary>Jangan simpan sebagai file; tempel langsung ke jendela PowerShell. Kalau ingin sebagai file: <code>powershell -ExecutionPolicy Bypass -File seed-produk.ps1</code>.</details>
+ <details><summary>Flutter: "requires SDK version >=3.9.0" atau error Riverpod</summary>Versi Flutter terlalu lama. Jalankan <code>flutter upgrade</code> (butuh 3.35+), lalu <code>flutter pub get</code>.</details>
+ <details><summary>Flutter: "No connected devices" / emulator tidak muncul</summary>Jalankan <code>flutter doctor</code> dan ikuti sarannya (biasanya <code>flutter doctor --android-licenses</code>). Pastikan emulator sudah menyala sebelum <code>flutter run</code>.</details>
+ <details><summary>"make" is not recognized</summary>Normal di Windows. Pakai perintah aslinya, misalnya <code>docker compose up</code> untuk <code>make up</code>, <code>go test ./...</code> untuk <code>make test</code>.</details>
+ <details><summary>Git: "detected dubious ownership"</summary>Terjadi di drive eksternal. Jalankan <code>git config --global --add safe.directory "*"</code>.</details>
+</section>
+</main>
+
+<script>
+(function(){
+document.querySelectorAll(".cmd button").forEach(b=>b.onclick=async()=>{
+ const t=b.closest(".cmd").querySelector("pre").innerText;
+ try{await navigator.clipboard.writeText(t)}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(_){}ta.remove();}
+ b.textContent="Tersalin ✓";b.classList.add("ok");setTimeout(()=>{b.textContent="Salin";b.classList.remove("ok")},1500);});
+document.querySelectorAll(".tabs").forEach(g=>{const grp=g.dataset.group;g.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+ g.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+ document.querySelectorAll('[data-p^="'+grp+'-"]').forEach(p=>p.classList.toggle("on",p.dataset.p===grp+"-"+b.dataset.t));});});
+const KEY="ecom-run-check";let s={};try{s=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+document.querySelectorAll("#check li").forEach((li,i)=>{if(s[i])li.classList.add("done");li.onclick=()=>{s[i]=!s[i];li.classList.toggle("done",!!s[i]);try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};});
+})();
+</script>
+</body>
+</html>
