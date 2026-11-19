@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>rombong-api — Penjelasan Kode</title>
+<title>rombong-api: Penjelasan Kode</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -189,7 +189,7 @@ h3.sub{font:600 18px "Space Grotesk",sans-serif;margin:24px 0 10px}
 <div class="wrap">
   <header class="hero">
     <div class="eyebrow">rombong-api / docs</div>
-    <h1>Kenapa kodenya <span>ditulis begini?</span></h1>
+    <h1>rombong-api: penjelasan kode</h1>
     <p class="lead">Panduan visual project rombong-api: konsep Go yang dipakai beserta kode aslinya, alur sistem dalam bentuk sequence diagram yang bisa diklik per langkah, cara menjalankan dengan atau tanpa Docker, dan alasan di balik setiap keputusan.</p>
     <div class="legend">
       <span class="tag t-go">GO</span><span class="tag t-pattern">PATTERN</span><span class="tag t-db">DATABASE</span><span class="tag t-sec">SECURITY</span><span class="tag t-test">TESTING</span>
@@ -205,7 +205,7 @@ h3.sub{font:600 18px "Space Grotesk",sans-serif;margin:24px 0 10px}
     <button class="vbtn on" data-view="konsep">Konsep kode</button>
     <button class="vbtn" data-view="alur">Alur sistem</button>
     <button class="vbtn" data-view="jalankan">Cara menjalankan</button>
-    <button class="vbtn" data-view="kenapa">Kenapa begini?</button>
+    <button class="vbtn" data-view="kenapa">Keputusan desain</button>
   </nav>
 
   <div class="view on" id="v-konsep">
@@ -310,14 +310,14 @@ go test -tags integration ./tests/...</code></pre>
 <p>Tanpa Docker: buat database <code>ecommerce_test</code>, lalu atur koneksinya lewat env var.</p>
 <pre><code>createdb -U postgres ecommerce_test
 # PowerShell
-$env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code></pre></li>
+$env:TEST_DB_PASSWORD="password_anda"; go test -tags integration ./tests/...</code></pre></li>
       </ol>
       <div class="callout bad">Integration test mengosongkan semua tabel di database test. Jangan arahkan ke database <code>ecommerce</code> yang berisi data penting.</div>
     </div>
   </section>
 
   <section class="mod">
-    <div class="mod-head"><h2>Coba alur lengkap</h2><p>setelah server jalan; pakai Swagger UI kalau tidak mau mengetik curl</p></div>
+    <div class="mod-head"><h2>Uji alur lengkap</h2><p>setelah server jalan; pakai Swagger UI kalau tidak mau mengetik curl</p></div>
     <ol class="steps compact">
       <li><b>Login admin</b> <code>POST /auth/login</code> → salin <code>access_token</code></li>
       <li><b>Buat kategori</b> <code>POST /categories</code> dengan header <code>Authorization: Bearer &lt;token admin&gt;</code></li>
@@ -332,7 +332,7 @@ $env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code>
 </div>
 <div class="view" id="v-kenapa">
   <section class="mod">
-    <div class="mod-head"><h2>Kenapa API ini ada?</h2></div>
+    <div class="mod-head"><h2>Latar belakang API</h2></div>
     <div class="whybox">
       <p>API ini adalah <b>backend toko online</b>: semua aturan bisnis dan data ada di server, dan aplikasi apa pun (web React, Flutter, Android) cukup memanggil endpoint-nya. Frontend tidak menyimpan harga, stok, atau status pesanan sendiri.</p>
       <p>Sebagai portfolio, e-commerce dipilih karena memaksa kita menyelesaikan masalah backend yang sungguhan, bukan sekadar CRUD:</p>
@@ -347,16 +347,16 @@ $env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code>
   </section>
 
   <section class="mod">
-    <div class="mod-head"><h2>Kenapa tiap modul ada?</h2><p>klik untuk melihat alurnya</p></div>
+    <div class="mod-head"><h2>Peran setiap modul</h2><p>klik untuk melihat alurnya</p></div>
     <div class="grid" id="whymods"></div>
   </section>
 
   <section class="mod">
-    <div class="mod-head"><h2>Kenapa pakai Docker?</h2></div>
+    <div class="mod-head"><h2>Alasan memakai Docker</h2></div>
     <div class="vs">
       <div class="vscol bad"><h4>Tanpa Docker</h4><ul>
         <li>Install Go, PostgreSQL, Redis satu per satu, versi bisa beda tiap laptop.</li>
-        <li>"Di laptop saya jalan kok" — tapi di server tidak.</li>
+        <li>"Di laptop saya berjalan normal", tapi di server tidak.</li>
         <li>Orang yang mau mencoba portfolio-mu harus setup 30 menit.</li>
         <li>Database lokal tercampur dengan project lain.</li></ul></div>
       <div class="vscol good"><h4>Dengan Docker</h4><ul>
@@ -368,7 +368,7 @@ $env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code>
     <h3 class="sub">Yang terjadi saat <code>docker compose up --build</code></h3>
     <div class="dockflow" id="dockflow"></div>
     <div class="caption" id="dock-caption">Klik salah satu tahap.</div>
-    <h3 class="sub">Kenapa Dockerfile-nya multi-stage?</h3>
+    <h3 class="sub">Dockerfile multi-stage</h3>
     <div class="vs">
       <div class="vscol"><h4>Stage 1: builder</h4><p>Image <code>golang:1.24-alpine</code> yang besar (ada compiler Go) dipakai untuk <code>go build</code>. Stage ini dibuang setelah selesai.</p></div>
       <div class="vscol"><h4>Stage 2: runtime</h4><p>Image <code>alpine</code> kecil, hanya berisi satu binary hasil build. Berjalan sebagai user non-root. Lebih kecil = lebih cepat di-deploy dan lebih sedikit celah keamanan.</p></div>
@@ -376,7 +376,7 @@ $env:TEST_DB_PASSWORD="passwordmu"; go test -tags integration ./tests/...</code>
   </section>
 
   <section class="mod">
-    <div class="mod-head"><h2>Kenapa teknologi ini?</h2></div>
+    <div class="mod-head"><h2>Pilihan teknologi</h2></div>
     <div class="grid" id="whytech"></div>
   </section>
 </div>
@@ -490,12 +490,12 @@ var (
 )
 
 func Validator() *validator.Validate {
-    once.Do(func() {        // dijamin cuma sekali, walau dipanggil
+    once.Do(func() {        // dijamin hanya sekali, walau dipanggil
         instance = validator.New() // dari banyak goroutine sekaligus
     })
     return instance
 }</script>
-<script type="text/plain" id="c-di">// internal/app/app.go — composition root
+<script type="text/plain" id="c-di">// internal/app/app.go, composition root
 txManager := database.NewTxManager(d.DB)
 tokens := token.NewManager(cfg.JWT.Secret, cfg.JWT.AccessTTL, cfg.App.Name)
 
@@ -658,7 +658,7 @@ type RegisterRequest struct {
     Password string `json:"password" validate:"required,password"` // tag custom
 }
 
-// internal/modules/user/model.go — entity DB TIDAK punya tag json
+// internal/modules/user/model.go, entity DB TIDAK punya tag json
 type User struct {
     ID           uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
     Email        string
@@ -905,7 +905,7 @@ func (r *GormRepository) DecreaseStock(ctx context.Context, id uuid.UUID, qty in
 // UPDATE products SET stock = stock - 1
 // WHERE id = $1 AND stock >= 1 AND deleted_at IS NULL
 // RETURNING *;</script>
-<script type="text/plain" id="c-wrong">// ❌ JANGAN: baca → cek di Go → tulis
+<script type="text/plain" id="c-wrong">// JANGAN: baca → cek di Go → tulis
 p, _ := repo.FindByID(ctx, id)  // goroutine A & B sama-sama baca stock = 1
 if p.Stock >= qty {             // A lolos, B juga lolos
     p.Stock -= qty
@@ -937,7 +937,7 @@ err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
     s.repo.Create(ctx, order)
     return s.carts.Clear(ctx, c.ID)
 })</script>
-<script type="text/plain" id="c-cas">// internal/modules/order/model.go — state machine sebagai map
+<script type="text/plain" id="c-cas">// internal/modules/order/model.go, state machine sebagai map
 var adminTransitions = map[Status][]Status{
     StatusPending:    {StatusCancelled},
     StatusPaid:       {StatusProcessing},
@@ -945,7 +945,7 @@ var adminTransitions = map[Status][]Status{
     StatusShipped:    {StatusCompleted},
 }
 
-// repository.go — compare-and-swap di level SQL
+// repository.go, compare-and-swap di level SQL
 func (r *GormRepository) TransitionStatus(ctx context.Context, id uuid.UUID, from, to Status) (bool, error) {
     res := database.FromContext(ctx, r.db).Model(&Order{}).
         Where("id = ? AND status = ?", id, from). // hanya kalau status MASIH `from`
@@ -953,12 +953,12 @@ func (r *GormRepository) TransitionStatus(ctx context.Context, id uuid.UUID, fro
     return res.RowsAffected == 1, res.Error
 }
 
-// service.go — Cancel
+// service.go, Cancel
 ok, err := s.repo.TransitionStatus(ctx, o.ID, StatusPending, StatusCancelled)
 if !ok {
     return apperror.Conflict("Only orders with status PENDING can be cancelled")
 }
-// baru kembalikan stok — dijamin cuma sekali</script>
+// baru kembalikan stok, dijamin hanya sekali</script>
 <script type="text/plain" id="c-idem">// internal/modules/payment/service.go
 func (s *Service) Create(ctx context.Context, caller Caller, key string, req CreateRequest) (*Payment, bool, error) {
     if key == "" {
@@ -972,7 +972,7 @@ func (s *Service) Create(ctx context.Context, caller Caller, key string, req Cre
     if existing, err := s.activePayment(ctx, orderID, key); err != nil || existing != nil {
         return existing, false, err
     }
-    // 3. insert — unique index idempotency_key adalah penjaga terakhir
+    // 3. insert, unique index idempotency_key adalah penjaga terakhir
     err = s.repo.Create(ctx, p)
     if errors.Is(err, apperror.ErrDuplicate) {
         return s.replay(ctx, key, orderID) // kalah balapan → kembalikan yang menang
@@ -982,7 +982,7 @@ func (s *Service) Create(ctx context.Context, caller Caller, key string, req Cre
 
 // SimulateSuccess: hanya satu request yang berhasil mengubah PENDING → SUCCESS
 ok, err := s.repo.Transition(ctx, p.ID, StatusSuccess, &now) // WHERE status = 'PENDING'</script>
-<script type="text/plain" id="c-waitgroup">// tests/cart_order_test.go — 20 pembeli berebut 5 barang
+<script type="text/plain" id="c-waitgroup">// tests/cart_order_test.go, 20 pembeli berebut 5 barang
 var created, conflict atomic.Int32 // counter aman dipakai banyak goroutine
 var wg sync.WaitGroup
 start := make(chan struct{})       // "pistol start"
@@ -1006,7 +1006,7 @@ wg.Wait()    // tunggu semuanya selesai
 assert.EqualValues(t, 5, created.Load())
 assert.EqualValues(t, 15, conflict.Load())
 assert.Equal(t, 0, productStock(t, productID))</script>
-<script type="text/plain" id="c-wg-mini">// Versi contoh kamu, tapi tanpa time.Sleep
+<script type="text/plain" id="c-wg-mini">// Versi contoh Anda, tapi tanpa time.Sleep
 func main() {
     var wg sync.WaitGroup
     wg.Add(2)
@@ -1039,7 +1039,7 @@ func (f *fakeTokens) Revoke(_ context.Context, id uuid.UUID) (bool, error) {
 svc := NewService(newFakeUsers(), newFakeTokens(), jwt, time.Hour, bcrypt.MinCost)</script>
 <script type="text/plain" id="c-buildtag">//go:build integration
 
-// tests/setup_test.go — file ini hanya ikut di-compile kalau
+// tests/setup_test.go, file ini hanya ikut di-compile kalau
 // `-tags integration` diberikan.
 package tests
 
@@ -1071,7 +1071,7 @@ const C = [
 /* ---------------- FONDASI ---------------- */
 {id:"goroutine", mod:"fondasi", tag:"go", title:"Goroutine", short:"Menjalankan server di \"thread ringan\" supaya main() tetap bisa mendengarkan sinyal shutdown.",
  file:"cmd/api/main.go", viz:"goroutine",
- code:[["Contoh sederhana (seperti contohmu)","c-goroutine-mini"],["Di project ini","c-goroutine"]],
+ code:[["Contoh sederhana ","c-goroutine-mini"],["Di project ini","c-goroutine"]],
  what:`<p>Goroutine adalah fungsi yang berjalan <b>bersamaan</b> dengan kode lain. Cukup tambah kata <code>go</code> di depan pemanggilan fungsi. Goroutine sangat murah (mulai dari sekitar 2 KB stack), jadi Go bisa menjalankan ratusan ribu goroutine sekaligus. Runtime Go yang membagi goroutine ke thread OS.</p>
  <p>Di contoh sederhana, <code>getCurrency()</code> dan <code>getExchangeRate()</code> jalan bersamaan. <code>time.Sleep</code> dipakai supaya <code>main()</code> tidak selesai duluan, karena saat <code>main()</code> selesai, semua goroutine ikut mati.</p>`,
  why:`<p><code>Fiber.Listen()</code> <b>memblok selamanya</b>: selama server hidup, fungsi itu tidak pernah return. Kalau dipanggil langsung di <code>main()</code>, kode di bawahnya (menunggu Ctrl+C / SIGTERM) tidak akan pernah jalan.</p>
@@ -1131,7 +1131,7 @@ const C = [
  <li><b>Dicek compiler.</b> Kalau ada dependency yang lupa diisi atau salah tipe, program tidak bisa di-compile. Framework DI berbasis reflection baru ketahuan salahnya saat runtime.</li></ul>`,
  without:`<div class="callout bad">Tanpa DI: service memanggil <code>database.GetDB()</code> global di dalamnya. Akibatnya service tidak bisa di-test tanpa database sungguhan, dan urutan inisialisasi jadi tersembunyi.</div>
  <div class="callout">Alternatif: Google Wire (generate kode DI) atau Uber Fx (runtime DI). Berguna untuk project besar; untuk ukuran ini DI manual lebih mudah dibaca.</div>`,
- qa:[["Kenapa tidak pakai framework DI?","Untuk tujuh modul, wiring manual cuma puluhan baris, mudah dibaca, dan dicek compiler. Framework menambah konsep baru dan kadang error baru muncul saat runtime."],
+ qa:[["Kenapa tidak pakai framework DI?","Untuk tujuh modul, wiring manual hanya puluhan baris, mudah dibaca, dan dicek compiler. Framework menambah konsep baru dan kadang error baru muncul saat runtime."],
      ["Apa itu composition root?","Satu tempat di aplikasi tempat semua dependency dibuat dan dirangkai. Kode lain cukup menerima dependency lewat constructor."]]},
 
 {id:"interface", mod:"fondasi", tag:"go", title:"Interface di sisi pemakai", short:"Service mendefinisikan interface kecil yang dia butuhkan. Repository cukup memenuhinya.",
@@ -1198,7 +1198,7 @@ const C = [
  <li>Urutan penting: <code>Auth</code> dulu (401 kalau tidak ada identitas), baru <code>RequireRole</code> (403 kalau identitas ada tapi role kurang).</li></ul>`,
  without:`<div class="callout bad">Tanpa middleware: setiap handler admin harus mengecek header, parse JWT, dan cek role sendiri. Satu handler lupa mengecek berarti satu endpoint admin terbuka untuk semua orang.</div>`,
  qa:[["Apa itu closure?","Fungsi yang membawa variabel dari lingkup luarnya. Auth(tokens) mengembalikan handler yang tetap bisa memakai tokens setiap kali dipanggil."],
-     ["Kenapa 401 dan 403 dipisah middleware-nya?","Auth menjawab 'siapa kamu' (401 kalau tidak valid). RequireRole menjawab 'boleh tidak' (403). Dengan urutan ini, endpoint admin tanpa token memberi 401, bukan 403."]]},
+     ["Kenapa 401 dan 403 dipisah middleware-nya?","Auth menjawab 'siapa Anda' (401 kalau tidak valid). RequireRole menjawab 'boleh tidak' (403). Dengan urutan ini, endpoint admin tanpa token memberi 401, bukan 403."]]},
 
 {id:"tags", mod:"fondasi", tag:"go", title:"Struct tag & DTO", short:"Metadata di struct untuk JSON, validasi, dan GORM. Entity DB tidak pernah dikirim langsung.",
  file:"internal/modules/*/model.go",
@@ -1397,7 +1397,7 @@ const C = [
  <li><code>count++</code> biasa dari banyak goroutine adalah data race; <code>atomic</code> mencegahnya.</li>
  <li>Test dijalankan dengan <code>go test -race</code>, yang mendeteksi akses memori yang tidak aman.</li></ul>`,
  without:`<div class="callout bad"><code>time.Sleep</code> untuk menunggu goroutine: terlalu pendek → test gagal acak; terlalu panjang → test lambat. WaitGroup menunggu tepat sampai selesai.</div>`,
- qa:[["Bagaimana kamu menguji race condition?","Banyak goroutine dilepas bersamaan dengan start barrier, lalu memeriksa invarian: jumlah order sukses sama dengan stok awal dan stok akhir 0. Dijalankan dengan -race dan diulang berkali-kali."],
+ qa:[["Bagaimana Anda menguji race condition?","Banyak goroutine dilepas bersamaan dengan start barrier, lalu memeriksa invarian: jumlah order sukses sama dengan stok awal dan stok akhir 0. Dijalankan dengan -race dan diulang berkali-kali."],
      ["Kenapa pakai atomic, bukan int biasa?","Menambah int biasa dari banyak goroutine adalah data race. atomic menjamin operasi baca-tambah-tulis tidak terpotong."]]},
 
 {id:"fakes", mod:"testing", tag:"test", title:"Fake + sync.Mutex", short:"Repository in-memory untuk unit test, aman dipakai goroutine.",
@@ -1489,7 +1489,7 @@ function vizHTML(kind){
   if(kind==="oversell") return `<div class="viz"><div class="viz-title">20 pembeli, 5 unit, bersamaan <button class="play" data-viz="oversell">Mulai flash sale</button></div>
     <div class="stockbox">stok: <span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span><span class="unit"></span></div>
     <div class="buyers">${Array.from({length:20},(_,i)=>`<div class="buyer">${i+1}</div>`).join("")}</div>
-    <div class="log" id="olog">UPDATE ... WHERE stock &gt;= 1 — hanya 5 yang mendapat baris.</div></div>`;
+    <div class="log" id="olog">UPDATE ... WHERE stock &gt;= 1, hanya 5 yang mendapat baris.</div></div>`;
   if(kind==="deadlock") return `<div class="viz"><div class="viz-title">Urutan lock <button class="play" data-viz="deadlock">Bandingkan</button></div>
     <div class="flow"><span class="node">tanpa sort</span><span class="node" id="d1">U1: Kopi → Teh</span><span class="node" id="d2">U2: Teh → Kopi</span><span class="node" id="d3">?</span></div>
     <div class="flow"><span class="node">dengan sort</span><span class="node" id="d4">U1: Kopi → Teh</span><span class="node" id="d5">U2: Kopi → Teh</span><span class="node" id="d6">?</span></div>
@@ -1553,7 +1553,7 @@ async function runViz(kind){
       if(stock>0){stock--;units[4-stock].classList.add("gone");buyers[i].classList.add("ok");}
       else buyers[i].classList.add("no");
       L.textContent=`stok tersisa: ${stock}`;}
-    L.textContent="Selesai: 5 order (201), 15 ditolak (409 CONFLICT), stok 0 — tidak pernah minus.";
+    L.textContent="Selesai: 5 order (201), 15 ditolak (409 CONFLICT), stok 0, tidak pernah minus.";
   }
   if(kind==="deadlock"){
     ["d1","d2","d3","d4","d5","d6"].forEach(i=>{const e=document.getElementById(i);e.className="node";});
@@ -1600,17 +1600,17 @@ function openModal(id){
   <div class="m-body">
     <div class="tabs" role="tablist">
       <button class="tab on" data-p="code">Kode</button><button class="tab" data-p="what">Apa ini?</button>
-      <button class="tab" data-p="why">Kenapa dipakai?</button><button class="tab" data-p="without">Kalau tidak?</button>
+      <button class="tab" data-p="why">Alasan pemakaian</button><button class="tab" data-p="without">Kalau tidak?</button>
       <button class="tab" data-p="qa">Interview</button>
     </div>
     <div class="pane on" data-p="code">${c.viz?vizHTML(c.viz):""}${c.code.map(([l,i])=>codeBlock(l,i)).join("")}</div>
     <div class="pane" data-p="what"><h4>Apa ini?</h4>${c.what}</div>
-    <div class="pane" data-p="why"><h4>Kenapa dipakai di sini?</h4>${c.why}</div>
+    <div class="pane" data-p="why"><h4>Alasan pemakaian</h4>${c.why}</div>
     <div class="pane" data-p="without"><h4>Kalau tidak dipakai?</h4>${c.without}</div>
     <div class="pane" data-p="qa"><h4>Latihan interview</h4>${c.qa.map(([q,a])=>`<div class="qa"><b>${q}</b><span>${a}</span></div>`).join("")}</div>
     <div class="navrow">
       <button class="nav" ${prev?`data-go="${prev.id}"`:"disabled style='opacity:.35'"}>← ${prev?prev.title:""}</button>
-      <button class="nav" ${next?`data-go="${next.id}"`:"disabled style='opacity:.35'"}>${next?next.title:""} →</button>
+      <button class="nav" ${next?`data-go="${next.id}"`:"disabled style='opacity:.35'"}>${next?next.title:""}</button>
     </div>
   </div>`;
   const m=$("#modal");
@@ -1656,8 +1656,8 @@ const LANE_HINT = {
   User:"Klien: aplikasi web, Flutter, Postman, atau curl",
   Middleware:"internal/middleware + middleware bawaan Fiber",
   Handler:"internal/modules/*/handler.go",
-  Service:"internal/modules/*/service.go — aturan bisnis",
-  Repository:"internal/modules/*/repository.go — satu-satunya yang kenal GORM",
+  Service:"internal/modules/*/service.go, aturan bisnis",
+  Repository:"internal/modules/*/repository.go, satu-satunya yang kenal GORM",
   PostgreSQL:"sumber kebenaran data",
   Redis:"cache dan rate limiter (boleh mati)"
 };
@@ -1683,7 +1683,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"JSON {success, data, meta}",d:"Sukses: response.OK/Created membungkus data dalam format standar. Error: dikembalikan ke ErrorHandler pusat yang menulis format error standar beserta request_id.",file:"pkg/response/response.go",concept:"errhandler"}
  ]},
 
-{id:"register", name:"Register", desc:"POST /auth/register — membuat akun customer.",
+{id:"register", name:"Register", desc:"POST /auth/register, membuat akun customer.",
  steps:[
   {f:"User",t:"Middleware",k:"req",l:"POST /auth/register",d:"Body: name, email, password. Route publik: tidak perlu token, tapi tetap kena rate limit."},
   {f:"Middleware",t:"Handler",k:"req",l:"auth.Handler.Register",d:"Tidak ada middleware Auth di route ini.",file:"internal/modules/auth/handler.go",fn:"Register"},
@@ -1697,7 +1697,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"201 Created (tanpa password)",d:"Respons memakai user.Response yang tidak punya field password hash sama sekali.",concept:"tags"}
  ]},
 
-{id:"login", name:"Login", desc:"POST /auth/login — menukar email + password dengan access token dan refresh token.",
+{id:"login", name:"Login", desc:"POST /auth/login, menukar email + password dengan access token dan refresh token.",
  steps:[
   {f:"User",t:"Handler",k:"req",l:"POST /auth/login",d:"Body: email, password. (Middleware umum diringkas.)"},
   {f:"Handler",t:"Service",k:"req",l:"Service.Login",file:"internal/modules/auth/service.go",fn:"Login",d:""},
@@ -1710,18 +1710,18 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"200 {user, tokens}",d:"Klien menyimpan keduanya. Access token dikirim di setiap request: Authorization: Bearer <token>."}
  ]},
 
-{id:"refresh", name:"Refresh token", desc:"POST /auth/refresh — access token habis, minta pasangan token baru.",
+{id:"refresh", name:"Refresh token", desc:"POST /auth/refresh, access token habis, minta pasangan token baru.",
  steps:[
   {f:"User",t:"Handler",k:"req",l:"POST /auth/refresh",d:"Body: refresh_token."},
   {f:"Handler",t:"Service",k:"req",l:"Service.Refresh",file:"internal/modules/auth/service.go",fn:"Refresh"},
-  {f:"Service",t:"PostgreSQL",k:"db",l:"cari by SHA-256(token)",d:"Tidak ketemu atau sudah kedaluwarsa → 401."},
+  {f:"Service",t:"PostgreSQL",k:"db",l:"cari by SHA-256(token)",d:"Tidak ditemukan atau sudah kedaluwarsa → 401."},
   {f:"Service",t:"PostgreSQL",k:"db",l:"UPDATE … WHERE revoked_at IS NULL",d:"Compare-and-swap: hanya berhasil kalau token masih aktif.",concept:"refresh"},
   {f:"PostgreSQL",t:"Service",k:"err",l:"0 rows → token dipakai ulang!",d:"Token ini sudah pernah dipakai. Artinya ada dua pihak memegang token yang sama (dicuri). Semua sesi user dicabut dan dibalas 401.",code:'s.tokens.RevokeAllForUser(ctx, stored.UserID)'},
   {f:"Service",t:"Service",k:"self",l:"issueTokens (pasangan baru)",d:"Kalau revoke berhasil, terbit access token dan refresh token baru."},
   {f:"Handler",t:"User",k:"ret",l:"200 {access, refresh baru}",d:"Refresh token lama tidak bisa dipakai lagi."}
  ]},
 
-{id:"admin-product", name:"Admin buat produk", desc:"POST /products — hanya admin.",
+{id:"admin-product", name:"Admin buat produk", desc:"POST /products, hanya admin.",
  steps:[
   {f:"User",t:"Middleware",k:"req",l:"POST /products + Bearer",d:"Admin login dulu, lalu mengirim token admin."},
   {f:"Middleware",t:"Middleware",k:"self",l:"Auth → RequireRole(admin)",d:"Tanpa token → 401. Token customer → 403.",concept:"middleware"},
@@ -1735,7 +1735,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"201 Created",d:""}
  ]},
 
-{id:"browse", name:"Lihat produk", desc:"GET /products/:id — publik, memakai cache Redis.",
+{id:"browse", name:"Lihat produk", desc:"GET /products/:id, publik, memakai cache Redis.",
  steps:[
   {f:"User",t:"Handler",k:"req",l:"GET /products/:id",d:"Tidak perlu login. ID harus UUID, kalau bukan → 400."},
   {f:"Handler",t:"Service",k:"req",l:"Service.Get",file:"internal/modules/product/service.go",fn:"Get",concept:"cacheaside"},
@@ -1747,7 +1747,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"200 produk",d:""}
  ]},
 
-{id:"cart", name:"Tambah ke cart", desc:"POST /cart/items — customer memasukkan produk ke keranjang.",
+{id:"cart", name:"Tambah ke cart", desc:"POST /cart/items, customer memasukkan produk ke keranjang.",
  steps:[
   {f:"User",t:"Middleware",k:"req",l:"POST /cart/items + Bearer",d:"Body: product_id, quantity (1–1000)."},
   {f:"Middleware",t:"Handler",k:"req",l:"cart.Handler.AddItem",d:"User ID diambil dari token, bukan dari body."},
@@ -1760,7 +1760,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"200 cart + total",d:""}
  ]},
 
-{id:"checkout", name:"Checkout", desc:"POST /orders — inti project: satu transaksi, anti-oversell.",
+{id:"checkout", name:"Checkout", desc:"POST /orders, inti project: satu transaksi, anti-oversell.",
  steps:[
   {f:"User",t:"Middleware",k:"req",l:"POST /orders + Bearer",d:"Tanpa body. Harga dan item tidak pernah diambil dari klien."},
   {f:"Middleware",t:"Handler",k:"req",l:"order.Handler.Create",d:""},
@@ -1778,7 +1778,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"201 order PENDING",d:""}
  ]},
 
-{id:"payment", name:"Pembayaran", desc:"POST /payments lalu simulate-success — idempotent.",
+{id:"payment", name:"Pembayaran", desc:"POST /payments lalu simulate-success, idempotent.",
  steps:[
   {f:"User",t:"Handler",k:"req",l:"POST /payments + Idempotency-Key",d:"Body: order_id. Header Idempotency-Key wajib (teks acak unik per percobaan bayar)."},
   {f:"Handler",t:"Service",k:"req",l:"payment.Service.Create",file:"internal/modules/payment/service.go",fn:"Create"},
@@ -1794,7 +1794,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"200 payment SUCCESS",d:""}
  ]},
 
-{id:"cancel", name:"Batalkan order", desc:"POST /orders/:id/cancel — hanya order PENDING; stok dikembalikan.",
+{id:"cancel", name:"Batalkan order", desc:"POST /orders/:id/cancel, hanya order PENDING; stok dikembalikan.",
  steps:[
   {f:"User",t:"Handler",k:"req",l:"POST /orders/:id/cancel",d:"Pemilik order atau admin."},
   {f:"Handler",t:"Service",k:"req",l:"Service.Cancel",file:"internal/modules/order/service.go",fn:"Cancel"},
@@ -1806,7 +1806,7 @@ const FLOWS = [
   {f:"Handler",t:"User",k:"ret",l:"200 order CANCELLED",d:""}
  ]},
 
-{id:"fulfil", name:"Admin proses & kirim", desc:"PATCH /orders/:id/status — PAID → PROCESSING → SHIPPED → COMPLETED.",
+{id:"fulfil", name:"Admin proses & kirim", desc:"PATCH /orders/:id/status, PAID → PROCESSING → SHIPPED → COMPLETED.",
  steps:[
   {f:"User",t:"Middleware",k:"req",l:"PATCH /orders/:id/status",d:"Body: status. Hanya admin."},
   {f:"Middleware",t:"Handler",k:"req",l:"RequireRole(admin) lolos",d:"Customer → 403."},
@@ -1938,10 +1938,10 @@ function openStep(i){
     <h4>Apa yang terjadi</h4><p>${st.d||"Hasil diteruskan ke lapisan berikutnya."}</p>
     ${st.file?`<h4>Di mana kodenya</h4><p><code>${st.file}</code>${st.fn?` → <code>${st.fn}</code>`:""}</p>`:""}
     ${st.code?`<div class="codehead"><span>Potongan kode</span></div><pre><code class="language-go">${esc(st.code)}</code></pre>`:""}
-    ${concept?`<h4>Konsep terkait</h4><button class="nav" id="goconcept">Buka penjelasan: ${concept.title} →</button>`:""}
+    ${concept?`<h4>Konsep terkait</h4><button class="nav" id="goconcept">Buka penjelasan: ${concept.title}</button>`:""}
     <div class="navrow">
-      <button class="nav" ${i>0?`data-step="${i-1}"`:"disabled style='opacity:.35'"}>← Langkah sebelumnya</button>
-      <button class="nav" ${i<f.steps.length-1?`data-step="${i+1}"`:"disabled style='opacity:.35'"}>Langkah berikutnya →</button>
+      <button class="nav" ${i>0?`data-step="${i-1}"`:"disabled style='opacity:.35'"}>Langkah sebelumnya</button>
+      <button class="nav" ${i<f.steps.length-1?`data-step="${i+1}"`:"disabled style='opacity:.35'"}>Langkah berikutnya</button>
     </div></div></div>`;
   const m=$("#modal");
   m.querySelector(".x").onclick=closeModal;
@@ -1965,7 +1965,7 @@ const WHYMODS = [
 const WHYTECH = [
   {t:"Go",tag:"go",d:"Compile jadi satu binary, cepat, konkurensi bawaan (goroutine), dan populer untuk backend di perusahaan Indonesia."},
   {t:"Fiber v2",tag:"go",d:"Framework HTTP yang ringan dengan API mirip Express. Catatan: v2 kini berstatus deprecated, penggantinya Fiber v3."},
-  {t:"PostgreSQL",tag:"db",d:"Transaksi ACID, row lock, partial index, CHECK constraint — semua dipakai untuk mencegah oversell dan data dobel."},
+  {t:"PostgreSQL",tag:"db",d:"Transaksi ACID, row lock, partial index, CHECK constraint, semua dipakai untuk mencegah oversell dan data dobel."},
   {t:"Redis",tag:"db",d:"Penyimpanan in-memory yang sangat cepat untuk cache produk dan counter rate limit. Bukan sumber kebenaran."},
   {t:"GORM",tag:"db",d:"ORM paling populer di Go: CRUD lebih singkat, query tetap memakai parameter binding sehingga aman dari SQL injection."},
   {t:"JWT + bcrypt",tag:"sec",d:"JWT untuk autentikasi stateless; bcrypt untuk menyimpan password dengan aman."},

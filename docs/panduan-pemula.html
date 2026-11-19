@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Panduan Pemula — Membaca Project Rombong Tanpa Bisa Ngoding</title>
+<title>Panduan Pemula: Membaca Project Rombong untuk Non-Programmer</title>
 <style>
 :root{--pri:#0B7A94;--pri-d:#04404F;--pri-s:#D9F2F8;--ink:#14202A;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9;--card:#fff;
 --be:#0B7A94;--be-s:#D9F2F8;--fe:#7C3AED;--fe-s:#EDE7FB;--db:#B45309;--db-s:#FEF0DC;--ok:#1E7B34;--ok-s:#E3F4E6;--warn:#8A5A00;--warn-s:#FFF4D6}
@@ -146,11 +146,11 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 </head>
 <body>
 <div class="hero"><div class="wrap">
-  <h1>Membaca project Rombong tanpa harus bisa ngoding</h1>
-  <p>Panduan ini menjelaskan isi dua project (<b>rombong-api</b> dan <b>rombong-app</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar waktu kamu menekan satu tombol di aplikasi.</p>
+  <h1>Membaca project Rombong tanpa latar belakang pemrograman</h1>
+  <p>Panduan ini menjelaskan isi dua project (<b>rombong-api</b> dan <b>rombong-app</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar saat pengguna menekan satu tombol di aplikasi.</p>
   <div class="toc">
-    <a href="#besar">1. Gambaran besar</a><a href="#peta">2. Peta folder</a><a href="#urutan">3. Urutan ngoding</a>
-    <a href="#perjalanan">4. Ikuti satu klik</a><a href="#root">5. File-file aneh</a><a href="#docker">6. Docker &amp; Makefile</a>
+    <a href="#besar">1. Gambaran besar</a><a href="#peta">2. Peta folder</a><a href="#urutan">3. Urutan pengerjaan</a>
+    <a href="#perjalanan">4. Alur satu aksi</a><a href="#root">5. File konfigurasi</a><a href="#docker">6. Docker &amp; Makefile</a>
     <a href="#jalan">7. Cara menjalankan</a><a href="#kamus">8. Kamus istilah</a>
   </div>
 </div></div>
@@ -158,7 +158,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 <main>
 <!-- 1 -->
 <section id="besar">
-  <h2><span class="n">1</span>Gambaran besar: anggap saja restoran</h2>
+  <h2><span class="n">1</span>Gambaran besar: analogi restoran</h2>
   <p class="lead">Klik tiap bagian. Hampir semua istilah teknis di project ini punya padanan di restoran.</p>
   <div class="resto" id="resto"></div>
   <div class="card" id="restoDetail"></div>
@@ -172,9 +172,9 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 
 <!-- 2 -->
 <section id="peta">
-  <h2><span class="n">2</span>Peta folder: klik untuk tahu isinya</h2>
+  <h2><span class="n">2</span>Peta folder</h2>
   <p class="lead">Ini isi asli kedua project. Klik folder untuk membuka, klik apa saja untuk melihat penjelasannya di sebelah kanan.</p>
-  <div class="tabs"><button class="on" data-tree="be">🖥️ Backend (rombong-api)</button><button data-tree="fe">📱 Aplikasi (rombong-app)</button></div>
+  <div class="tabs"><button class="on" data-tree="be">Backend (rombong-api)</button><button data-tree="fe">Aplikasi (rombong-app)</button></div>
   <div class="legend"><span><i style="background:#0B7A94"></i>kode program</span><span><i style="background:#B45309"></i>database</span><span><i style="background:#1E7B34"></i>pengujian</span><span><i style="background:#8A5A00"></i>pengaturan / alat bantu</span><span><i style="background:#7C3AED"></i>dokumentasi</span></div>
   <div class="explorer">
     <div class="tree" id="tree"></div>
@@ -184,18 +184,18 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 
 <!-- 3 -->
 <section id="urutan">
-  <h2><span class="n">3</span>Urutan ngoding dari nol</h2>
+  <h2><span class="n">3</span>Urutan pengerjaan dari nol</h2>
   <p class="lead">Seperti membangun rumah: fondasi dulu, baru kamar-kamar, baru listrik dan cat. Klik tiap langkah untuk detail dan alasannya.</p>
-  <div class="tabs"><button class="on" data-tl="be">🖥️ Backend dulu</button><button data-tl="fe">📱 Lalu aplikasi</button></div>
+  <div class="tabs"><button class="on" data-tl="be">Backend dulu</button><button data-tl="fe">Lalu aplikasi</button></div>
   <div class="timeline" id="timeline"></div>
   <div class="callout warn"><b>Kenapa backend dulu?</b> Aplikasi tidak bisa menampilkan produk kalau belum ada yang menyimpan dan mengirim produknya. Backend juga bisa dites sendiri tanpa aplikasi, jadi kesalahannya ketahuan lebih awal.</div>
 </section>
 
 <!-- 4 -->
 <section id="perjalanan">
-  <h2><span class="n">4</span>Ikuti satu klik: apa yang terjadi saat pelanggan menekan "Buat pesanan"?</h2>
+  <h2><span class="n">4</span>Alur satu aksi: apa yang terjadi saat pelanggan menekan "Buat pesanan"?</h2>
   <p class="lead">Tekan "Lanjut" atau "Putar otomatis". Setiap kotak adalah satu file asli di project.</p>
-  <div class="jctl"><button class="btn sec" id="jPrev">← Kembali</button><button class="btn" id="jNext">Lanjut →</button><button class="btn sec" id="jPlay">▶ Putar otomatis</button><button class="btn sec" id="jReset">↺ Ulang</button></div>
+  <div class="jctl"><button class="btn sec" id="jPrev">Kembali</button><button class="btn" id="jNext">Lanjut</button><button class="btn sec" id="jPlay">Putar otomatis</button><button class="btn sec" id="jReset">Ulang</button></div>
   <div class="journey">
     <div class="lanes" id="lanes"></div>
     <div class="jtext" id="jtext"></div>
@@ -204,29 +204,29 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 
 <!-- 5 -->
 <section id="root">
-  <h2><span class="n">5</span>File-file "aneh" di folder paling luar</h2>
+  <h2><span class="n">5</span>File konfigurasi di folder utama</h2>
   <p class="lead">Ini bukan kode aplikasinya, tapi perlengkapan: resep, setelan, daftar belanja, dan robot pemeriksa. Klik untuk penjelasan lengkap.</p>
   <div class="grid g4" id="rootfiles"></div>
 </section>
 
 <!-- 6 -->
 <section id="docker">
-  <h2><span class="n">6</span>Docker &amp; Makefile, pelan-pelan</h2>
+  <h2><span class="n">6</span>Docker dan Makefile</h2>
   <h3>Masalah yang diselesaikan Docker</h3>
-  <p>Backend butuh tiga "mesin" sekaligus: program Go-nya, database <b>PostgreSQL</b>, dan cache <b>Redis</b>. Tanpa Docker, kamu harus menginstal ketiganya di laptop dengan versi yang pas, dan sering muncul masalah "di laptopku jalan, di laptopmu error".</p>
+  <p>Backend butuh tiga "mesin" sekaligus: program Go-nya, database <b>PostgreSQL</b>, dan cache <b>Redis</b>. Tanpa Docker, Anda harus menginstal ketiganya di laptop dengan versi yang pas, dan sering muncul masalah "di laptopku jalan, di laptopmu error".</p>
   <div class="dock">
-    <div class="dbox"><h4>😩 Tanpa Docker</h4>
+    <div class="dbox"><h4>Tanpa Docker</h4>
       <ol class="steps-list"><li>Instal Go versi tertentu</li><li>Instal PostgreSQL, buat user &amp; database</li><li>Instal Redis</li><li>Atur port, password, dan setelan satu per satu</li><li>Laptop teman beda versi → error lain lagi</li></ol></div>
-    <div class="dbox"><h4>😌 Dengan Docker</h4>
+    <div class="dbox"><h4>Dengan Docker</h4>
       <p style="margin-top:0">Cukup satu perintah: <code>docker compose up</code>. Docker menyalakan tiga "kotak" yang isinya sudah lengkap dan sama persis di laptop siapa pun:</p>
-      <div class="containers"><div class="cont"><b>📦 api</b>program Go yang sudah jadi</div><div class="cont pg"><b>🗄️ postgres</b>database PostgreSQL 16</div><div class="cont rd"><b>⚡ redis</b>cache Redis 7</div></div>
+      <div class="containers"><div class="cont"><b>api</b>program Go yang sudah jadi</div><div class="cont pg"><b>postgres</b>database PostgreSQL 16</div><div class="cont rd"><b>redis</b>cache Redis 7</div></div>
       <p style="font-size:14px;color:var(--muted)">Kotak-kotak ini disebut <b>container</b>. Resep isi kotak api ada di <code>Dockerfile</code>; daftar kotak yang dinyalakan bersama ada di <code>docker-compose.yml</code>.</p></div>
   </div>
   <div class="grid g2" style="margin-top:16px">
-    <div class="card"><div class="emoji">📜</div><h4>Dockerfile = resep membuat satu kotak</h4><p>Tahap 1 (<i>builder</i>): ambil Go, unduh library, ubah kode menjadi satu file program. Tahap 2: pindahkan file program itu saja ke kotak Alpine Linux yang kecil (±20 MB), jalankan sebagai user biasa (bukan admin) supaya aman, dan cek kesehatannya lewat <code>/health</code> setiap 15 detik.</p></div>
-    <div class="card"><div class="emoji">🧩</div><h4>docker-compose.yml = daftar kotak + kabelnya</h4><p>Menyalakan api, postgres, redis bersamaan, menyambungkan mereka di jaringan internal, membuka port 8080 ke laptop, menyimpan data database di <i>volume</i> supaya tidak hilang saat dimatikan, dan menunggu database siap sebelum api dinyalakan.</p></div>
+    <div class="card"><div class="emoji"></div><h4>Dockerfile = resep membuat satu kotak</h4><p>Tahap 1 (<i>builder</i>): ambil Go, unduh library, ubah kode menjadi satu file program. Tahap 2: pindahkan file program itu saja ke kotak Alpine Linux yang kecil (±20 MB), jalankan sebagai user biasa (bukan admin) supaya aman, dan cek kesehatannya lewat <code>/health</code> setiap 15 detik.</p></div>
+    <div class="card"><div class="emoji"></div><h4>docker-compose.yml = daftar kotak + kabelnya</h4><p>Menyalakan api, postgres, redis bersamaan, menyambungkan mereka di jaringan internal, membuka port 8080 ke laptop, menyimpan data database di <i>volume</i> supaya tidak hilang saat dimatikan, dan menunggu database siap sebelum api dinyalakan.</p></div>
   </div>
-  <h3>Makefile = tombol remote untuk perintah panjang</h3>
+  <h3>Makefile: pintasan untuk perintah panjang</h3>
   <p>Perintah programmer sering panjang dan susah diingat. <code>Makefile</code> memberi nama pendek. Ketik <code>make</code> + nama:</p>
   <div class="grid g3" id="makegrid"></div>
   <div class="callout">Contoh: <code>make test-integration</code> sebenarnya menjalankan <code>go test -tags integration -race -count=1 ./tests/...</code>. Makefile hanya jalan pintas; tanpa Makefile pun semuanya tetap bisa dijalankan manual. Di Windows, <code>make</code> perlu diinstal dulu (misalnya lewat Git Bash atau Chocolatey).</div>
@@ -234,10 +234,10 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 
 <!-- 7 -->
 <section id="jalan">
-  <h2><span class="n">7</span>Cara menjalankan, versi singkat</h2>
+  <h2><span class="n">7</span>Cara menjalankan (ringkas)</h2>
   <div class="grid g2">
-    <div class="card"><span class="tag t-be">Backend</span><h4>Pakai Docker (paling gampang)</h4>
-      <ol class="steps-list"><li>Instal <b>Docker Desktop</b>, lalu buka aplikasinya</li><li>Buka terminal di folder <code>rombong-api</code></li><li><code>cp .env.example .env</code> (bikin file setelan)</li><li><code>docker compose up --build</code></li><li>Buka <code>http://localhost:8080/docs</code>: daftar semua endpoint, bisa dicoba langsung</li></ol></div>
+    <div class="card"><span class="tag t-be">Backend</span><h4>Pakai Docker (paling mudah)</h4>
+      <ol class="steps-list"><li>Instal <b>Docker Desktop</b>, lalu buka aplikasinya</li><li>Buka terminal di folder <code>rombong-api</code></li><li><code>cp .env.example .env</code> (buat file setelan)</li><li><code>docker compose up --build</code></li><li>Buka <code>http://localhost:8080/docs</code>: daftar semua endpoint, bisa dicoba langsung</li></ol></div>
     <div class="card"><span class="tag t-fe">Aplikasi</span><h4>Flutter di emulator</h4>
       <ol class="steps-list"><li>Instal <b>Flutter 3.35+</b> dan Android Studio (untuk emulator)</li><li>Buka terminal di folder <code>rombong-app</code></li><li>Sekali saja: <code>flutter create --org com.aulansah --project-name rombong .</code> (membuat folder android/ios)</li><li><code>flutter pub get</code> (unduh library)</li><li>Pastikan backend sudah jalan, lalu <code>flutter run</code></li></ol></div>
   </div>
@@ -262,11 +262,11 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 
 /* ---------------- 1. restaurant ---------------- */
 const resto=[
- {e:"📱",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>rombong-app</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
- {e:"🧑‍🍳",t:"Pelayan",s:"API / endpoint",d:"<b>API</b> adalah aturan cara memesan. Setiap 'kalimat pesanan' disebut <b>endpoint</b>, misalnya <code>POST /api/v1/orders</code> = \"buatkan pesanan dari keranjang saya\". Ada 34 endpoint di project ini."},
- {e:"🔥",t:"Dapur",s:"Backend Go",d:"<b>rombong-api</b>. Di sinilah aturan bisnis dijalankan: cek stok, hitung total, kurangi stok, catat pesanan. Dapur dibagi ke beberapa stasiun (<b>modul</b>): auth, produk, keranjang, pesanan, pembayaran."},
- {e:"🗄️",t:"Gudang",s:"Database PostgreSQL",d:"Tempat menyimpan semua data secara permanen: user, produk, pesanan, pembayaran. Berbentuk tabel seperti Excel, tapi bisa diakses ribuan orang bersamaan tanpa kacau."},
- {e:"🍱",t:"Etalase saji cepat",s:"Cache Redis",d:"Produk yang sering dilihat disimpan sementara di <b>Redis</b> supaya tidak perlu bolak-balik ke gudang. Hasil uji: detail produk jadi ±19× lebih cepat. Kalau etalase rusak, dapur tetap ambil dari gudang (lebih lambat, tapi tetap jalan)."},
+ {e:"",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>rombong-app</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
+ {e:"",t:"Pelayan",s:"API / endpoint",d:"<b>API</b> adalah aturan cara memesan. Setiap 'kalimat pesanan' disebut <b>endpoint</b>, misalnya <code>POST /api/v1/orders</code> = \"buatkan pesanan dari keranjang saya\". Ada 34 endpoint di project ini."},
+ {e:"",t:"Dapur",s:"Backend Go",d:"<b>rombong-api</b>. Di sinilah aturan bisnis dijalankan: cek stok, hitung total, kurangi stok, catat pesanan. Dapur dibagi ke beberapa stasiun (<b>modul</b>): auth, produk, keranjang, pesanan, pembayaran."},
+ {e:"",t:"Gudang",s:"Database PostgreSQL",d:"Tempat menyimpan semua data secara permanen: user, produk, pesanan, pembayaran. Berbentuk tabel seperti Excel, tapi bisa diakses ribuan orang bersamaan tanpa kacau."},
+ {e:"",t:"Etalase saji cepat",s:"Cache Redis",d:"Produk yang sering dilihat disimpan sementara di <b>Redis</b> supaya tidak perlu bolak-balik ke gudang. Hasil uji: detail produk jadi ±19× lebih cepat. Kalau etalase rusak, dapur tetap ambil dari gudang (lebih lambat, tapi tetap jalan)."},
 ];
 const rEl=$("#resto");
 resto.forEach((r,i)=>{const d=document.createElement("div");d.className="rstep";d.innerHTML=`<div class="emoji">${r.e}</div><b>${r.t}</b><small>${r.s}</small>`;
@@ -276,7 +276,7 @@ rEl.children[0].click();
 /* ---------------- 2. trees ---------------- */
 // kind: code | db | test | tool | doc
 const BE=[
- {n:"cmd",k:"code",d:{w:"Pintu masuk program. Isinya cuma satu folder <code>api</code> dengan <code>main.go</code>.",a:"Saklar utama restoran.",t:"Hampir tidak pernah diubah."},c:[
+ {n:"cmd",k:"code",d:{w:"Pintu masuk program. Isinya hanya satu folder <code>api</code> dengan <code>main.go</code>.",a:"Saklar utama restoran.",t:"Hampir tidak pernah diubah."},c:[
    {n:"api",k:"code",c:[{n:"main.go",k:"code",d:{w:"File pertama yang dijalankan. Tugasnya: baca setelan, panggil <code>app.New()</code> untuk merakit semua bagian, nyalakan server di port 8080, dan mematikannya dengan rapi (<i>graceful shutdown</i>) saat dihentikan supaya request yang sedang jalan tidak terpotong.",a:"Manajer yang membuka dan menutup restoran.",t:"Jarang."}}]}]},
  {n:"internal",k:"code",d:{w:"Semua kode inti backend. Nama <code>internal</code> adalah aturan Go: isinya tidak boleh dipakai project lain.",a:"Area dapur khusus karyawan.",t:"Paling sering diubah."},c:[
    {n:"app",k:"code",c:[{n:"app.go",k:"code",d:{w:"Merakit semua bagian: koneksi database, Redis, lalu membuat setiap modul (repository → service → handler) dan menyambungkannya. Disebut <b>dependency injection manual</b>.",a:"Kepala dapur yang menempatkan tiap koki di stasiunnya.",t:"Setiap menambah modul baru."}}]},
@@ -309,7 +309,7 @@ const FE=[
  {n:"lib",k:"code",d:{w:"Semua kode aplikasi Flutter. Dibagi dua: <code>core</code> (dipakai semua fitur) dan <code>features</code> (satu folder per fitur).",a:"Isi buku menu dan cara kerjanya.",t:"Paling sering."},c:[
    {n:"main.dart",k:"code",d:{w:"File pertama yang dijalankan. Membungkus aplikasi dengan <code>ProviderScope</code> (wadah Riverpod) lalu menjalankan <code>App</code>.",a:"Tombol power HP.",t:"Hampir tidak pernah."},x:"void main() {\n  runApp(const ProviderScope(child: App()));\n}"},
    {n:"app.dart",k:"code",d:{w:"Memasang tema (warna, font dari Figma) dan router (pengatur pindah layar).",a:"Sampul dan daftar isi buku menu.",t:"Jarang."}},
-   {n:"core",k:"code",d:{w:"Bagian bersama yang dipakai semua fitur.",a:"Peralatan bersama.",t:"Kadang."},c:[
+   {n:"core",k:"code",d:{w:"Bagian bersama yang dipakai semua fitur.",a:"Paket utilitas bersama.",t:"Kadang."},c:[
      {n:"config",k:"tool",d:{w:"<code>env.dart</code>: alamat backend. Emulator Android memakai <code>10.0.2.2:8080</code> untuk menuju laptop; bisa diganti lewat <code>--dart-define=API_BASE_URL=…</code>.",a:"Alamat dapur.",t:"Saat backend pindah alamat."}},
      {n:"network",k:"code",d:{w:"Klien HTTP (Dio). <code>auth_interceptor.dart</code> otomatis menempelkan token ke setiap request dan, kalau token kedaluwarsa, diam-diam memperbaruinya lalu mengulang request. User tidak perlu login ulang setiap 15 menit.",a:"Kurir yang selalu membawa kartu akses dan memperpanjangnya sendiri.",t:"Jarang."}},
      {n:"storage",k:"code",d:{w:"Menyimpan token di brankas HP (Keystore/Keychain) lewat flutter_secure_storage.",a:"Dompet terkunci.",t:"Jarang."}},
@@ -338,15 +338,15 @@ const FE=[
  {n:"android/ ios/ (belum ada)",k:"tool",f:1,d:{w:"Folder khusus platform. Sengaja belum ada di repo; dibuat otomatis dengan <code>flutter create --org com.aulansah --project-name rombong .</code> saat pertama kali menjalankan di laptop.",a:"Cetakan sampul untuk tiap jenis HP.",t:"Sekali saat setup."}},
 ];
 const ROOT={
- "Dockerfile":{e:"📜",s:"Resep membuat kotak program",w:"Langkah-langkah membuat <b>image</b> Docker untuk backend: siapkan Go, unduh library, compile kode jadi satu file program, lalu pindahkan ke kotak Linux yang kecil. Hasilnya bisa dijalankan di komputer mana pun yang punya Docker.",a:"Resep masakan yang hasilnya selalu sama di dapur mana pun.",x:"FROM golang:1.24-alpine AS builder   # tahap 1: dapur besar\nCOPY . .\nRUN go build -o /out/api ./cmd/api  # masak jadi satu file\n\nFROM alpine:3.20                     # tahap 2: kotak kecil\nCOPY --from=builder /out/api /app/api\nUSER app                             # bukan admin, lebih aman\nEXPOSE 8080\nENTRYPOINT [\"/app/api\"]"},
- "docker-compose.yml":{e:"🧩",s:"Menyalakan 3 kotak sekaligus",w:"Daftar container yang dinyalakan bersama (api, postgres, redis), port yang dibuka, volume penyimpan data, dan urutan tunggu (api menunggu database sehat dulu).",a:"Denah food court: tiga kios yang dibuka bersamaan dan saling tersambung.",x:"services:\n  api:\n    build: .\n    ports: [\"8080:8080\"]\n    depends_on: [postgres, redis]\n  postgres:\n    image: postgres:16-alpine\n  redis:\n    image: redis:7-alpine"},
- "Makefile":{e:"🎮",s:"Jalan pintas perintah",w:"Kumpulan nama pendek untuk perintah panjang. Ketik <code>make help</code> untuk melihat semuanya.",a:"Tombol remote: satu tombol untuk serangkaian aksi.",x:"make up                # nyalakan semua dengan Docker\nmake test              # unit test\nmake test-integration  # test dengan database\nmake run               # jalankan tanpa Docker"},
- ".env.example":{e:"🔐",s:"Contoh setelan",w:"Contoh semua setelan: alamat database, password, kunci rahasia JWT, batas request, akun admin awal. Disalin menjadi <code>.env</code> lalu diisi. File <code>.env</code> asli <b>tidak boleh</b> masuk Git karena berisi rahasia.",a:"Formulir kosong; yang terisi disimpan sendiri di brankas.",x:"DB_HOST=localhost\nDB_PASSWORD=postgres\nJWT_SECRET=ganti-dengan-teks-acak-minimal-32-karakter\nADMIN_EMAIL=admin@example.com"},
- ".gitignore":{e:"🙈",s:"Yang tidak ikut ke GitHub",w:"Daftar file yang diabaikan Git: <code>.env</code> (rahasia), hasil build, cache. Supaya repo bersih dan aman.",a:"Barang pribadi yang tidak ikut difoto untuk katalog.",x:".env\nbin/\ncoverage.out"},
- "go.mod":{e:"🛒",s:"Daftar belanja library Go",w:"Nama project dan daftar library yang dipakai beserta versinya: Fiber (web server), GORM (database), go-redis, JWT, Viper (setelan), Zap (log), validator, testify (test).",a:"Daftar bahan baku dan merek pemasoknya.",x:"module github.com/aulansah/rombong-api\n\nrequire (\n  github.com/gofiber/fiber/v2 v2.52\n  gorm.io/gorm v1.25\n  github.com/redis/go-redis/v9 v9.22\n)"},
- "pubspec.yaml":{e:"🛒",s:"Daftar belanja library Flutter",w:"Nama aplikasi, versi Flutter minimal (3.35), dan library: flutter_riverpod (state), dio (HTTP), go_router (navigasi), flutter_secure_storage (brankas token), equatable; untuk test: mocktail.",a:"Daftar bahan untuk buku menu.",x:"environment:\n  sdk: \">=3.9.0 <4.0.0\"\n  flutter: \">=3.35.0\"\ndependencies:\n  flutter_riverpod: ^3.0.0\n  dio: ^5.8.0\n  go_router: \">=14.8.0 <19.0.0\""},
- "analysis_options.yaml":{e:"🧹",s:"Aturan kerapian kode",w:"Aturan yang dicek <code>flutter analyze</code>, misalnya wajib <code>const</code> bila bisa, tidak boleh ada import yang tidak dipakai.",a:"Standar kebersihan dapur.",x:"include: package:flutter_lints/flutter.yaml"},
- "README.md":{e:"📘",s:"Halaman depan project",w:"Hal pertama yang dibaca orang di GitHub: apa project ini, fiturnya, cara menjalankan, arsitektur, cara test, dan progres.",a:"Brosur restoran.",x:"# rombong-api\nProduction-style e-commerce REST API in Go…\n\n## Quick start\ndocker compose up --build"},
+ "Dockerfile":{e:"",s:"Resep membuat kotak program",w:"Langkah-langkah membuat <b>image</b> Docker untuk backend: siapkan Go, unduh library, compile kode jadi satu file program, lalu pindahkan ke kotak Linux yang kecil. Hasilnya bisa dijalankan di komputer mana pun yang punya Docker.",a:"Resep masakan yang hasilnya selalu sama di dapur mana pun.",x:"FROM golang:1.24-alpine AS builder   # tahap 1: dapur besar\nCOPY . .\nRUN go build -o /out/api ./cmd/api  # masak jadi satu file\n\nFROM alpine:3.20                     # tahap 2: kotak kecil\nCOPY --from=builder /out/api /app/api\nUSER app                             # bukan admin, lebih aman\nEXPOSE 8080\nENTRYPOINT [\"/app/api\"]"},
+ "docker-compose.yml":{e:"",s:"Menyalakan 3 kotak sekaligus",w:"Daftar container yang dinyalakan bersama (api, postgres, redis), port yang dibuka, volume penyimpan data, dan urutan tunggu (api menunggu database sehat dulu).",a:"Denah food court: tiga kios yang dibuka bersamaan dan saling tersambung.",x:"services:\n  api:\n    build: .\n    ports: [\"8080:8080\"]\n    depends_on: [postgres, redis]\n  postgres:\n    image: postgres:16-alpine\n  redis:\n    image: redis:7-alpine"},
+ "Makefile":{e:"",s:"Jalan pintas perintah",w:"Kumpulan nama pendek untuk perintah panjang. Ketik <code>make help</code> untuk melihat semuanya.",a:"Tombol remote: satu tombol untuk serangkaian aksi.",x:"make up                # nyalakan semua dengan Docker\nmake test              # unit test\nmake test-integration  # test dengan database\nmake run               # jalankan tanpa Docker"},
+ ".env.example":{e:"",s:"Contoh setelan",w:"Contoh semua setelan: alamat database, password, kunci rahasia JWT, batas request, akun admin awal. Disalin menjadi <code>.env</code> lalu diisi. File <code>.env</code> asli <b>tidak boleh</b> masuk Git karena berisi rahasia.",a:"Formulir kosong; yang terisi disimpan sendiri di brankas.",x:"DB_HOST=localhost\nDB_PASSWORD=postgres\nJWT_SECRET=ganti-dengan-teks-acak-minimal-32-karakter\nADMIN_EMAIL=admin@example.com"},
+ ".gitignore":{e:"",s:"Yang tidak ikut ke GitHub",w:"Daftar file yang diabaikan Git: <code>.env</code> (rahasia), hasil build, cache. Supaya repo bersih dan aman.",a:"Barang pribadi yang tidak ikut difoto untuk katalog.",x:".env\nbin/\ncoverage.out"},
+ "go.mod":{e:"",s:"Daftar belanja library Go",w:"Nama project dan daftar library yang dipakai beserta versinya: Fiber (web server), GORM (database), go-redis, JWT, Viper (setelan), Zap (log), validator, testify (test).",a:"Daftar bahan baku dan merek pemasoknya.",x:"module github.com/aulansah/rombong-api\n\nrequire (\n  github.com/gofiber/fiber/v2 v2.52\n  gorm.io/gorm v1.25\n  github.com/redis/go-redis/v9 v9.22\n)"},
+ "pubspec.yaml":{e:"",s:"Daftar belanja library Flutter",w:"Nama aplikasi, versi Flutter minimal (3.35), dan library: flutter_riverpod (state), dio (HTTP), go_router (navigasi), flutter_secure_storage (brankas token), equatable; untuk test: mocktail.",a:"Daftar bahan untuk buku menu.",x:"environment:\n  sdk: \">=3.9.0 <4.0.0\"\n  flutter: \">=3.35.0\"\ndependencies:\n  flutter_riverpod: ^3.0.0\n  dio: ^5.8.0\n  go_router: \">=14.8.0 <19.0.0\""},
+ "analysis_options.yaml":{e:"",s:"Aturan kerapian kode",w:"Aturan yang dicek <code>flutter analyze</code>, misalnya wajib <code>const</code> bila bisa, tidak boleh ada import yang tidak dipakai.",a:"Standar kebersihan dapur.",x:"include: package:flutter_lints/flutter.yaml"},
+ "README.md":{e:"",s:"Halaman depan project",w:"Hal pertama yang dibaca orang di GitHub: apa project ini, fiturnya, cara menjalankan, arsitektur, cara test, dan progres.",a:"Brosur restoran.",x:"# rombong-api\nProduction-style e-commerce REST API in Go…\n\n## Quick start\ndocker compose up --build"},
 };
 const kindColor={code:"#0B7A94",db:"#B45309",test:"#1E7B34",tool:"#8A5A00",doc:"#7C3AED"};
 const kindName={code:"Kode program",db:"Database",test:"Pengujian",tool:"Pengaturan / alat bantu",doc:"Dokumentasi"};
@@ -357,12 +357,12 @@ function renderTree(data){
     const p=path?path+"/"+it.n:it.n;
     const row=document.createElement("div");row.className="node";
     const isDir=!!it.c; const looksDir=isDir||(!it.f&&!/\.[a-z]+$/i.test(it.n));
-    row.innerHTML=`<span class="ic">${looksDir?"📁":(it.f?"⚙️":"📄")}</span><span>${esc(it.n)}${looksDir&&!/\/$/.test(it.n)?"/":""}</span><span class="dot" style="background:${kindColor[it.k]||"#999"}"></span>`;
+    row.innerHTML=`<span class="ic">${looksDir?"":(it.f?"":"")}</span><span>${esc(it.n)}${looksDir&&!/\/$/.test(it.n)?"/":""}</span><span class="dot" style="background:${kindColor[it.k]||"#999"}"></span>`;
     parent.appendChild(row);
     let kids=null;
     if(isDir){kids=document.createElement("div");kids.className="kids closed";parent.appendChild(kids);mk(it.c,kids,p);}
     row.onclick=()=>{document.querySelectorAll(".node.sel").forEach(x=>x.classList.remove("sel"));row.classList.add("sel");
-      if(kids){kids.classList.toggle("closed");row.querySelector(".ic").textContent=kids.classList.contains("closed")?"📁":"📂";}
+      if(kids){kids.classList.toggle("closed");row.querySelector(".ic").textContent=kids.classList.contains("closed")?"":"";}
       showPanel(it,p);};
   });
   mk(data,root,"");
@@ -375,7 +375,7 @@ function showPanel(it,path){
   $("#panel").innerHTML=`<span class="tag" style="background:${kindColor[it.k]}22;color:${kindColor[it.k]}">${kindName[it.k]||""}</span>
    <h3>${esc(path)}${it.c?"/":""}</h3>
    <div class="row"><div class="lab">Apa ini</div><div>${d.w}</div></div>
-   ${d.a?`<div class="row"><div class="lab">Analogi restoran</div><div>🍽️ ${d.a}</div></div>`:""}
+   ${d.a?`<div class="row"><div class="lab">Analogi restoran</div><div>Analogi: ${d.a}</div></div>`:""}
    ${d.t?`<div class="row"><div class="lab">Seberapa sering diubah</div><div>${d.t}</div></div>`:""}
    ${x?`<div class="row"><div class="lab">Contoh isi</div><pre>${esc(x)}</pre></div>`:""}
    ${it.c?`<div class="row"><div class="lab">Isinya</div><div>${it.c.map(c=>"<code>"+esc(c.n)+"</code>").join(" ")}</div></div>`:""}`;
@@ -396,7 +396,7 @@ const TL={be:[
  ["Modul pembayaran","internal/modules/payment","Pembayaran dengan Idempotency-Key, kedaluwarsa, simulasi sukses/gagal.","Butuh pesanan yang sudah ada."],
  ["Rakit & daftarkan alamat","internal/app/app.go · internal/routes/routes.go · cmd/api/main.go","Sambungkan semua modul, daftarkan 34 endpoint, nyalakan server. Sekarang backend bisa dijalankan.","Merakit di akhir supaya tiap modul bisa dikerjakan dan dites terpisah dulu."],
  ["Tulis test","*_test.go · tests/","Unit test per bagian (53 lulus) dan integration test alur lengkap dengan database sungguhan (70 lulus), termasuk rebutan stok.","Bukti bahwa aturan penting benar-benar bekerja, dan alarm kalau nanti ada yang rusak."],
- ["Bungkus dengan Docker","Dockerfile · docker-compose.yml · Makefile","Supaya siapa pun bisa menjalankan dengan satu perintah.","Dilakukan setelah program jalan, tinggal dikemas."],
+ ["Kemas dengan Docker","Dockerfile · docker-compose.yml · Makefile","Supaya siapa pun bisa menjalankan dengan satu perintah.","Dilakukan setelah program jalan, tinggal dikemas."],
  ["Dokumentasi & CI","README.md · docs/ · .github/workflows","Daftar endpoint (Swagger), README, robot pemeriksa otomatis di GitHub.","Supaya orang lain (dan recruiter) paham dan percaya kodenya teruji."],
 ],fe:[
  ["Siapkan project","pubspec.yaml · analysis_options.yaml · .gitignore","Daftar library (Riverpod, Dio, go_router, secure storage) dan aturan kerapian kode.",""],
@@ -412,26 +412,26 @@ const TL={be:[
  ["Test & CI","test/ · .github/workflows/flutter-ci.yml","91 test. Catatan: belum dijalankan karena SDK Flutter tidak tersedia saat pembuatan; jalan pertama kali di laptop / GitHub Actions.",""],
 ]};
 function renderTL(k){const el=$("#timeline");el.innerHTML="";TL[k].forEach((s,i)=>{const d=document.createElement("div");d.className="tl"+(k==="fe"?" fe":"");d.dataset.n=i+1;
- d.innerHTML=`<div class="box"><h4><span>${s[0]}</span><span class="chev">›</span></h4><div class="where">📍 ${s[1]}</div><div class="more">${s[2]}${s[3]?`<div class="why">💡 <b>Kenapa di urutan ini:</b> ${s[3]}</div>`:""}</div></div>`;
+ d.innerHTML=`<div class="box"><h4><span>${s[0]}</span><span class="chev">›</span></h4><div class="where">${s[1]}</div><div class="more">${s[2]}${s[3]?`<div class="why"><b>Kenapa di urutan ini:</b> ${s[3]}</div>`:""}</div></div>`;
  d.querySelector(".box").onclick=()=>d.classList.toggle("open");el.appendChild(d);});el.firstChild.classList.add("open");}
 document.querySelectorAll("[data-tl]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-tl]").forEach(x=>x.classList.remove("on"));b.classList.add("on");renderTL(b.dataset.tl);});
 renderTL("be");
 
 /* ---------------- 4. journey ---------------- */
 const J=[
- {e:"👆",s:"fe",t:"Pelanggan menekan tombol",f:"lib/features/orders/presentation/pages/checkout_page.dart",d:"Di layar Checkout, tombol <b>Buat pesanan</b> ditekan. Halaman ini hanya menggambar tampilan; ia memanggil controller."},
- {e:"🧠",s:"fe",t:"Controller menjaga tombol",f:"lib/features/orders/presentation/controllers/order_controllers.dart",d:"<code>CheckoutController.placeOrder()</code>. Kalau masih loading (tombol ditekan dua kali), panggilan kedua diabaikan. Lalu tombol berubah jadi loading."},
- {e:"📋",s:"fe",t:"Use case: aksi bisnis",f:"lib/features/orders/domain/usecases/order_usecases.dart",d:"<code>PlaceOrder</code>, satu aksi = satu kelas. Lapisan ini tidak tahu soal tampilan maupun internet."},
- {e:"🔌",s:"fe",t:"Repository & data source",f:"lib/features/orders/data/…",d:"Repository memanggil data source yang mengirim <code>POST /api/v1/orders</code>. Kalau gagal, error diubah jadi pesan yang bisa dimengerti."},
- {e:"🎫",s:"fe",t:"Token ditempel otomatis",f:"lib/core/network/auth_interceptor.dart",d:"Interceptor menempelkan <code>Authorization: Bearer &lt;token&gt;</code>. Kalau token kedaluwarsa, ia memperbaruinya diam-diam lalu mengulang."},
- {e:"🌐",s:"be",t:"Request tiba di backend",f:"cmd/api/main.go → internal/routes/routes.go",d:"Server Fiber menerima request. <code>routes.go</code> menunjukkan bahwa <code>POST /orders</code> ditangani <code>OrderHandler.Create</code>, dan wajib login."},
- {e:"💂",s:"be",t:"Satpam memeriksa",f:"internal/middleware/",d:"Beri nomor request, cek batas request, cek token asli dan belum kedaluwarsa, catat siapa user-nya."},
- {e:"🧑‍🍳",s:"be",t:"Handler menerima",f:"internal/modules/order/handler.go",d:"Mengambil ID user dari token lalu memanggil service. Tidak ada body yang dibaca: pesanan dibuat dari keranjang di server, jadi pelanggan tidak bisa mengakali harga."},
- {e:"⚖️",s:"be",t:"Service menjalankan aturan",f:"internal/modules/order/service.go",d:"Mulai <b>transaksi</b> (semua berhasil atau semua batal). Kunci keranjang, urutkan produk (anti-macet), kurangi stok <b>hanya jika cukup</b>, salin harga, buat pesanan, kosongkan keranjang."},
- {e:"🗄️",s:"db",t:"Database menyimpan",f:"internal/modules/order/repository.go → PostgreSQL",d:"<code>UPDATE products SET stock = stock - 1 WHERE id = … AND stock >= 1</code>. Kalau stok tidak cukup, 0 baris berubah → transaksi dibatalkan → jawaban 409. Terbukti: 300 pembeli rebutan 50 stok → tepat 50 pesanan."},
- {e:"⚡",s:"be",t:"Cache diperbarui",f:"internal/cache/redis.go",d:"Data produk lama di Redis dibuang supaya stok yang tampil selanjutnya akurat."},
- {e:"📦",s:"be",t:"Jawaban dikirim",f:"pkg/response/response.go",d:"<code>201 Created</code> dengan data pesanan (nomor, status PENDING, total) dalam format JSON yang seragam."},
- {e:"✅",s:"fe",t:"Layar diperbarui",f:"order_controllers.dart → checkout_page.dart",d:"Keranjang dan riwayat dimuat ulang (badge kembali 0), aplikasi pindah ke detail pesanan dan menampilkan \"Pesanan ORD-… dibuat\". Semua ini terjadi dalam puluhan milidetik."},
+ {e:"",s:"fe",t:"Pelanggan menekan tombol",f:"lib/features/orders/presentation/pages/checkout_page.dart",d:"Di layar Checkout, tombol <b>Buat pesanan</b> ditekan. Halaman ini hanya menggambar tampilan; ia memanggil controller."},
+ {e:"",s:"fe",t:"Controller menjaga tombol",f:"lib/features/orders/presentation/controllers/order_controllers.dart",d:"<code>CheckoutController.placeOrder()</code>. Kalau masih loading (tombol ditekan dua kali), panggilan kedua diabaikan. Lalu tombol berubah jadi loading."},
+ {e:"",s:"fe",t:"Use case: aksi bisnis",f:"lib/features/orders/domain/usecases/order_usecases.dart",d:"<code>PlaceOrder</code>, satu aksi = satu kelas. Lapisan ini tidak tahu soal tampilan maupun internet."},
+ {e:"",s:"fe",t:"Repository & data source",f:"lib/features/orders/data/…",d:"Repository memanggil data source yang mengirim <code>POST /api/v1/orders</code>. Kalau gagal, error diubah jadi pesan yang bisa dimengerti."},
+ {e:"",s:"fe",t:"Token ditempel otomatis",f:"lib/core/network/auth_interceptor.dart",d:"Interceptor menempelkan <code>Authorization: Bearer &lt;token&gt;</code>. Kalau token kedaluwarsa, ia memperbaruinya diam-diam lalu mengulang."},
+ {e:"",s:"be",t:"Request tiba di backend",f:"cmd/api/main.go → internal/routes/routes.go",d:"Server Fiber menerima request. <code>routes.go</code> menunjukkan bahwa <code>POST /orders</code> ditangani <code>OrderHandler.Create</code>, dan wajib login."},
+ {e:"",s:"be",t:"Satpam memeriksa",f:"internal/middleware/",d:"Beri nomor request, cek batas request, cek token asli dan belum kedaluwarsa, catat siapa user-nya."},
+ {e:"",s:"be",t:"Handler menerima",f:"internal/modules/order/handler.go",d:"Mengambil ID user dari token lalu memanggil service. Tidak ada body yang dibaca: pesanan dibuat dari keranjang di server, jadi pelanggan tidak bisa mengakali harga."},
+ {e:"",s:"be",t:"Service menjalankan aturan",f:"internal/modules/order/service.go",d:"Mulai <b>transaksi</b> (semua berhasil atau semua batal). Kunci keranjang, urutkan produk (anti-macet), kurangi stok <b>hanya jika cukup</b>, salin harga, buat pesanan, kosongkan keranjang."},
+ {e:"",s:"db",t:"Database menyimpan",f:"internal/modules/order/repository.go → PostgreSQL",d:"<code>UPDATE products SET stock = stock - 1 WHERE id = … AND stock >= 1</code>. Kalau stok tidak cukup, 0 baris berubah → transaksi dibatalkan → jawaban 409. Terbukti: 300 pembeli rebutan 50 stok → tepat 50 pesanan."},
+ {e:"",s:"be",t:"Cache diperbarui",f:"internal/cache/redis.go",d:"Data produk lama di Redis dibuang supaya stok yang tampil selanjutnya akurat."},
+ {e:"",s:"be",t:"Jawaban dikirim",f:"pkg/response/response.go",d:"<code>201 Created</code> dengan data pesanan (nomor, status PENDING, total) dalam format JSON yang seragam."},
+ {e:"",s:"fe",t:"Layar diperbarui",f:"order_controllers.dart → checkout_page.dart",d:"Keranjang dan riwayat dimuat ulang (badge kembali 0), aplikasi pindah ke detail pesanan dan menampilkan \"Pesanan ORD-… dibuat\". Semua ini terjadi dalam puluhan milidetik."},
 ];
 let ji=-1,timer=null;
 const lanes=$("#lanes");
@@ -439,13 +439,13 @@ J.forEach((s,i)=>{const d=document.createElement("div");d.className="lane side-"
 function go(i){ji=Math.max(-1,Math.min(J.length-1,i));
  [...lanes.children].forEach((c,k)=>{c.classList.toggle("on",k===ji);c.classList.toggle("done",k<ji);});
  if(ji<0){$("#jtext").innerHTML=`<div class="stepno">SIAP</div><h4>Pelanggan sudah mengisi keranjang dan membuka layar Checkout.</h4><p>Ungu = di HP pelanggan, biru = di server backend, oranye = di database. Tekan <b>Lanjut</b>.</p><div class="progress"><div></div></div>`;}
- else{const s=J[ji];const where={fe:"📱 Di HP (aplikasi Flutter)",be:"🖥️ Di server (backend Go)",db:"🗄️ Di database"}[s.s];
+ else{const s=J[ji];const where={fe:"Di HP (aplikasi Flutter)",be:"Di server (backend Go)",db:"Di database"}[s.s];
   $("#jtext").innerHTML=`<div class="stepno">LANGKAH ${ji+1} DARI ${J.length} · ${where}</div><h4>${s.e} ${s.t}</h4><p><code>${esc(s.f)}</code></p><p>${s.d}</p><div class="progress"><div style="width:${(ji+1)/J.length*100}%"></div></div>`;
   const el=lanes.children[ji];if(el&&el.scrollIntoView&&lanes.scrollHeight>lanes.clientHeight)el.scrollIntoView({block:"nearest"});}
  $("#jPrev").disabled=ji<0;$("#jNext").disabled=ji>=J.length-1;}
-function stop(){clearInterval(timer);timer=null;$("#jPlay").textContent="▶ Putar otomatis";}
+function stop(){clearInterval(timer);timer=null;$("#jPlay").textContent="Putar otomatis";}
 $("#jNext").onclick=()=>{stop();go(ji+1);};$("#jPrev").onclick=()=>{stop();go(ji-1);};$("#jReset").onclick=()=>{stop();go(-1);};
-$("#jPlay").onclick=()=>{if(timer){stop();return;}if(ji>=J.length-1)go(-1);$("#jPlay").textContent="⏸ Jeda";timer=setInterval(()=>{if(ji>=J.length-1){stop();return;}go(ji+1);},2600);};
+$("#jPlay").onclick=()=>{if(timer){stop();return;}if(ji>=J.length-1)go(-1);$("#jPlay").textContent="Jeda";timer=setInterval(()=>{if(ji>=J.length-1){stop();return;}go(ji+1);},2600);};
 go(-1);
 
 /* ---------------- 5. root files ---------------- */
@@ -453,10 +453,10 @@ const order=["Dockerfile","docker-compose.yml","Makefile",".env.example","go.mod
 const rf=$("#rootfiles");
 order.forEach(n=>{const r=ROOT[n];const d=document.createElement("div");d.className="card filecard";
  d.innerHTML=`<div class="emoji">${r.e}</div><div class="fn" style="margin-top:8px">${esc(n)}</div><p style="margin-top:4px">${r.s}</p>`;
- d.onclick=()=>openModal(`<h3>${r.e} <code>${esc(n)}</code></h3><p><b>${r.s}.</b> ${r.w}</p><p>🍽️ <i>${r.a}</i></p><pre>${esc(r.x)}</pre>`);rf.appendChild(d);});
-const cicd={e:"🤖",n:".github/workflows",s:"Robot pemeriksa otomatis (CI)"};
+ d.onclick=()=>openModal(`<h3>${r.e} <code>${esc(n)}</code></h3><p><b>${r.s}.</b> ${r.w}</p><p>Analogi: <i>${r.a}</i></p><pre>${esc(r.x)}</pre>`);rf.appendChild(d);});
+const cicd={e:"",n:".github/workflows",s:"Robot pemeriksa otomatis (CI)"};
 const d=document.createElement("div");d.className="card filecard";d.innerHTML=`<div class="emoji">${cicd.e}</div><div class="fn" style="margin-top:8px">${cicd.n}</div><p style="margin-top:4px">${cicd.s}</p>`;
-d.onclick=()=>openModal(`<h3>🤖 <code>.github/workflows/*.yml</code></h3><p><b>CI (Continuous Integration)</b> = setiap kali kode dikirim ke GitHub, server GitHub otomatis menjalankan pemeriksaan. Backend: cek format, <code>go vet</code>, unit test, integration test dengan PostgreSQL, build. Aplikasi: <code>flutter analyze</code> dan <code>flutter test</code>.</p><p>Hasilnya muncul sebagai ✅ atau ❌ di halaman GitHub, sehingga kesalahan ketahuan sebelum digabung.</p><p>🍽️ <i>Inspektur kesehatan yang datang otomatis setiap kali resep diubah.</i></p>`);rf.appendChild(d);
+d.onclick=()=>openModal(`<h3><code>.github/workflows/*.yml</code></h3><p><b>CI (Continuous Integration)</b> = setiap kali kode dikirim ke GitHub, server GitHub otomatis menjalankan pemeriksaan. Backend: cek format, <code>go vet</code>, unit test, integration test dengan PostgreSQL, build. Aplikasi: <code>flutter analyze</code> dan <code>flutter test</code>.</p><p>Hasilnya muncul sebagai atau di halaman GitHub, sehingga kesalahan ketahuan sebelum digabung.</p><p>Analogi: <i>Inspektur kesehatan yang datang otomatis setiap kali resep diubah.</i></p>`);rf.appendChild(d);
 const m=$("#modal");function openModal(h){$("#mbody").innerHTML=h;m.classList.add("on");}
 $("#mclose").onclick=()=>m.classList.remove("on");m.onclick=e=>{if(e.target===m)m.classList.remove("on");};document.addEventListener("keydown",e=>{if(e.key==="Escape")m.classList.remove("on");});
 
