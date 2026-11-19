@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Panduan Pemula — Membaca Project E-Commerce Tanpa Bisa Ngoding</title>
+<title>Panduan Pemula — Membaca Project Rombong Tanpa Bisa Ngoding</title>
 <style>
 :root{--pri:#0B7A94;--pri-d:#04404F;--pri-s:#D9F2F8;--ink:#14202A;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9;--card:#fff;
 --be:#0B7A94;--be-s:#D9F2F8;--fe:#7C3AED;--fe-s:#EDE7FB;--db:#B45309;--db-s:#FEF0DC;--ok:#1E7B34;--ok-s:#E3F4E6;--warn:#8A5A00;--warn-s:#FFF4D6}
@@ -146,8 +146,8 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 </head>
 <body>
 <div class="hero"><div class="wrap">
-  <h1>Membaca project E-Commerce tanpa harus bisa ngoding</h1>
-  <p>Panduan ini menjelaskan isi dua project (<b>rombong-api</b> dan <b>rombong</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar waktu kamu menekan satu tombol di aplikasi.</p>
+  <h1>Membaca project Rombong tanpa harus bisa ngoding</h1>
+  <p>Panduan ini menjelaskan isi dua project (<b>rombong-api</b> dan <b>rombong-app</b>): folder apa untuk apa, file mana dibuat duluan, apa itu Docker dan Makefile, dan apa yang terjadi di balik layar waktu kamu menekan satu tombol di aplikasi.</p>
   <div class="toc">
     <a href="#besar">1. Gambaran besar</a><a href="#peta">2. Peta folder</a><a href="#urutan">3. Urutan ngoding</a>
     <a href="#perjalanan">4. Ikuti satu klik</a><a href="#root">5. File-file aneh</a><a href="#docker">6. Docker &amp; Makefile</a>
@@ -164,7 +164,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
   <div class="card" id="restoDetail"></div>
   <h3>Ada dua project yang terpisah</h3>
   <div class="grid g2">
-    <div class="card"><span class="tag t-fe">rombong</span><h4>Aplikasi HP (Flutter, bahasa Dart)</h4><p>Yang dilihat dan disentuh pelanggan: layar katalog, keranjang, tombol bayar. Aplikasi ini <b>tidak menyimpan data toko</b>; semua ditanyakan ke backend lewat internet.</p></div>
+    <div class="card"><span class="tag t-fe">rombong-app</span><h4>Aplikasi HP (Flutter, bahasa Dart)</h4><p>Yang dilihat dan disentuh pelanggan: layar katalog, keranjang, tombol bayar. Aplikasi ini <b>tidak menyimpan data toko</b>; semua ditanyakan ke backend lewat internet.</p></div>
     <div class="card"><span class="tag t-be">rombong-api</span><h4>Backend / server (bahasa Go)</h4><p>Otak dan gudangnya. Memeriksa login, menghitung total, mengurangi stok, mencatat pembayaran. Juga melayani panel admin. Bisa dipakai juga oleh website atau aplikasi lain nanti.</p></div>
   </div>
   <div class="callout">Keduanya berbicara lewat <b>API</b>: aplikasi mengirim permintaan seperti <code>GET /api/v1/products</code> ("tolong daftar produk"), lalu backend menjawab dengan data berformat <b>JSON</b> (teks terstruktur yang mudah dibaca mesin).</div>
@@ -174,7 +174,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
 <section id="peta">
   <h2><span class="n">2</span>Peta folder: klik untuk tahu isinya</h2>
   <p class="lead">Ini isi asli kedua project. Klik folder untuk membuka, klik apa saja untuk melihat penjelasannya di sebelah kanan.</p>
-  <div class="tabs"><button class="on" data-tree="be">🖥️ Backend (rombong-api)</button><button data-tree="fe">📱 Aplikasi (rombong)</button></div>
+  <div class="tabs"><button class="on" data-tree="be">🖥️ Backend (rombong-api)</button><button data-tree="fe">📱 Aplikasi (rombong-app)</button></div>
   <div class="legend"><span><i style="background:#0B7A94"></i>kode program</span><span><i style="background:#B45309"></i>database</span><span><i style="background:#1E7B34"></i>pengujian</span><span><i style="background:#8A5A00"></i>pengaturan / alat bantu</span><span><i style="background:#7C3AED"></i>dokumentasi</span></div>
   <div class="explorer">
     <div class="tree" id="tree"></div>
@@ -239,7 +239,7 @@ h3{margin:24px 0 8px;font-size:18px;color:var(--pri-d)}
     <div class="card"><span class="tag t-be">Backend</span><h4>Pakai Docker (paling gampang)</h4>
       <ol class="steps-list"><li>Instal <b>Docker Desktop</b>, lalu buka aplikasinya</li><li>Buka terminal di folder <code>rombong-api</code></li><li><code>cp .env.example .env</code> (bikin file setelan)</li><li><code>docker compose up --build</code></li><li>Buka <code>http://localhost:8080/docs</code>: daftar semua endpoint, bisa dicoba langsung</li></ol></div>
     <div class="card"><span class="tag t-fe">Aplikasi</span><h4>Flutter di emulator</h4>
-      <ol class="steps-list"><li>Instal <b>Flutter 3.35+</b> dan Android Studio (untuk emulator)</li><li>Buka terminal di folder <code>rombong</code></li><li>Sekali saja: <code>flutter create --org com.aulansah --project-name rombong .</code> (membuat folder android/ios)</li><li><code>flutter pub get</code> (unduh library)</li><li>Pastikan backend sudah jalan, lalu <code>flutter run</code></li></ol></div>
+      <ol class="steps-list"><li>Instal <b>Flutter 3.35+</b> dan Android Studio (untuk emulator)</li><li>Buka terminal di folder <code>rombong-app</code></li><li>Sekali saja: <code>flutter create --org com.aulansah --project-name rombong .</code> (membuat folder android/ios)</li><li><code>flutter pub get</code> (unduh library)</li><li>Pastikan backend sudah jalan, lalu <code>flutter run</code></li></ol></div>
   </div>
   <div class="callout">Login admin bawaan: <code>admin@example.com</code> / <code>Admin12345</code> (diatur di <code>.env</code>). Pelanggan bisa daftar sendiri dari aplikasi.</div>
 </section>
@@ -262,7 +262,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 
 /* ---------------- 1. restaurant ---------------- */
 const resto=[
- {e:"📱",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>rombong</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
+ {e:"📱",t:"Buku menu di HP",s:"Aplikasi Flutter",d:"<b>rombong-app</b>. Pelanggan melihat menu, memesan, membayar. Buku menu tidak memasak dan tidak punya gudang; ia hanya meneruskan pesanan ke pelayan."},
  {e:"🧑‍🍳",t:"Pelayan",s:"API / endpoint",d:"<b>API</b> adalah aturan cara memesan. Setiap 'kalimat pesanan' disebut <b>endpoint</b>, misalnya <code>POST /api/v1/orders</code> = \"buatkan pesanan dari keranjang saya\". Ada 34 endpoint di project ini."},
  {e:"🔥",t:"Dapur",s:"Backend Go",d:"<b>rombong-api</b>. Di sinilah aturan bisnis dijalankan: cek stok, hitung total, kurangi stok, catat pesanan. Dapur dibagi ke beberapa stasiun (<b>modul</b>): auth, produk, keranjang, pesanan, pembayaran."},
  {e:"🗄️",t:"Gudang",s:"Database PostgreSQL",d:"Tempat menyimpan semua data secara permanen: user, produk, pesanan, pembayaran. Berbentuk tabel seperti Excel, tapi bisa diakses ribuan orang bersamaan tanpa kacau."},

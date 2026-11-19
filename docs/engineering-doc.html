@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>E-Commerce Platform — Dokumen Rekayasa (FRD, FSD, System Design, Test, Stress Test)</title>
+<title>Rombong — Dokumen Rekayasa (FRD, FSD, System Design, Test, Stress Test)</title>
 <style>
 :root{--pri:#0B7A94;--pri-soft:#D9F2F8;--ink:#12181D;--muted:#5B6670;--line:#DDE3E7;--bg:#F6F8F9;--ok:#1E7B34;--ok-soft:#E3F4E6;--warn:#8A5A00;--warn-soft:#FFF4D6;--err:#B3261E;--info:#1D4ED8;--info-soft:#E0E9FF}
 *{box-sizing:border-box}
@@ -59,12 +59,12 @@ footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 0 40px}
 @media print{nav{display:none}.layout{display:block}section{break-inside:avoid-page;border:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style></head><body>
 <header><div class="wrap">
-<h1>E-Commerce Platform — Dokumen Rekayasa Perangkat Lunak</h1>
+<h1>Rombong — Dokumen Rekayasa Perangkat Lunak</h1>
 <p>FRD · FSD · System Design · Sequence &amp; Flow · Unit Test · Integration Test · Stress Test</p>
-<div class="tags"><span>rombong-api v1.0.0</span><span>rombong v1.0.0</span><span>Go · Fiber · PostgreSQL · Redis</span><span>Flutter · Riverpod 3 · Clean Architecture</span></div>
+<div class="tags"><span>rombong-api v1.0.0</span><span>rombong-app v1.0.0</span><span>Go · Fiber · PostgreSQL · Redis</span><span>Flutter · Riverpod 3 · Clean Architecture</span></div>
 </div></header>
 <div class="layout"><nav><a href="#ringkasan"><span>1</span>Ringkasan dokumen</a><a href="#frd"><span>2</span>FRD — Functional Requirements Document</a><a href="#design"><span>3</span>System design</a><a href="#fsd"><span>4</span>FSD — Functional Specification Document</a><a href="#diagram"><span>5</span>Sequence diagram & flow</a><a href="#testing"><span>6</span>Pengujian: UT & UIT</a><a href="#stress"><span>7</span>Stress test & hasil</a><a href="#risiko"><span>8</span>Risiko, batasan & rencana</a></nav><main><section id="ringkasan"><h2><span class="num">1</span>Ringkasan dokumen</h2>
-<p>Dokumen ini menjelaskan <b>E-Commerce Platform</b>: backend <code>rombong-api</code> (Go, Fiber, PostgreSQL, Redis) dan aplikasi mobile <code>rombong</code> (Flutter, Riverpod, Clean Architecture). Isinya mengikuti urutan pembuatan aplikasi yang semestinya: kebutuhan bisnis (FRD), spesifikasi fungsional (FSD), desain sistem, diagram, rencana dan hasil pengujian (UT, UIT), serta stress test.</p>
+<p>Dokumen ini menjelaskan <b>Rombong</b>: backend <code>rombong-api</code> (Go, Fiber, PostgreSQL, Redis) dan aplikasi mobile <code>rombong-app</code> (Flutter, Riverpod, Clean Architecture). Isinya mengikuti urutan pembuatan aplikasi yang semestinya: kebutuhan bisnis (FRD), spesifikasi fungsional (FSD), desain sistem, diagram, rencana dan hasil pengujian (UT, UIT), serta stress test.</p>
 <div class="kpis">
   <div class="kpi"><div class="kv">34</div><div class="kl">endpoint REST</div></div>
   <div class="kpi"><div class="kv">8</div><div class="kl">tabel database</div></div>
@@ -498,7 +498,7 @@ footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 0 40px}
 <h3>4.6 Spesifikasi layar (Flutter)</h3>
 <div class="tw"><table class=""><thead><tr><th>Route</th><th>Layar</th><th>Perilaku utama</th><th>Aktor</th></tr></thead><tbody><tr><td><code>/splash</code></td><td>Splash</td><td>Memeriksa sesi tersimpan</td><td>Semua</td></tr><tr><td><code>/login, /register</code></td><td>Login & daftar</td><td>Form dengan validasi, error dari backend per field</td><td>Guest</td></tr><tr><td><code>/home</code></td><td>Katalog</td><td>Cari (debounce), chip kategori, grid 2 kolom, infinite scroll, pull-to-refresh</td><td>Customer</td></tr><tr><td><code>/products/:id</code></td><td>Detail produk</td><td>Stepper 1…stok, tambah ke keranjang</td><td>Customer</td></tr><tr><td><code>/cart</code></td><td>Keranjang</td><td>Ubah jumlah optimistic, hapus/geser, banner stok kurang, total</td><td>Customer</td></tr><tr><td><code>/checkout</code></td><td>Checkout</td><td>Ringkasan, guard tap ganda, penanganan 409 stok</td><td>Customer</td></tr><tr><td><code>/orders, /orders/:id</code></td><td>Pesanan</td><td>Riwayat berhalaman, timeline status, batalkan</td><td>Customer</td></tr><tr><td><code>/orders/:id/pay</code></td><td>Pembayaran</td><td>Countdown, referensi, simulasi berhasil/ditolak, coba lagi</td><td>Customer</td></tr><tr><td><code>/admin, /admin/products/:id</code></td><td>Admin</td><td>Tab produk/kategori/pesanan, form produk, ubah status</td><td>Admin</td></tr></tbody></table></div>
 <h3>4.7 Design system</h3>
-<p>Token di Figma (<a href="https://www.figma.com/design/B9ckLWw2BNWUWNO3h5zdqa">E-Commerce App — UI Design</a>) dipetakan 1:1 ke <code>AppColors</code>, <code>AppSizes</code>, <code>AppTextStyles</code>.</p>
+<p>Token di Figma (<a href="https://www.figma.com/design/B9ckLWw2BNWUWNO3h5zdqa">Rombong App — UI Design</a>) dipetakan 1:1 ke <code>AppColors</code>, <code>AppSizes</code>, <code>AppTextStyles</code>.</p>
 <div class="swatches"><div class="sw"><span style="background:#0B7A94"></span><code>primary</code><small>#0B7A94</small></div><div class="sw"><span style="background:#D9F2F8"></span><code>primaryContainer</code><small>#D9F2F8</small></div><div class="sw"><span style="background:#F6F8F9"></span><code>background</code><small>#F6F8F9</small></div><div class="sw"><span style="background:#EEF2F4"></span><code>surfaceVariant</code><small>#EEF2F4</small></div><div class="sw"><span style="background:#DDE3E7"></span><code>border</code><small>#DDE3E7</small></div><div class="sw"><span style="background:#12181D"></span><code>text</code><small>#12181D</small></div><div class="sw"><span style="background:#5B6670"></span><code>textMuted</code><small>#5B6670</small></div><div class="sw"><span style="background:#B3261E"></span><code>error</code><small>#B3261E</small></div><div class="sw"><span style="background:#1E7B34"></span><code>success</code><small>#1E7B34</small></div></div>
 </section><section id="diagram"><h2><span class="num">5</span>Sequence diagram & flow</h2>
 <h3>5.1 User journey</h3><figure><svg viewBox="0 0 1080 300" class="diagram" role="img" aria-label="User journey" xmlns="http://www.w3.org/2000/svg">

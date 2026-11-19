@@ -1,0 +1,2241 @@
+{
+  "info": {
+    "_postman_id": "ccc0cb36-984a-43b5-8fbe-37433148d3cb",
+    "name": "Rombong API (lengkap)",
+    "description": "Collection lengkap rombong-api: 34 endpoint, token & ID tersimpan otomatis, test di setiap request.\n\nCara pakai: nyalakan backend (docker compose up), lalu klik kanan collection → Run collection → Run. Bisa juga dijalankan satu per satu dari atas ke bawah.\n\nRate limit backend 100 request/menit per IP: tunggu 1 menit sebelum menjalankan ulang seluruh collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Health",
+      "description": "Pastikan backend menyala sebelum menjalankan yang lain.",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{host}}/health",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Database & Redis up\", () => { pm.expect(body.database).to.eql(\"up\"); pm.expect(body.redis).to.eql(\"up\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Auth (customer)",
+      "description": "Daftar, login, profil. Token tersimpan otomatis ke collection variables.",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "201 akun dibuat. 409 berarti email sudah terdaftar (aman, lanjut login).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"auldy\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201 atau 409\", () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"access_token\", body.data.tokens.access_token);",
+                  "pm.collectionVariables.set(\"refresh_token\", body.data.tokens.refresh_token);",
+                  "pm.collectionVariables.set(\"user_id\", body.data.user.id);",
+                  "pm.test(\"Token tersimpan\", () => pm.expect(body.data.tokens.access_token).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get my profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Email benar\", () => pm.expect(body.data.email).to.eql(pm.collectionVariables.get(\"email\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update my profile",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/users/me",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Auldy Ansya Rullah\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Nama berubah\", () => pm.expect(body.data.name).to.eql(\"Auldy Ansya Rullah\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "Rotasi: refresh token lama langsung dicabut. Token lama disimpan di old_refresh_token untuk uji keamanan di folder 9.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"old_refresh_token\", pm.collectionVariables.get(\"refresh_token\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"access_token\", body.data.access_token);",
+                  "pm.collectionVariables.set(\"refresh_token\", body.data.refresh_token);",
+                  "pm.test(\"Refresh token baru berbeda\", () => pm.expect(body.data.refresh_token).to.not.eql(pm.collectionVariables.get(\"old_refresh_token\")));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Admin login",
+      "description": "Akun admin dibuat otomatis oleh backend dari ADMIN_EMAIL/ADMIN_PASSWORD.",
+      "item": [
+        {
+          "name": "Admin login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{admin_email}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"admin_token\", body.data.tokens.access_token);",
+                  "pm.collectionVariables.set(\"admin_refresh_token\", body.data.tokens.refresh_token);",
+                  "pm.test(\"Role admin\", () => pm.expect(body.data.user.role).to.eql(\"admin\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List users (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users?page=1&limit=10",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get user by id (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{user_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Categories",
+      "description": "Baca publik, tulis khusus admin.",
+      "item": [
+        {
+          "name": "Create category (admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/categories",
+            "description": "Nama diberi timestamp supaya collection bisa dijalankan berulang (nama kategori harus unik).",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Minuman {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"category_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/categories/{{category_id}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update category (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/categories/{{category_id}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Minuman & Kopi {{$timestamp}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Products",
+      "description": "Katalog dengan cache Redis, pencarian, filter, urutan, dan pagination.",
+      "item": [
+        {
+          "name": "Create product (admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/products",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kopi Arabika Gayo 250g\",\n  \"description\": \"Biji kopi single origin dari Gayo, Aceh.\",\n  \"price\": 85000,\n  \"stock\": 20,\n  \"category_id\": \"{{category_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"product_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create second product (admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/products",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Keripik Singkong Balado\",\n  \"description\": \"Keripik singkong bumbu balado.\",\n  \"price\": 18000,\n  \"stock\": 50,\n  \"category_id\": \"{{category_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"product2_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?page=1&limit=10",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Ada meta pagination\", () => pm.expect(body.meta).to.have.property(\"total_pages\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?search=kopi&limit=10",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Filter by category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products?category_id={{category_id}}&sort=price&order=asc",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Urut harga naik\", () => { const p = body.data.map(x => x.price); pm.expect(p).to.eql([...p].sort((a,b)=>a-b)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product_id}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update product (admin)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product_id}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kopi Arabika Gayo 250g\",\n  \"description\": \"Sangrai medium, rasa fruity dengan aftertaste cokelat.\",\n  \"price\": 89000,\n  \"stock\": 20,\n  \"category_id\": \"{{category_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Harga baru\", () => pm.expect(body.data.price).to.eql(89000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update stock (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product_id}}/stock",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stock\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Stok 30\", () => pm.expect(body.data.stock).to.eql(30));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Cart",
+      "description": "Keranjang milik user yang login. Total dihitung server dari harga terbaru.",
+      "item": [
+        {
+          "name": "Clear cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/cart",
+            "description": "Mulai dari keranjang kosong supaya collection bisa diulang."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.expect(pm.response.code).to.be.oneOf([204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add item",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"cart_item_id\", body.data.items.find(i => i.product_id === pm.collectionVariables.get(\"product_id\")).id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add second item",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product2_id}}\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"cart_item2_id\", body.data.items.find(i => i.product_id === pm.collectionVariables.get(\"product2_id\")).id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/cart",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"2 item\", () => pm.expect(body.data.items.length).to.eql(2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update quantity",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items/{{cart_item_id}}",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Total = 3x89.000 + 18.000\", () => pm.expect(body.data.total_amount).to.eql(3*89000 + 18000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items/{{cart_item2_id}}",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Tinggal 1 item\", () => pm.expect(body.data.items.length).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add second item again",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product2_id}}\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Orders",
+      "description": "Checkout dalam satu transaksi: stok dikurangi, harga di-snapshot, keranjang dikosongkan.",
+      "item": [
+        {
+          "name": "Create order (checkout)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"order_id\", body.data.id);",
+                  "pm.test(\"Status PENDING\", () => pm.expect(body.data.status).to.eql(\"PENDING\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order again (cart empty)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders",
+            "description": "Keranjang sudah kosong → 400. Tidak ada pesanan ganda."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List my orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/orders?page=1&limit=10",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get order",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Payments",
+      "description": "Pembayaran idempoten: Idempotency-Key yang sama → pembayaran yang sama.",
+      "item": [
+        {
+          "name": "Create payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotency_key}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"idempotency_key\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"payment_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create payment again (same key)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotency_key}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments",
+            "description": "Meniru retry setelah timeout. 200, bukan 201: tidak ada pembayaran kedua.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"ID pembayaran SAMA\", () => pm.expect(body.data.id).to.eql(pm.collectionVariables.get(\"payment_id\")));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create payment with another key",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments",
+            "description": "Pesanan sudah punya pembayaran aktif → 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get payment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/payments/{{payment_id}}",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Simulate success",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/payments/{{payment_id}}/simulate-success",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"SUCCESS\", () => pm.expect(body.data.status).to.eql(\"SUCCESS\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Order is now PAID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"PAID\", () => pm.expect(body.data.status).to.eql(\"PAID\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Admin: order flow",
+      "description": "Admin memajukan status pesanan. Lompat status ditolak.",
+      "item": [
+        {
+          "name": "Customer cannot change status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PROCESSING\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.expect(pm.response.code).to.be.oneOf([403]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Skip to COMPLETED (rejected)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set PROCESSING (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PROCESSING\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"PROCESSING\", () => pm.expect(body.data.status).to.eql(\"PROCESSING\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set SHIPPED (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SHIPPED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"SHIPPED\", () => pm.expect(body.data.status).to.eql(\"SHIPPED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set COMPLETED (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order_id}}/status",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"COMPLETED\", () => pm.expect(body.data.status).to.eql(\"COMPLETED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List all orders (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/orders?page=1&limit=10",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "9. Cancel flow",
+      "description": "Pembayaran ditolak, pesanan dibatalkan, stok kembali.",
+      "item": [
+        {
+          "name": "Stock before",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product_id}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"stock_before\", body.data.stock);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add item",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"order2_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotency_key2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/payments",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order2_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"idempotency_key2\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"payment2_id\", body.data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Simulate failure",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/payments/{{payment2_id}}/simulate-failure",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"FAILED\", () => pm.expect(body.data.status).to.eql(\"FAILED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel order",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order2_id}}/cancel",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"CANCELLED\", () => pm.expect(body.data.status).to.eql(\"CANCELLED\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Stock restored",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product_id}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Stok kembali seperti semula\", () => pm.expect(body.data.stock).to.eql(Number(pm.collectionVariables.get(\"stock_before\"))));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel again (rejected)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/orders/{{order2_id}}/cancel",
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10. Validasi & error",
+      "description": "Contoh respons error yang benar.",
+      "item": [
+        {
+          "name": "Login wrong password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"salah\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register invalid input",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"A\",\n  \"email\": \"bukan-email\",\n  \"password\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 422\", () => pm.expect(pm.response.code).to.be.oneOf([422]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"Error per field\", () => pm.expect(body.error.details.length).to.be.above(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cart without token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/cart",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Product not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/00000000-0000-0000-0000-000000000000",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.expect(pm.response.code).to.be.oneOf([404]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add more than stock",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/cart/items",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Payment without Idempotency-Key",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/payments",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": \"{{order_id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.expect(pm.response.code).to.be.oneOf([400]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete category in use",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/categories/{{category_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "11. Session security",
+      "description": "Rotasi refresh token, deteksi pemakaian ulang, logout.",
+      "item": [
+        {
+          "name": "Reuse old refresh token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "Refresh token lama (dari folder 1) dipakai lagi → dianggap dicuri, SEMUA sesi user dicabut.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{old_refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login again",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set(\"access_token\", body.data.tokens.access_token);",
+                  "pm.collectionVariables.set(\"refresh_token\", body.data.tokens.refresh_token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/logout",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh after logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/auth/refresh",
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "12. Cleanup (admin)",
+      "description": "Opsional: hapus produk uji (soft delete).",
+      "item": [
+        {
+          "name": "Delete product",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product2_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", () => pm.expect(pm.response.code).to.be.oneOf([204]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deleted product is gone",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/products/{{product2_id}}",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", () => pm.expect(pm.response.code).to.be.oneOf([404]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-refresh: sebelum setiap request, kalau access token (customer/admin) tinggal < 60 detik,",
+          "// panggil /auth/refresh memakai refresh_token lalu simpan pasangan token yang baru.",
+          "function expMs(t) {",
+          "  try {",
+          "    let p = t.split(\".\")[1].replace(/-/g, \"+\").replace(/_/g, \"/\");",
+          "    while (p.length % 4) p += \"=\";",
+          "    return JSON.parse(require(\"atob\")(p)).exp * 1000;",
+          "  } catch (e) { return 0; }",
+          "}",
+          "const url = pm.request.url.toString();",
+          "const auth = pm.request.auth;  // kosong = mewarisi auth collection ({{access_token}})",
+          "const bearer = auth && auth.type === \"bearer\" && auth.bearer ? (auth.bearer.get(\"token\") || \"\") : \"\";",
+          "const usesAdmin = bearer.indexOf(\"admin_token\") >= 0;",
+          "const accessVar = usesAdmin ? \"admin_token\" : \"access_token\";",
+          "const refreshVar = usesAdmin ? \"admin_refresh_token\" : \"refresh_token\";",
+          "const access = pm.collectionVariables.get(accessVar);",
+          "const refresh = pm.collectionVariables.get(refreshVar);",
+          "const isAuthCall = url.indexOf(\"/auth/\") >= 0;",
+          "const noAuth = auth && auth.type === \"noauth\";",
+          "if (!isAuthCall && !noAuth && access && refresh && expMs(access) - Date.now() < 60000) {",
+          "  pm.sendRequest({",
+          "    url: pm.collectionVariables.get(\"baseUrl\") + \"/auth/refresh\",",
+          "    method: \"POST\",",
+          "    header: { \"Content-Type\": \"application/json\" },",
+          "    body: { mode: \"raw\", raw: JSON.stringify({ refresh_token: refresh }) }",
+          "  }, (err, res) => {",
+          "    if (!err && res.code === 200) {",
+          "      const d = res.json().data;",
+          "      pm.collectionVariables.set(accessVar, d.access_token);",
+          "      pm.collectionVariables.set(refreshVar, d.refresh_token);",
+          "      console.log(\"Token \" + accessVar + \" diperbarui otomatis lewat /auth/refresh\");",
+          "    } else {",
+          "      console.warn(\"Auto-refresh gagal (\" + (res ? res.code : err) + \"), jalankan request Login lagi.\");",
+          "    }",
+          "  });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "host",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "email",
+      "value": "auldy@gmail.com"
+    },
+    {
+      "key": "password",
+      "value": "Auldy12345"
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@example.com"
+    },
+    {
+      "key": "admin_password",
+      "value": "Admin12345"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "old_refresh_token",
+      "value": ""
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "admin_refresh_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "product2_id",
+      "value": ""
+    },
+    {
+      "key": "cart_item_id",
+      "value": ""
+    },
+    {
+      "key": "cart_item2_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    },
+    {
+      "key": "order2_id",
+      "value": ""
+    },
+    {
+      "key": "payment_id",
+      "value": ""
+    },
+    {
+      "key": "payment2_id",
+      "value": ""
+    },
+    {
+      "key": "idempotency_key",
+      "value": ""
+    },
+    {
+      "key": "idempotency_key2",
+      "value": ""
+    },
+    {
+      "key": "stock_before",
+      "value": ""
+    }
+  ]
+}
