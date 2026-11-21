@@ -1,10 +1,20 @@
 # Rombong API
 
 Rombong ("gerobak" pedagang, sekarang digital) is a production-oriented e-commerce REST API written in Go. It covers the full
-purchase path — catalog, cart, transactional checkout, simulated payment —
+purchase path (catalog, cart, transactional checkout, and payment through
+Midtrans Snap or a built-in simulator)
 with the concerns that matter in a real backend: no overselling under
 concurrency, idempotent payments, token rotation, cache invalidation and
 consistent error handling.
+
+<p align="center"><img src="docs/media/rombong-12-konsep.gif" width="300" alt="Animasi 12 konsep di balik Rombong"></p>
+
+Visual docs: [`docs/motion.html`](docs/motion.html) animates the 12 core
+mechanisms (also as a [9:16 video](docs/media/rombong-12-konsep-reels.mp4)),
+[`docs/engineering-doc.html`](docs/engineering-doc.html) has the FRD/FSD,
+system design and test results. The Flutter client lives in
+[rombong-app](https://github.com/aulansah/rombong-app); the UI is designed in
+[Figma](https://www.figma.com/design/0c97QesZUU2kNCA0ipNoFS).
 
 ## Table of contents
 
@@ -14,6 +24,7 @@ consistent error handling.
 - [Project structure](#project-structure)
 - [Database design](#database-design)
 - [Getting started](#getting-started)
+- [Deploying](#deploying)
 - [Environment variables](#environment-variables)
 - [API documentation](#api-documentation)
 - [Authentication flow](#authentication-flow)
@@ -255,6 +266,22 @@ In production set `APP_ENV=production` (JSON logs), a strong `JWT_SECRET`,
 explicit `CORS_ALLOW_ORIGINS`, and consider running migrations as a separate
 step (`./api -migrate-only`) with `AUTO_MIGRATE=false`.
 
+## Deploying
+
+`render.yaml` is a [Render Blueprint](https://render.com/docs/blueprint-spec)
+that creates the API (from the Dockerfile), PostgreSQL and a Redis-compatible
+Key Value store, wired together, with a generated `JWT_SECRET`:
+
+1. Push this repo to GitHub.
+2. Render dashboard: **New → Blueprint**, select the repo.
+3. Enter `ADMIN_EMAIL`, `ADMIN_PASSWORD` and, for real sandbox payments,
+   `MIDTRANS_SERVER_KEY` (then set `PAYMENT_PROVIDER=midtrans`).
+4. In the Midtrans dashboard set the notification URL to
+   `https://<service>.onrender.com/api/v1/webhooks/midtrans`.
+
+The free plan sleeps after inactivity; the first request after that takes a
+few seconds.
+
 ## Environment variables
 
 | Variable | Default | Description |
@@ -273,6 +300,8 @@ step (`./api -migrate-only`) with `AUTO_MIGRATE=false`.
 | `RATE_LIMIT_ENABLED` `RATE_LIMIT_MAX` `RATE_LIMIT_WINDOW` | `true` `100` `1m` | Per-IP rate limit |
 | `CACHE_PRODUCT_TTL` / `CACHE_PRODUCT_LIST_TTL` | `10m` / `2m` | Cache lifetimes |
 | `PAYMENT_EXPIRY` | `30m` | How long a payment stays payable |
+| `PAYMENT_PROVIDER` | `simulated` | `simulated` or `midtrans` |
+| `MIDTRANS_SERVER_KEY` / `MIDTRANS_PRODUCTION` | — / `false` | Midtrans Snap server key; sandbox unless production is `true` |
 | `ADMIN_NAME` `ADMIN_EMAIL` `ADMIN_PASSWORD` | — | Seed admin (skipped when empty) |
 
 ## API documentation
@@ -432,7 +461,7 @@ requests (cancel vs. pay, two cancels) cannot both win.
 
 | Payment status | Meaning |
 |---|---|
-| `PENDING` | Waiting for the simulated gateway result |
+| `PENDING` | Waiting for the gateway result |
 | `SUCCESS` | Paid; the order moved to `PAID` in the same transaction |
 | `FAILED` | Order stays `PENDING`; a new payment can be created |
 | `EXPIRED` | Passed `expires_at` before being paid |
@@ -445,6 +474,30 @@ Idempotency works on two levels:
 - **Processing**: `simulate-success` moves `PENDING → SUCCESS` with a
   compare-and-swap. Repeated or concurrent calls return the same result and
   the order is marked `PAID` exactly once.
+
+**Payment providers.** `PAYMENT_PROVIDER=simulated` (the default) exposes
+`simulate-success` and `simulate-failure` for demos. With
+`PAYMENT_PROVIDER=midtrans`:
+
+1. `POST /payments` creates the payment row, then opens a
+   [Midtrans Snap](https://docs.midtrans.com/reference/snap-api-overview)
+   transaction whose `order_id` is the payment reference and whose amount is
+   the order total. The response carries `redirect_url`; the app opens it so
+   the buyer pays on the Midtrans page. The gateway call happens after the
+   database commit, so a slow gateway never holds a transaction open. If
+   Midtrans is unreachable the payment is marked `FAILED` and the API answers
+   `502 GATEWAY_ERROR`; the app retries with a new key.
+2. Midtrans calls `POST /api/v1/webhooks/midtrans`. The handler verifies
+   `signature_key` (SHA-512 of order_id, status_code, gross_amount and the
+   server key), checks the amount, and applies the result with the same
+   compare-and-swap as above. Midtrans retries notifications; duplicates are
+   acknowledged and change nothing.
+3. The simulate endpoints answer `403`, so a real payment cannot be faked.
+
+To try it: create a free sandbox account, copy the server key from
+*Settings → Access Keys*, set the variables above, and set the notification
+URL in the dashboard to `https://<your-host>/api/v1/webhooks/midtrans`
+(use a tunnel such as `cloudflared` when running locally).
 
 ## Caching strategy
 
@@ -513,8 +566,9 @@ docs(readme): document order and payment flow
 
 Deliberate scope cuts, and what a next iteration would add:
 
-- **Payments are simulated.** A real gateway would deliver results through a
-  signed webhook; `simulate-success` stands in for that webhook.
+- **Midtrans is integrated through Snap and webhooks**, tested against a fake
+  Snap server and signed notifications. A scheduled reconciliation job that
+  polls the Midtrans status API would cover missed webhooks.
 - **Expired payments are detected lazily** (when accessed), and unpaid orders
   are not cancelled automatically. A background worker would do both.
 - **No refund flow**, so paid orders cannot be cancelled.
