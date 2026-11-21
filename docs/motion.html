@@ -412,7 +412,7 @@ const FLOWS=[
   [0,1,"kirim ulang","Idempotency-Key: k-7f3 (sama)",{0:"menunggu"},"App mengirim ulang dengan key yang sama, bukan key baru."],
   [1,2,"cari berdasarkan key","SELECT ... WHERE idempotency_key = 'k-7f3'",{},"Server menemukan pembayaran yang sudah ada."],
   [1,0,"200 PAY-1 (sama)","tidak ada pembayaran kedua",{0:"PAY-1"},"Hasilnya sama dengan permintaan pertama. Tidak ada tagihan ganda."],
-  [0,1,"konfirmasi bayar","POST /payments/{id}/simulate-success",{},"Pada versi ini pembayaran disimulasikan. Integrasi gateway sungguhan bisa menggantikan langkah ini."],
+  [0,1,"konfirmasi bayar","POST /payments/{id}/simulate-success",{},"Di mode demo langkah ini disimulasikan. Dengan PAYMENT_PROVIDER=midtrans, hasilnya datang dari webhook Midtrans yang ditandatangani SHA-512."],
   [1,2,"PAY-1 SUCCESS, order PAID","satu transaksi",{2:"order PAID"},"Status pembayaran dan pesanan berubah bersama."]]}}},
 {id:"refresh",tab:"Refresh token otomatis",title:"Token kedaluwarsa tanpa mengganggu pengguna",who:["Layar","Dio + interceptor","API"],
  scenarios:{"Access token habis":{init:["buka keranjang","token A (habis)","RT#1 aktif"],steps:[
