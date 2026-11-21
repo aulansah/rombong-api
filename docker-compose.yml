@@ -22,6 +22,10 @@ services:
       CORS_ALLOW_ORIGINS: http://localhost:3000
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin12345}
+      # Real payments: PAYMENT_PROVIDER=midtrans MIDTRANS_SERVER_KEY=SB-Mid-server-... docker compose up
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-simulated}
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY:-}
+      MIDTRANS_PRODUCTION: ${MIDTRANS_PRODUCTION:-false}
     depends_on:
       postgres:
         condition: service_healthy

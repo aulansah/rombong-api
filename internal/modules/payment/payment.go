@@ -1,4 +1,5 @@
-// Package payment simulates a payment gateway for orders.
+// Package payment takes payment for orders, either simulated or through
+// the Midtrans Snap gateway.
 package payment
 
 import (
@@ -23,6 +24,12 @@ const (
 	StatusExpired Status = "EXPIRED"
 )
 
+// Providers.
+const (
+	ProviderSimulated = "simulated"
+	ProviderMidtrans  = "midtrans"
+)
+
 // Payment is the payments table.
 type Payment struct {
 	ID             uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
@@ -31,6 +38,9 @@ type Payment struct {
 	IdempotencyKey string
 	Amount         int64
 	Status         Status
+	Provider       string
+	GatewayToken   *string
+	RedirectURL    *string
 	PaidAt         *time.Time
 	ExpiresAt      time.Time
 	CreatedAt      time.Time
@@ -45,28 +55,34 @@ type CreateRequest struct {
 
 // Response is the public representation of a payment.
 type Response struct {
-	ID        uuid.UUID  `json:"id"`
-	OrderID   uuid.UUID  `json:"order_id"`
-	Reference string     `json:"reference"`
-	Amount    int64      `json:"amount"`
-	Status    Status     `json:"status"`
-	PaidAt    *time.Time `json:"paid_at"`
-	ExpiresAt time.Time  `json:"expires_at"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uuid.UUID `json:"id"`
+	OrderID   uuid.UUID `json:"order_id"`
+	Reference string    `json:"reference"`
+	Amount    int64     `json:"amount"`
+	Status    Status    `json:"status"`
+	// Provider is "simulated" or "midtrans". For midtrans, the app opens
+	// RedirectURL so the buyer can pay on the Midtrans page.
+	Provider    string     `json:"provider"`
+	RedirectURL *string    `json:"redirect_url,omitempty"`
+	PaidAt      *time.Time `json:"paid_at"`
+	ExpiresAt   time.Time  `json:"expires_at"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 func ToResponse(p *Payment) Response {
 	return Response{
-		ID:        p.ID,
-		OrderID:   p.OrderID,
-		Reference: p.Reference,
-		Amount:    p.Amount,
-		Status:    p.Status,
-		PaidAt:    p.PaidAt,
-		ExpiresAt: p.ExpiresAt,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
+		ID:          p.ID,
+		OrderID:     p.OrderID,
+		Reference:   p.Reference,
+		Amount:      p.Amount,
+		Status:      p.Status,
+		Provider:    p.Provider,
+		RedirectURL: p.RedirectURL,
+		PaidAt:      p.PaidAt,
+		ExpiresAt:   p.ExpiresAt,
+		CreatedAt:   p.CreatedAt,
+		UpdatedAt:   p.UpdatedAt,
 	}
 }
 
@@ -104,6 +120,21 @@ func (r *GormRepository) FindByIdempotencyKey(ctx context.Context, key string) (
 		return nil, apperror.ErrNotFound
 	}
 	return &p, err
+}
+
+func (r *GormRepository) FindByReference(ctx context.Context, ref string) (*Payment, error) {
+	var p Payment
+	err := database.FromContext(ctx, r.db).First(&p, "reference = ?", ref).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, apperror.ErrNotFound
+	}
+	return &p, err
+}
+
+// SetCheckout stores the gateway token and payment page URL.
+func (r *GormRepository) SetCheckout(ctx context.Context, id uuid.UUID, token, redirectURL string) error {
+	return database.FromContext(ctx, r.db).Model(&Payment{}).Where("id = ?", id).
+		Updates(map[string]any{"gateway_token": token, "redirect_url": redirectURL}).Error
 }
 
 func (r *GormRepository) FindPendingByOrder(ctx context.Context, orderID uuid.UUID) (*Payment, error) {

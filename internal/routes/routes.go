@@ -81,6 +81,9 @@ func Register(app *fiber.App, h Handlers, authn fiber.Handler) {
 	o.Post("/:id/cancel", h.Order.Cancel)
 	o.Patch("/:id/status", admin, h.Order.UpdateStatus)
 
+	// Payment gateway webhook: authenticated by signature, not by login.
+	v1.Post("/webhooks/midtrans", h.Payment.MidtransNotification)
+
 	// Payments
 	pay := v1.Group("/payments", authn)
 	pay.Post("/", h.Payment.Create)

@@ -5,6 +5,7 @@ import (
 
 	"github.com/aulansah/rombong-api/internal/middleware"
 	"github.com/aulansah/rombong-api/internal/utils"
+	"github.com/aulansah/rombong-api/pkg/apperror"
 	"github.com/aulansah/rombong-api/pkg/response"
 )
 
@@ -76,4 +77,18 @@ func (h *Handler) SimulateFailure(c *fiber.Ctx) error {
 		return err
 	}
 	return response.OK(c, "Payment failed", ToResponse(p))
+}
+
+// MidtransNotification handles POST /webhooks/midtrans, the HTTP
+// notification Midtrans sends when a transaction changes status. It is not
+// behind login: the signature_key proves the sender.
+func (h *Handler) MidtransNotification(c *fiber.Ctx) error {
+	var n Notification
+	if err := c.BodyParser(&n); err != nil {
+		return apperror.BadRequest("Invalid notification body")
+	}
+	if err := h.svc.HandleNotification(c.UserContext(), n); err != nil {
+		return err
+	}
+	return response.OK(c, "Notification processed", nil)
 }
