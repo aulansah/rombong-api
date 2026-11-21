@@ -1,0 +1,55 @@
+# Render Blueprint: API (Docker) + PostgreSQL + Redis-compatible Key Value.
+# Dashboard > New > Blueprint > pick this repo. Fill the values marked
+# "sync: false" when Render asks for them.
+services:
+  - type: web
+    name: rombong-api
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_PORT
+        value: "10000"
+      - key: AUTO_MIGRATE
+        value: "true"
+      - key: DB_HOST
+        fromDatabase: { name: rombong-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: rombong-db, property: port }
+      - key: DB_USER
+        fromDatabase: { name: rombong-db, property: user }
+      - key: DB_PASSWORD
+        fromDatabase: { name: rombong-db, property: password }
+      - key: DB_NAME
+        fromDatabase: { name: rombong-db, property: database }
+      - key: DB_SSLMODE
+        value: prefer
+      - key: REDIS_ADDR
+        fromService: { type: keyvalue, name: rombong-cache, property: hostport }
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOW_ORIGINS
+        value: http://localhost:3000
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PAYMENT_PROVIDER
+        value: simulated # set to midtrans and fill the key for real sandbox payments
+      - key: MIDTRANS_SERVER_KEY
+        sync: false
+
+  - type: keyvalue
+    name: rombong-cache
+    plan: free
+    region: singapore
+    ipAllowList: [] # only reachable from services in this account
+
+databases:
+  - name: rombong-db
+    plan: free
+    region: singapore
+    databaseName: rombong
