@@ -79,6 +79,17 @@ type CacheConfig struct {
 
 type PaymentConfig struct {
 	Expiry time.Duration
+	// Provider is "simulated" (default, no real money) or "midtrans".
+	Provider string
+	Midtrans MidtransConfig
+}
+
+// MidtransConfig configures the Midtrans Snap gateway. BaseURL is empty in
+// normal use; it is derived from Production and only overridden in tests.
+type MidtransConfig struct {
+	ServerKey  string
+	Production bool
+	BaseURL    string
 }
 
 // AdminConfig seeds the first admin account at startup. Public registration
@@ -144,7 +155,14 @@ func Load() (*Config, error) {
 			ProductTTL:     v.GetDuration("CACHE_PRODUCT_TTL"),
 			ProductListTTL: v.GetDuration("CACHE_PRODUCT_LIST_TTL"),
 		},
-		Payment: PaymentConfig{Expiry: v.GetDuration("PAYMENT_EXPIRY")},
+		Payment: PaymentConfig{
+			Expiry:   v.GetDuration("PAYMENT_EXPIRY"),
+			Provider: strings.ToLower(strings.TrimSpace(v.GetString("PAYMENT_PROVIDER"))),
+			Midtrans: MidtransConfig{
+				ServerKey:  strings.TrimSpace(v.GetString("MIDTRANS_SERVER_KEY")),
+				Production: v.GetBool("MIDTRANS_PRODUCTION"),
+			},
+		},
 		Admin: AdminConfig{
 			Name:     v.GetString("ADMIN_NAME"),
 			Email:    strings.ToLower(strings.TrimSpace(v.GetString("ADMIN_EMAIL"))),
@@ -193,6 +211,9 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("CACHE_PRODUCT_LIST_TTL", "2m")
 
 	v.SetDefault("PAYMENT_EXPIRY", "30m")
+	v.SetDefault("PAYMENT_PROVIDER", "simulated")
+	v.SetDefault("MIDTRANS_SERVER_KEY", "")
+	v.SetDefault("MIDTRANS_PRODUCTION", false)
 
 	v.SetDefault("ADMIN_NAME", "Administrator")
 	v.SetDefault("ADMIN_EMAIL", "")
@@ -213,6 +234,15 @@ func (c *Config) validate() error {
 	}
 	if c.IsProduction() && strings.TrimSpace(c.CORS.AllowOrigins) == "*" {
 		return errors.New("CORS_ALLOW_ORIGINS must not be '*' in production")
+	}
+	switch c.Payment.Provider {
+	case "", "simulated":
+	case "midtrans":
+		if c.Payment.Midtrans.ServerKey == "" {
+			return errors.New("MIDTRANS_SERVER_KEY is required when PAYMENT_PROVIDER=midtrans")
+		}
+	default:
+		return errors.New("PAYMENT_PROVIDER must be 'simulated' or 'midtrans'")
 	}
 	return nil
 }

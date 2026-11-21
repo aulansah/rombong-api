@@ -74,7 +74,12 @@ func New(d Deps) *App {
 	productSvc := product.NewService(productRepo, categorySvc, d.Cache, d.Log, cfg.Cache.ProductTTL, cfg.Cache.ProductListTTL)
 	cartSvc := cart.NewService(cartRepo, productRepo)
 	orderSvc := order.NewService(orderRepo, cartRepo, productRepo, productSvc, txManager)
-	paymentSvc := payment.NewService(paymentRepo, orderRepo, txManager, cfg.Payment.Expiry)
+	var gateway payment.Gateway
+	if cfg.Payment.Provider == payment.ProviderMidtrans {
+		m := cfg.Payment.Midtrans
+		gateway = payment.NewMidtrans(m.ServerKey, m.Production, m.BaseURL)
+	}
+	paymentSvc := payment.NewService(paymentRepo, orderRepo, txManager, cfg.Payment.Expiry, gateway)
 
 	f := fiber.New(fiber.Config{
 		AppName:               cfg.App.Name,
